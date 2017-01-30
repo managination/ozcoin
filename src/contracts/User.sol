@@ -2,6 +2,7 @@ pragma solidity ^0.4.0;
 contract User{
 
     enum Role{
+        undefined,
         Administrator,
         Minter,
         Arbitrator,
@@ -36,7 +37,7 @@ contract User{
 
 
 
-    function getUserDetails(address _account) constant returns (bytes32,Role,string){
+    function getUserDetails(address _account) constant returns (bytes32 name, Role role, string details){
       return (users[_account].name,users[_account].role,users[_account].details);
 
     }

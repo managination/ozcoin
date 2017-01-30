@@ -8,33 +8,40 @@ contract Certificate {
   struct CertificateDetails{
 
     CertificateType certificateType;
-    bytes32 IPFSAddress;
-    bytes32 certificateID;
-
+    string IPFSAddress;
+    string certificateID;
   }
 
-  CertificateDetails [] certificates;
+  CertificateDetails [] private certificates;
 
-  function registerProofOfAsset(bytes32 _IPFSAddress,bytes32 _certificateID) external {
-    certificates.push(CertificateDetails({ certificateType : CertificateType.PoA, IPFSAddress : _IPFSAddress, certificateID : _certificateID}));
-  }
-
-
-  function registerAuditReport(bytes32 _IPFSAddress,bytes32 _reportID) external {
-    certificates.push(CertificateDetails({ certificateType : CertificateType.Audit, IPFSAddress : _IPFSAddress, certificateID : _reportID}));
-  }
-
-  function getAllCertificates() constant external returns (bytes32 [] ,bytes32 []  ){
-   bytes32 [] memory ID = new bytes32[](certificates.length);
-   bytes32 [] memory IPFS = new bytes32[](certificates.length);
-   for (uint256 ii=0;ii<certificates.length;ii++){
-      ID[ii] = certificates[ii].certificateID;
-      IPFS[ii] = certificates[ii].IPFSAddress;
+  modifier stringNotEmpty(string _input){
+    if(bytes(_input).length >0 ){
+      _;
     }
-    return (ID,IPFS);
   }
 
-  function getCertificateDetailsByIndex(uint256 index) constant external returns (CertificateType,bytes32,bytes32){
+  modifier validCertificateIndex(uint256 _index){
+    if(_index >=0 && _index < certificates.length){
+      _;
+    }
+  }
+
+  event CertificateAdded(CertificateType  cType,string  IPFS, string  ID);
+
+  function registerProofOfAsset(string _IPFSAddress,string _certificateID) external stringNotEmpty(_IPFSAddress) stringNotEmpty(_certificateID)  {
+    certificates.push(CertificateDetails({ certificateType : CertificateType.PoA, IPFSAddress : _IPFSAddress, certificateID : _certificateID}));
+    CertificateAdded(CertificateType.PoA,_IPFSAddress,_certificateID);
+  }
+
+
+  function registerAuditReport(string _IPFSAddress,string _reportID) external stringNotEmpty(_IPFSAddress) stringNotEmpty(_reportID){
+    certificates.push(CertificateDetails({ certificateType : CertificateType.Audit, IPFSAddress : _IPFSAddress, certificateID : _reportID}));
+    CertificateAdded(CertificateType.Audit,_IPFSAddress,_reportID);
+
+  }
+
+
+  function getCertificateDetailsByIndex(uint256 index) validCertificateIndex(index) constant external returns (CertificateType,string,string){
       return(certificates[index].certificateType,certificates[index].IPFSAddress,certificates[index].certificateID);
   }
 

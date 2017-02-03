@@ -1,22 +1,17 @@
-import React from 'react';
 import {Meteor} from 'meteor/meteor';
 import {render} from 'react-dom';
+import {renderRoutes} from './router';
+import React from 'react';
 
-import App from './App';
+import Wait from '../imports/components/Wait';
 
-Meteor.startup (() => {
+import {initializeKeystore} from '../imports/api/ethereum-services';
 
-    render (<App
-        visibleBoxShadow={true}
-        visibleToolbarTitle={true}
-        toolbarTitle={"Oz-Coins"}
-        drawerTitle={"Actions"}
-        toolbarProminent={true}
-        onMediaTypeChange={() => undefined}
-        setCustomTheme={() => undefined}
-        defaultMedia={'desktop'}
-        mobile={false}
-        tablet={false}
-        desktop={true}
-    />, document.getElementById ('render-target'));
+Meteor.startup(() => {
+    render(<Wait visible={true}/>, document.getElementById('render-target'));
+
+    initializeKeystore().then((keystore) => {
+        Session.set('initialized', true);
+        render(renderRoutes(), document.getElementById('render-target'));
+    })
 });

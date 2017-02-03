@@ -22,6 +22,7 @@ export default class WaitOverlay extends PureComponent {
                 {...this.state}
                 fullPage
                 aria-label="dialogLabel"
+                focusOnMount={false}
             >
                 <Toolbar
                     colored

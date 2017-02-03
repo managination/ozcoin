@@ -1,16 +1,16 @@
-import React, {PureComponent} from 'react';
 import {Meteor} from 'meteor/meteor';
 import {Accounts} from 'meteor/accounts-base'
-import {createContainer} from 'meteor/react-meteor-data';
+import TrackerReact from 'meteor/ultimatejs:tracker-react';
+import React, {PureComponent} from 'react';
 import Dialog from 'react-md/lib/Dialogs';
 import Button from 'react-md/lib/Buttons/Button';
 import TextField from 'react-md/lib/TextFields';
 import Toolbar from 'react-md/lib/Toolbars';
-import Wait from './Wait';
+import {browserHistory} from 'react-router';
 
 import {createKeystore} from '../api/ethereum-services'
 
-class RegistrationDialog extends PureComponent {
+export default class RegistrationDialog extends TrackerReact(PureComponent) {
     constructor (props) {
         super (props);
 
@@ -39,6 +39,7 @@ class RegistrationDialog extends PureComponent {
         let alias = this.refs.alias.getField().value;
         let email = this.refs.email.getField().value;
         let keystorePassword = this.refs.keystorePassword.getField().value;
+        Session.set('showWait', true);
         createKeystore(alias, email, keystorePassword)
             .then((keystore)=>{
                 let options = {
@@ -48,9 +49,11 @@ class RegistrationDialog extends PureComponent {
                     profile: {
                         fullName: alias
                     }
-                }
+                };
                 Accounts.createUser(options, (err) => {
+                    browserHistory.push(Session.get('initialLocation') || '/');
                     console.log("user creation error ", err);
+                    Session.set('showWait', false);
                 })
             })
             .catch((error) => {
@@ -59,7 +62,7 @@ class RegistrationDialog extends PureComponent {
     }
 
     render () {
-        Session.set("show-wait", false);
+        // Session.set("show-wait", false);
         const nav = <Button icon onClick={this._closeDialog}>close</Button>;
         const action = <Button raised label="Create keystore" onClick={this._createKeystore}/>;
         const dialogLabel = "Create new Keystore";
@@ -79,7 +82,7 @@ class RegistrationDialog extends PureComponent {
                         colored
                         nav={nav}
                         actions={action}
-                        title={toolbarTitle}
+                        title={toolbarTitle + ' ' + this.props.params.affiliate}
                         fixed
                     />
                     <form className="md-toolbar-relative md-grid" ref="keystoreCreation">
@@ -116,14 +119,8 @@ class RegistrationDialog extends PureComponent {
                         />
                     </form>
                 </Dialog>
-                <Wait/>
             </div>
         );
     }
 }
 
-export default createContainer (() => {
-    return {
-        user: Meteor.user (),
-    };
-}, RegistrationDialog);

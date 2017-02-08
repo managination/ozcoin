@@ -10,7 +10,6 @@ function approve(address _spender, uint256 _value) returns (bool success);
 function allowance(address _owner, address _spender) constant returns (uint256 remaining);
 
 function getTransactionFee() constant returns (uint256);
-function setTransactionFee(uint256 _fee) returns (bool success);
 
 function setPrice(bool isBuy,uint256 _price) returns (bool success);
 function getPrices(address _user) constant returns(uint256 _buyPrice,uint256 _sellPrice);
@@ -18,7 +17,6 @@ function getPrices(address _user) constant returns(uint256 _buyPrice,uint256 _se
 event Transfer(address indexed _from, address indexed _to, uint256 _value);
 event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
-event TransactionFeeChanged(uint256 oldFee, uint256 newFee);
 event UserPriceChange(address _user,bool isBuy,uint256 _price);
 
 

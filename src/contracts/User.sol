@@ -73,7 +73,11 @@ contract User is BaseContract{
         return userAccounts.length;
     }
 
-    function checkRegistration(address _account) returns (bool,Role){
+    function findUserRole(address _account) constant external returns (bool,Role){
+      return checkRegistration(_account);
+    }
+
+    function checkRegistration(address _account) constant returns (bool,Role){
       return ((users[_account].active==true),users[_account].role);
 
     }

@@ -9,59 +9,71 @@ import Toolbar from 'react-md/lib/Toolbars';
 import {browserHistory} from 'react-router';
 
 import {createKeystore} from '../api/ethereum-services'
+import {Profiles} from '../api/profiles.js';
+import {Roles} from '../api/profiles.js';
+
 
 export default class RegistrationDialog extends TrackerReact(PureComponent) {
-    constructor (props) {
-        super (props);
+    constructor(props) {
+        super(props);
 
-        this.state = { visible: true, pageX: 1, pageY: 1 };
-        this._openDialog = this._openDialog.bind (this);
-        this._closeDialog = this._closeDialog.bind (this);
-        this._createKeystore = this._createKeystore.bind (this);
+        this.state = {visible: true, pageX: 1, pageY: 1};
+        this._openDialog = this._openDialog.bind(this);
+        this._closeDialog = this._closeDialog.bind(this);
+        this._createKeystore = this._createKeystore.bind(this);
     }
 
-    _openDialog (e) {
-        let { pageX, pageY } = e;
+    _openDialog(e) {
+        let {pageX, pageY} = e;
         if (e.changedTouches) {
             const [touch] = e.changedTouches;
             pageX = touch.pageX;
             pageY = touch.pageY;
         }
 
-        this.setState ({ visible: true, pageX, pageY });
+        this.setState({visible: true, pageX, pageY});
     }
 
-    _closeDialog () {
-        this.setState ({ visible: false });
+    _closeDialog() {
+        this.setState({visible: false});
     }
 
-    _createKeystore () {
+    _createKeystore() {
+        let self = this;
         let alias = this.refs.alias.getField().value;
         let email = this.refs.email.getField().value;
         let keystorePassword = this.refs.keystorePassword.getField().value;
         Session.set('showWait', true);
         createKeystore(alias, email, keystorePassword)
-            .then((keystore)=>{
+            .then((keystore) => {
                 let options = {
                     username: keystore.username,
-                    email: email,
+                    email: keystore.username + '@ozcoin.eth',
                     password: keystore.password,
-                    profile: {
-                        fullName: alias
-                    }
                 };
                 Accounts.createUser(options, (err) => {
                     browserHistory.push(Session.get('initialLocation') || '/');
-                    console.log("user creation error ", err);
-                    Session.set('showWait', false);
+                    if (err) {
+                        console.log("user creation error ", err);
+                    } else {
+                        Profiles.insert({
+                            owner: Meteor.userId(),
+                            email: email,
+                            alias: alias,
+                            roles: [Roles.coinowner],
+                            address: keystore.username,
+                            affiliate: self.props.params.affiliate,
+                        });
+                        Session.set('showWait', false);
+                    }
                 })
             })
             .catch((error) => {
-
+                console.log("keystore creation error ", err);
             });
     }
 
-    render () {
+    render() {
         // Session.set("show-wait", false);
         const nav = <Button icon onClick={this._closeDialog}>close</Button>;
         const action = <Button raised label="Create keystore" onClick={this._createKeystore}/>;

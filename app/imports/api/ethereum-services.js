@@ -23,8 +23,9 @@ export const initializeKeystore = (() => {
                         Meteor.loginWithPassword(ks.username, ks.password, (err) => {
                             if (err)
                                 reject(err);
-                            else
+                            else {
                                 resolve(ks);
+                            }
                         });
                     })
                 }).then((keystore) => resolve(keystore)).catch((err) => reject(err))

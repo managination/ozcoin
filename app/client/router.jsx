@@ -11,7 +11,8 @@ export const renderRoutes = () => (
         <Route path="/" component={AppContainer}>
             <Route path="register/:affiliate" component={RegistrationDialog}/>
             <Route path="register" component={RegistrationDialog}/>
-            <Route path="*" component={UserDetails}/>
+            <Route path="edit-user/:email" component={UserDetails}/>
+            <Route path="edit-user" component={UserDetails}/>
         </Route>
     </Router>
 );

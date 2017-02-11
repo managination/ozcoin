@@ -5,6 +5,8 @@ import {keystore} from 'eth-lightwallet';
 import W3 from 'web3';
 import * as LocalStorage from 'meteor/simply:reactive-local-storage';
 
+import {Profiles} from './profiles';
+
 export const initializeKeystore = (() => {
     return new Promise((resolve, reject) => {
         let mnemonic = LocalStorage.getItem('mnemonic');
@@ -24,6 +26,9 @@ export const initializeKeystore = (() => {
                             if (err)
                                 reject(err);
                             else {
+                                Meteor.subscribe("current-profile", () => {
+                                    Session.set('currentProfile', {alias: Profiles.findOne({address: ks.username}).alias});
+                                })
                                 resolve(ks);
                             }
                         });

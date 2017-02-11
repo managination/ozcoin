@@ -60,7 +60,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                             owner: Meteor.userId(),
                             email: email,
                             alias: alias,
-                            roles: [Roles.coinowner],
+                            role: Roles.coinowner,
                             address: keystore.username,
                             affiliate: self.props.params.affiliate,
                         });

@@ -3,7 +3,7 @@ import {Profiles} from '../imports/api/profiles.js';
 Meteor.startup (() => {
 });
 
-Meteor.publish("profiles", () => {
+Meteor.publish("current-profile", function () {
     return Profiles.find({owner: this.userId});
 });
 

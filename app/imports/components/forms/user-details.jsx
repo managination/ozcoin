@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react';
-import TrackerReact from 'meteor/ultimatejs:tracker-react';
-import {ReactiveVar} from 'meteor/reactive-var'
+import { EJSON } from 'meteor/ejson';
 
 import SelectField from 'react-md/lib/SelectFields';
 import Button from 'react-md/lib/Buttons';
@@ -18,15 +17,12 @@ export default class UserDetails extends PureComponent {
         super(props);
         this.state = {
             activeForm: <Affiliate/>,
-            selectedForm: Roles.affiliate,
+            _id: false,
+            role: Roles.administrator,
             email: '',
-            user: {
-                _id: false,
-                role: Roles.administrator,
-                email: '',
-                companyName: '',
-            },
+            companyName: '',
         };
+        this.user = {};
         this.userDetailsForms = [
             {
                 name: 'Affiliate',
@@ -60,12 +56,12 @@ export default class UserDetails extends PureComponent {
         this._handleRoleChange.bind(this);
         this._handleChange.bind(this);
         this._handleSearch.bind(this);
+        this._handleSearchButton.bind(this);
         this._save.bind(this);
         this._reset.bind(this);
     }
 
     componentWillMount() {
-        console.log('user-details componentWillMount');
         if (this.props.params.email) {
             this._handleSearch(this.props.params.email);
             delete this.props.params.email;
@@ -73,46 +69,37 @@ export default class UserDetails extends PureComponent {
     }
 
     _handleRoleChange = (value, index, event) => {
-        this.setState({selectedForm: value});
+        this.user.role = value;
+        this.setState({role: value});
     };
 
     _handleChange = (value, event) => {
-        if (event.target.id === 'email' && this.state.user._id) {
+        if (event.target.id === 'email') {
             this._handleSearch(value);
         }
-        this.setState({email: value});
+        this.user[event.target.id] = value;
+        let change = {};
+        change[event.target.id] = value;
+        this.setState(change);
     };
 
     _handleSearch = (email) => {
         let self = this;
         if (this.profileSub) this.profileSub.stop();
         this.profileSub = Meteor.subscribe("user-profile", email, () => {
-            let user = Profiles.findOne({email: email}) || {_id: false, email: email || ''};
-            user.role = typeof user.role == 'undefined' ? Roles.minter : user.role;
-            user.companyName = user.companyName || '';
-            /*
-             this.user.email = user.email || ' ';
-             this.user.address1 = user.address1 || ' ';
-             this.user.address2 = user.address2 || ' ';
-             this.user.website = user.website || ' ';
-             this.user.city = user.city || ' ';
-             this.user.state = user.state || ' ';
-             this.user.zip = user.zip || ' ';
-             this.user.country = user.country || ' ';
-             */
-            self.setState({user: user});
-            self.setState({email: user.email || ''});
-
-            if (self.state.user.role) {
-                self.setState({selectedForm: self.state.user.role});
-            }
+            this.user = Profiles.findOne({email: email}) || {_id: false, email: email || ''};
+            self.setState(this.user);
         })
     };
+    
+    _handleSearchButton = () => {
+        this._handleSearch(this.state.email);
+    }
 
     _save = () => {
-        let user = this.state.user;
+        let user = EJSON.clone(this.user);
         delete user._id;
-        Profiles.update({_id: this.state.user._id}, {$set: user}, (err, docCount) => {
+        Profiles.update({_id: this.user._id}, {$set: user}, (err, docCount) => {
             console.log(err, docCount);
         });
     };
@@ -132,7 +119,7 @@ export default class UserDetails extends PureComponent {
                             id="states"
                             ref="state"
                             label="Select a user role"
-                            value={this.state.user.role}
+                            value={this.state.role}
                             menuItems={this.userDetailsForms}
                             itemLabel="name"
                             itemValue="formIdx"
@@ -150,7 +137,7 @@ export default class UserDetails extends PureComponent {
                             onChange={this._handleChange}
                             helpText="enter an e-mail address and press search"
                         />,
-                        <Button className="md-cell md-cell--4" flat primary label="Search" onClick={this._handleSearch}>
+                        <Button className="md-cell md-cell--4" flat primary label="Search" onClick={this._handleSearchButton}>
                             search
                         </Button>
                     </Toolbar>
@@ -164,9 +151,9 @@ export default class UserDetails extends PureComponent {
                             placeholder="Company Name"
                             className="md-cell md-cell--4"
                             required
-                            disabled={!this.state.user._id}
+                            disabled={!this.state._id}
                             onChange={this._handleChange}
-                            value={this.state.user.companyName}
+                            value={this.state.companyName}
                         />
                         {/*
                          < TextField

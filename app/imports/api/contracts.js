@@ -3,7 +3,7 @@ import {Mongo} from 'meteor/mongo';
 
 export const Contracts = new Mongo.Collection('eth-contracts');
 
-Profiles.deny({
+Contracts.deny({
     insert: function (userId, doc) {
         return !Meteor.isServer;
     },

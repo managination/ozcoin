@@ -9,11 +9,12 @@ Profiles.allow({
     },
     update: function (userId, doc, fields, modifier) {
         // can only change your own documents unless you are an admin
-        return doc.owner === userId || Profiles.find({role: Roles.administrator, address: userId}).count() > 0;
+        console.log(userId, ' is owner ', doc.owner, doc.owner === userId);
+        return doc.owner === userId || Profiles.find({role: Roles.administrator, owner: userId}).count() > 0;
     },
     remove: function (userId, doc) {
         // can only remove your own documents unless you are an admin
-        return doc.owner === userId || Profiles.find({role: Roles.administrator, address: userId}).count() > 0;
+        return doc.owner === userId || Profiles.find({role: Roles.administrator, owner: userId}).count() > 0;
     },
     fetch: ['owner']
 });

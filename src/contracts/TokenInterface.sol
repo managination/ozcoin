@@ -9,8 +9,10 @@ function transferFrom(address _from, address _to, uint256 _value) returns (bool 
 function approve(address _spender, uint256 _value) returns (bool success);
 function allowance(address _owner, address _spender) constant returns (uint256 remaining);
 
+function buyCoins (uint256 _amount,address _seller) payable returns (bool success);
+function sellCoins (uint256 _amount,address _buyer) returns (bool success);
+function withdrawEther () returns (bool success);
 function getTransactionFee() constant returns (uint256);
-
 function setPrice(bool isBuy,uint256 _price) returns (bool success);
 function getPrices(address _user) constant returns(uint256 _buyPrice,uint256 _sellPrice);
 

@@ -1,14 +1,11 @@
 import React, {PureComponent} from 'react';
-import { EJSON } from 'meteor/ejson';
+import {EJSON} from 'meteor/ejson';
 
 import SelectField from 'react-md/lib/SelectFields';
 import Button from 'react-md/lib/Buttons';
 import TextField from 'react-md/lib/TextFields';
 import Toolbar from 'react-md/lib/Toolbars';
-import BottomNavigation from 'react-md/lib/BottomNavigations';
 
-import Affiliate from './user-details/affiliates';
-import Auditor from './user-details/auditors';
 import {Roles} from '../../api/profiles';
 import {Profiles} from '../../api/profiles';
 
@@ -16,14 +13,24 @@ export default class UserDetails extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            activeForm: <Affiliate/>,
             _id: false,
             role: Roles.administrator,
             email: '',
             companyName: '',
+            website: '',
+            address1: '',
+            address2: '',
+            city: '',
+            zip: '',
+            state: '',
+            country: '',
         };
         this.user = {};
         this.userDetailsForms = [
+            {
+                name: 'Adminitrator',
+                formIdx: Roles.administrator
+            },
             {
                 name: 'Affiliate',
                 formIdx: Roles.affiliate
@@ -87,14 +94,14 @@ export default class UserDetails extends PureComponent {
         let self = this;
         if (this.profileSub) this.profileSub.stop();
         this.profileSub = Meteor.subscribe("user-profile", email, () => {
-            this.user = Profiles.findOne({email: email}) || {_id: false, email: email || ''};
+            this.user = Profiles.findOne({email: email}, {fields: {owner: 0}}) || {_id: false, email: email || ''};
             self.setState(this.user);
         })
     };
-    
+
     _handleSearchButton = () => {
         this._handleSearch(this.state.email);
-    }
+    };
 
     _save = () => {
         let user = EJSON.clone(this.user);
@@ -113,7 +120,7 @@ export default class UserDetails extends PureComponent {
         console.log("rendering user-details");
         return (
             <div>
-                <div className="toolbar-group md-toolbar-relative md-grid">
+                <div className="toolbar-group md-toolbar-relative">
                     <Toolbar themed>
                         <SelectField
                             id="states"
@@ -135,11 +142,14 @@ export default class UserDetails extends PureComponent {
                             className="md-cell md-cell--4"
                             required
                             onChange={this._handleChange}
-                            helpText="enter an e-mail address and press search"
+                            helpText="enter an e-mail address. The search is automatic"
                         />,
-                        <Button className="md-cell md-cell--4" flat primary label="Search" onClick={this._handleSearchButton}>
+                        {/*
+                         <Button className="md-cell md-cell--4" flat primary label="Search"
+                         onClick={this._handleSearchButton}>
                             search
                         </Button>
+                         */}
                     </Toolbar>
                 </div>
                 <div>
@@ -155,79 +165,77 @@ export default class UserDetails extends PureComponent {
                             onChange={this._handleChange}
                             value={this.state.companyName}
                         />
-                        {/*
-                         < TextField
-                         id="website"
-                         ref="website"
-                         label="Website"
-                         placeholder="Website"
-                         className="md-cell md-cell--4"
-                         required
-                         disabled={!this.state.user._id}
-                         value={this.state.user.website}
-                         onChange={this._handleChange}
-                         />
-                         < TextField
-                         id="address1"
-                         ref="address1"
-                         label="Address Line 1"
-                         placeholder="Address Line 1"
-                         className="md-cell md-cell--4"
-                         disabled={!this.state.user._id}
-                         value={this.state.user.address1}
-                         onChange={this._handleChange}
-                         />
-                         < TextField
-                         id="address2"
-                         ref="address2"
-                         label="Address Line 2"
-                         placeholder="Address Line 2"
-                         className="md-cell md-cell--4"
-                         disabled={!this.state.user._id}
-                         value={this.state.user.address2}
-                         onChange={this._handleChange}
-                         />
-                         < TextField
-                         id="city"
-                         ref="city"
-                         label="City"
-                         placeholder="City"
-                         className="md-cell md-cell--4"
-                         disabled={!this.state.user._id}
-                         value={this.state.user.city}
-                         onChange={this._handleChange}
-                         />
-                         < TextField
-                         id="state"
-                         ref="state"
-                         label="State / Province"
-                         placeholder="State / Province"
-                         className="md-cell md-cell--4"
-                         disabled={!this.state.user._id}
-                         value={this.state.user.state}
-                         onChange={this._handleChange}
-                         />
-                         < TextField
-                         id="zip"
-                         ref="zip"
-                         label="Post Code"
-                         placeholder="Post Code"
-                         className="md-cell md-cell--4"
-                         disabled={!this.state.user._id}
-                         value={this.state.user.zip}
-                         onChange={this._handleChange}
-                         />
-                         < TextField
-                         id="country"
-                         ref="country"
-                         label="Country"
-                         placeholder="Country"
-                         className="md-cell md-cell--4"
-                         disabled={!this.state.user._id}
-                         value={this.state.user.country}
-                         onChange={this._handleChange}
-                         />
-                         */}
+                        < TextField
+                            id="website"
+                            ref="website"
+                            label="Website"
+                            placeholder="Website"
+                            className="md-cell md-cell--4"
+                            required
+                            disabled={!this.state._id}
+                            value={this.state.website}
+                            onChange={this._handleChange}
+                        />
+                        < TextField
+                            id="address1"
+                            ref="address1"
+                            label="Address Line 1"
+                            placeholder="Address Line 1"
+                            className="md-cell md-cell--4"
+                            disabled={!this.state._id}
+                            value={this.state.address1}
+                            onChange={this._handleChange}
+                        />
+                        < TextField
+                            id="address2"
+                            ref="address2"
+                            label="Address Line 2"
+                            placeholder="Address Line 2"
+                            className="md-cell md-cell--4"
+                            disabled={!this.state._id}
+                            value={this.state.address2}
+                            onChange={this._handleChange}
+                        />
+                        < TextField
+                            id="city"
+                            ref="city"
+                            label="City"
+                            placeholder="City"
+                            className="md-cell md-cell--4"
+                            disabled={!this.state._id}
+                            value={this.state.city}
+                            onChange={this._handleChange}
+                        />
+                        < TextField
+                            id="state"
+                            ref="state"
+                            label="State / Province"
+                            placeholder="State / Province"
+                            className="md-cell md-cell--4"
+                            disabled={!this.state._id}
+                            value={this.state.state}
+                            onChange={this._handleChange}
+                        />
+                        < TextField
+                            id="zip"
+                            ref="zip"
+                            label="Post Code"
+                            placeholder="Post Code"
+                            className="md-cell md-cell--4"
+                            disabled={!this.state._id}
+                            value={this.state.zip}
+                            onChange={this._handleChange}
+                        />
+                        < TextField
+                            id="country"
+                            ref="country"
+                            label="Country"
+                            placeholder="Country"
+                            className="md-cell md-cell--4"
+                            disabled={!this.state._id}
+                            value={this.state.country}
+                            onChange={this._handleChange}
+                        />
                     </form>
 
                 </div>

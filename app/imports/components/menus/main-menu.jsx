@@ -4,47 +4,44 @@ import {browserHistory} from 'react-router';
 
 import {Roles} from '../../api/profiles';
 
-export default entries = (user, tracker) => {
+export default entries = (user, path) => {
+
     return [{
         key: 'edit-user',
-        primaryText: 'Register User',
+        primaryText: 'Edit User Details',
         leftIcon: <FontIcon>android</FontIcon>,
-        role: Roles.all,
-        active: tracker.get().key == 'edit-user',
+        roles: [Roles.administrator],
+        active: path.indexOf('edit-user') > -1,
         onClick: () => browserHistory.push('/edit-user'),
     }, {
         key: 'wallet',
         primaryText: 'Wallet',
         leftIcon: <FontIcon>account_balance_wallet</FontIcon>,
-        role: Roles.all,
-        active: tracker.get().key == 'wallet',
+        roles: [Roles.all],
+        active: path.indexOf('wallet') > -1,
         onClick: () => browserHistory.push('/wallet'),
     }, {
         key: 'upoload-certificate',
         primaryText: 'Proof of Asset',
         leftIcon: <FontIcon>fingerprint</FontIcon>,
-        role: Roles.all,
-        active: tracker.get().key == 'upoload-certificate',
+        roles: [Roles.certificatecreator, Roles.administrator],
+        active: path.indexOf('upload/certificate') > -1,
         onClick: () => browserHistory.push('/upload/certificate'),
     }, {
         key: 'upload-audit-report',
         primaryText: 'Audit Report',
         leftIcon: <FontIcon>send</FontIcon>,
-        role: Roles.all,
-        active: tracker.get().key == 'upload-audit-report',
-        onClick: () => browserHistory.push('/upload/audit'),
+        roles: [Roles.auditor, Roles.administrator],
+        active: path.indexOf('upload/audit-report') > -1,
+        onClick: () => browserHistory.push('/upload/audit-report'),
     }, /*{ key: 'divider', divider: true },*/].map((entry) => {
         if (entry.key === 'divider') return entry;
 
         try {
-            if (entry.role == Roles.all || user.profile.roles.indexOf(entry.role) >= 0) {
-                delete entry.role;
-                // entry.active = tracker.get('activeMenu').key == entry.key;
+            if (entry.roles.indexOf(Roles.all) > -1 || entry.roles.indexOf(user.role) > -1) {
+                delete entry.roles;
                 let click = entry.onClick;
                 entry.onClick = (event) => {
-                    entry.active = true;
-                    tracker.get().active = false;
-                    tracker.set(entry);
                     if (typeof click == 'function') {
                         click();
                     }

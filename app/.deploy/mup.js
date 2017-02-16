@@ -16,10 +16,17 @@ module.exports = {
             one: {},
         },
         buildOptions: {
-            serverOnly: true,
+            serverOnly: false,
+            debug: true,
+        },
+        ssl: {
+            autogenerate: {
+                email: 'micha@ozcoin.local',
+                domains: 'app.ozcoin.local'
+            }
         },
         env: {
-            ROOT_URL: 'ozcoin.mngn.io',
+            ROOT_URL: '13.90.153.50',
             MONGO_URL: 'mongodb://localhost/meteor',
         },
 

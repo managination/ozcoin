@@ -27,8 +27,12 @@ export const initializeKeystore = (() => {
                                 reject(err);
                             else {
                                 Meteor.subscribe("current-profile", () => {
-                                    Session.set('currentProfile', {alias: Profiles.findOne({address: ks.username}).alias});
-                                })
+                                    let profile = Profiles.findOne({address: ks.username});
+                                    if (profile)
+                                        Session.set('currentProfile', {alias: profile.alias});
+                                    else
+                                        console.log("could not find profile for ", ks.username);
+                                });
                                 resolve(ks);
                             }
                         });

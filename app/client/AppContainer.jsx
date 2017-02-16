@@ -1,6 +1,5 @@
 import {Meteor} from 'meteor/meteor';
 import {Session} from 'meteor/session'
-import {ReactiveVar} from 'meteor/reactive-var'
 import TrackerReact from 'meteor/ultimatejs:tracker-react';
 import {browserHistory} from 'react-router';
 
@@ -10,7 +9,6 @@ import NavigationDrawer from 'react-md/lib/NavigationDrawers';
 import Button from 'react-md/lib/Buttons';
 import MenuButton from 'react-md/lib/Menus/MenuButton';
 import ListItem from 'react-md/lib/Lists/ListItem';
-import FontIcon from 'react-md/lib/FontIcons';
 
 import Wait from '../imports/components/Wait';
 import {Profiles} from '../imports/api/profiles';
@@ -20,12 +18,12 @@ export default class AppContainer extends TrackerReact(PureComponent) {
     constructor(props) {
         super(props);
         this.state = {
-            activeMenu: new ReactiveVar({key: 'none'}, (oldVal, newVal) => oldVal.key && newVal.key && oldVal.key == newVal.key)
+
         };
         Session.set("showWait", false);
         Session.set('currentProfile', {alias: 'Please login'});
 
-        Meteor.subscribe('profiles', () => {
+        Meteor.subscribe('current-profile', () => {
             if (Profiles.find({}).count() == 0) {
                 Session.set('currentProfile', {alias: 'Please login'});
             } else {
@@ -70,9 +68,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         this.state.initialized = Session.get('initialized');
         this.state.showWait = Session.get("showWait");
 
-        const menuItems = menuEntries(Meteor.user(), this.state.activeMenu);
-        this.state.activeMenu.set(this.state.activeMenu.get().key != 'none' ? this.state.activeMenu.get() : menuItems[0]);
-        this.state.activeMenu.get().active = true;
+        const menuItems = menuEntries(Session.get('currentProfile'), this.props.location.pathname);
 
         // const { children } = this.props;
         if (this.state.initialized) {

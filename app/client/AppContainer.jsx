@@ -11,25 +11,17 @@ import MenuButton from 'react-md/lib/Menus/MenuButton';
 import ListItem from 'react-md/lib/Lists/ListItem';
 
 import Wait from '../imports/components/Wait';
-import {Profiles} from '../imports/api/profiles';
+import {Profiles} from '../imports/api/model/profiles';
 import menuEntries from '../imports/components/menus/main-menu';
+import {add0x} from '../imports/api/ethereum-services';
 
 export default class AppContainer extends TrackerReact(PureComponent) {
     constructor(props) {
         super(props);
-        this.state = {
-
-        };
+        this.state = {};
         Session.set("showWait", false);
         Session.set('currentProfile', {alias: 'Please login'});
 
-        Meteor.subscribe('current-profile', () => {
-            if (Profiles.find({}).count() == 0) {
-                Session.set('currentProfile', {alias: 'Please login'});
-            } else {
-                Session.set('currentProfile', Profiles.findOne({address: Meteor.user().username}))
-            }
-        });
         console.log("constructing app.jsx");
     }
 
@@ -37,9 +29,16 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         console.log("componentWillMount app.jsx");
         const user = Meteor.user();
         if (user) {
-            if (this.props.location.pathname.indexOf('register') >= 0) {
-                browserHistory.push('/');
-            }
+            Meteor.subscribe("current-profile", () => {
+                let profile = Profiles.findOne({address: add0x(user.username)});
+                Session.set('currentProfile', profile || {alias: "not logged in"});
+
+                if (this.props.location.pathname.indexOf('register') >= 0) {
+                    browserHistory.push('/edit-user/' + profile.email);
+                } else if (this.props.location.pathname == '/') {
+                    browserHistory.push('/wallet');
+                }
+            });
         } else {
             if (this.props.location.pathname.indexOf('register') == -1) {
                 Session.set('initialLocation', this.props.location.pathname);
@@ -59,8 +58,13 @@ export default class AppContainer extends TrackerReact(PureComponent) {
             <Button key="search" icon>search</Button>,
             <MenuButton id="aliases" buttonChildren="more_vert" key="menu" icon>
                 {Profiles.find().fetch().map((profile) => {
-                    return <ListItem key={profile._id} primaryText={profile.alias}
-                                     onClick={Session.set('activeProfile', profile)}/>;
+                    return (
+                        <ListItem key={profile._id} primaryText={profile.alias}
+                                  onClick={() => {
+                                      Session.set('currentProfile', profile)
+                                  }}/>
+
+                    );
                 })}
             </MenuButton>
         ];

@@ -2,7 +2,7 @@ import React from 'react';
 import FontIcon from 'react-md/lib/FontIcons';
 import {browserHistory} from 'react-router';
 
-import {Roles} from '../../api/profiles';
+import {Roles} from '../../api/model/profiles';
 
 export default entries = (user, path) => {
 
@@ -10,7 +10,7 @@ export default entries = (user, path) => {
         key: 'edit-user',
         primaryText: 'Edit User Details',
         leftIcon: <FontIcon>android</FontIcon>,
-        roles: [Roles.administrator],
+        roles: [Roles.all],
         active: path.indexOf('edit-user') > -1,
         onClick: () => browserHistory.push('/edit-user'),
     }, {

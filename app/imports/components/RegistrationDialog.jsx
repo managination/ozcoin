@@ -9,8 +9,8 @@ import Toolbar from 'react-md/lib/Toolbars';
 import {browserHistory} from 'react-router';
 
 import {createKeystore} from '../api/ethereum-services'
-import {Profiles} from '../api/profiles.js';
-import {Roles} from '../api/profiles.js';
+import {Profiles} from '../api/model/profiles.js';
+import {Roles} from '../api/model/profiles.js';
 
 
 export default class RegistrationDialog extends TrackerReact(PureComponent) {
@@ -42,17 +42,20 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
         let self = this;
         let alias = this.refs.alias.getField().value;
         let email = this.refs.email.getField().value;
+        let mnemonic = this.refs.mnemonic.getField().value;
+
         let keystorePassword = this.refs.keystorePassword.getField().value;
         Session.set('showWait', true);
-        createKeystore(alias, email, keystorePassword)
+        createKeystore(alias, email, keystorePassword, null, mnemonic)
             .then((keystore) => {
+                Session.set('keystore', keystore);
                 let options = {
                     username: keystore.username,
                     email: keystore.username + '@ozcoin.eth',
                     password: keystore.password,
                 };
                 Accounts.createUser(options, (err) => {
-                    browserHistory.push(Session.get('initialLocation') || '/');
+                    browserHistory.push(Session.get('initialLocation') || '/wallet');
                     if (err) {
                         console.log("user creation error ", err);
                     } else {
@@ -61,8 +64,9 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                             email: email,
                             alias: alias,
                             role: Roles.coinowner,
-                            address: keystore.username,
+                            address: '0x' + keystore.username,
                             affiliate: self.props.params.affiliate,
+                            nonce: 1,
                         });
                         Session.set('showWait', false);
                     }
@@ -128,6 +132,15 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                             customSize="title"
                             className="md-cell md-cell--12"
                             required
+                        />
+                        <TextField
+                            id="mnemonic"
+                            ref="mnemonic"
+                            label="mnemonic"
+                            placeholder="if you know your mnemonic paste it here"
+                            customSize="title"
+                            className="md-cell md-cell--12"
+                            helpText="if you do not provide a mnemonic a random one will be created for you"
                         />
                     </form>
                 </Dialog>

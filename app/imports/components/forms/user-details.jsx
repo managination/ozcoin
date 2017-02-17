@@ -6,8 +6,8 @@ import Button from 'react-md/lib/Buttons';
 import TextField from 'react-md/lib/TextFields';
 import Toolbar from 'react-md/lib/Toolbars';
 
-import {Roles} from '../../api/profiles';
-import {Profiles} from '../../api/profiles';
+import {Roles} from '../../api/model/profiles';
+import {Profiles} from '../../api/model/profiles';
 
 export default class UserDetails extends PureComponent {
     constructor(props) {

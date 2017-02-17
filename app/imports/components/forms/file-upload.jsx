@@ -2,6 +2,9 @@ import React, {PureComponent} from 'react';
 import FileInput from 'react-md/lib/FileInputs';
 import Button from 'react-md/lib/Buttons';
 import TextField from 'react-md/lib/TextFields';
+import {signing} from 'eth-lightwallet';
+import {wallet} from '../../api/ethereum-services';
+import {add0x} from '../../api/ethereum-services';
 
 export default class FileUpload extends PureComponent {
     constructor(props) {
@@ -10,8 +13,7 @@ export default class FileUpload extends PureComponent {
         this.state = {
             file: null,
             fileName: '',
-            visible: false,
-            progress: 0,
+            documentId: '',
         };
 
         this._interval = null;
@@ -25,18 +27,41 @@ export default class FileUpload extends PureComponent {
         if (!file) {
             return;
         }
-        this.setState({file, fileName: file.name});
+        this.setState({file, fileName: file.name, documentId: file.name});
     };
 
-    _handleChange = (value) => {
-        this.setState({fileName: value});
+    _handleChange = (value, event) => {
+        if (event.target.id === 'email') {
+            this._handleSearch(value);
+        }
+        let change = {};
+        change[event.target.id] = value;
+        this.setState(change);
     };
 
     _uploadFile = () => {
         let fileName = this.state.fileName;
+        let documentId = this.state.documentId;
         let reader = new FileReader();
+        let docType = this.props.params.docType;
         reader.onload = function (fileLoadEvent) {
-            Meteor.call('file-upload', fileName, reader.result);
+            Meteor.call('file-upload', docType, fileName, documentId, reader.result, (err, rawTx) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    /*
+                     let privateKey = wallet.keystore.exportPrivateKey('0x' + Meteor.user().username, wallet.pwDerivedKey);
+                     let tx = new Tx(rawTx);
+                     tx.sign(Buffer.from(privateKey, 'hex'));
+
+                     let signedTxString = tx.serialize();
+                     */
+                    let signedTxString = signing.signTx(wallet.keystore, wallet.pwDerivedKey, add0x(rawTx), add0x(Meteor.user().username));
+                    Meteor.call('submit-raw-tx', add0x(signedTxString.toString('hex')), (err, result) => {
+                        console.log(err, result);
+                    });
+                }
+            });
         };
         reader.readAsBinaryString(this.state.file);
     };
@@ -55,6 +80,16 @@ export default class FileUpload extends PureComponent {
                         className="md-cell md-cell--6"
                         disabled={!this.state.file}
                         value={this.state.fileName}
+                        onChange={this._handleChange}
+                    />
+                    < TextField
+                        id="documentId"
+                        ref="documentId"
+                        label="Document ID"
+                        placeholder="Document ID"
+                        className="md-cell md-cell--6"
+                        disabled={!this.state.file}
+                        value={this.state.documentId}
                         onChange={this._handleChange}
                     />
                     <div className="file-block md-cell md-cell--12">

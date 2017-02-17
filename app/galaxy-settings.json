@@ -1,0 +1,7 @@
+{
+  "galaxy.meteor.com": {
+    "env": {
+      "MONGO_URL": "mongodb://ozcoin:Q309JyQeyUPXHmBC4OqENX3@ds155469-a0.mlab.com:55469,ds155469-a1.mlab.com:55469/ozcoin?replicaSet=rs-ds155469"
+    }
+  }
+}

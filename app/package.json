@@ -8,6 +8,8 @@
     "babel-runtime": "6.18.0",
     "bcrypt": "^1.0.2",
     "eth-lightwallet": "^2.5.3",
+    "ethereumjs-tx": "^1.2.5",
+    "fibers": "^1.0.15",
     "ipfs-api": "^12.1.4",
     "meteor-node-stubs": "~0.2.0",
     "react": "^15.4.2",

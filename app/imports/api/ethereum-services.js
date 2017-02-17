@@ -5,7 +5,7 @@ import {keystore} from 'eth-lightwallet';
 import W3 from 'web3';
 import * as LocalStorage from 'meteor/simply:reactive-local-storage';
 
-import {Profiles} from './profiles';
+import {Profiles} from './model/profiles';
 
 export const initializeKeystore = (() => {
     return new Promise((resolve, reject) => {
@@ -16,7 +16,7 @@ export const initializeKeystore = (() => {
             let salt = LocalStorage.getItem('salt');
             let alias = LocalStorage.getItem('alias');
             let email = LocalStorage.getItem('email');
-            //TODO: remove password from localstorage
+            //TODO: remove password from localstorage and ask the user to enter it
             let password = LocalStorage.getItem('password');
 
             createKeystore(alias, email, password, salt, mnemonic)
@@ -26,13 +26,6 @@ export const initializeKeystore = (() => {
                             if (err)
                                 reject(err);
                             else {
-                                Meteor.subscribe("current-profile", () => {
-                                    let profile = Profiles.findOne({address: ks.username});
-                                    if (profile)
-                                        Session.set('currentProfile', {alias: profile.alias});
-                                    else
-                                        console.log("could not find profile for ", ks.username);
-                                });
                                 resolve(ks);
                             }
                         });
@@ -44,16 +37,18 @@ export const initializeKeystore = (() => {
     })
 });
 
+let initialisedWeb3 = undefined;
 export const getWeb3 = () => {
-    let w3 = Session.get('localWeb3');
+    let w3 = initialisedWeb3;
     if (!w3) {
         let provider = new W3.providers.HttpProvider('http://localhost:8545');
         w3 = new W3(provider);
-        Session.set('localWeb3', w3);
+        initialisedWeb3 = w3;
     }
     return w3;
 };
 
+export let wallet = undefined;
 export const createKeystore = (alias, email, password, salt, mnemonic) => {
     let _resolve;
     let _reject;
@@ -64,6 +59,8 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
         // Allowing you to only decrypt private keys on an as-needed basis.
         // You can generate that value with this convenient method:
         ks.keyFromPassword(password, (err, pwDerivedKey) => {
+            wallet = {keystore: ks, pwDerivedKey: pwDerivedKey};
+
             if (err) _reject(err);
 
             // generate one new address/private key pair
@@ -90,15 +87,25 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
         });
     };
 
+    if (mnemonic && salt) {
+        return new Promise((resolve, reject) => {
+            _resolve = resolve;
+            _reject = reject;
+            keystore.createVault({
+                password: password,
+                seedPhrase: mnemonic,
+                salt: salt
+            }, keystoreCallback);
+
+        });
+    }
     if (mnemonic) {
         return new Promise((resolve, reject) => {
             _resolve = resolve;
             _reject = reject;
             keystore.createVault({
                 password: password,
-                seedPhrase: mnemonic, // Optionally provide a 12-word seed phrase
-                salt: salt
-                // hdPathString: hdPath    // Optional custom HD Path String
+                seedPhrase: mnemonic,
             }, keystoreCallback);
 
         });
@@ -112,4 +119,14 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
 
     });
 
+};
+
+export const add0x = (input) => {
+    if (typeof(input) !== 'string') {
+        return input;
+    } else if (input.length < 2 || input.slice(0, 2) !== '0x') {
+        return '0x' + input;
+    } else {
+        return input;
+    }
 };

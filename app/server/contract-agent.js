@@ -7,6 +7,7 @@ let nameRegistryContract = getWeb3().eth.contract(nameRegistry.abi).at(nameRegis
 const getContracts = (name) => {
     try {
         let contract = nameRegistryContract.getContractDetails.call(name);
+        // console.log("contract: ", name, 'address:', contract[0]);
         Contracts.upsert({name: name}, {name: name, address: contract[0], abi: contract[1]});
     } catch (err) {
         console.log(err);
@@ -14,9 +15,11 @@ const getContracts = (name) => {
 };
 
 Meteor.startup(() => {
+    /*
     Meteor.setInterval(() => {
         getContracts("User");
         getContracts("Certificate");
     }, 10000);
+     */
 });
 

@@ -2,8 +2,8 @@ import React from 'react';
 import {Router, Route, browserHistory} from 'react-router';
 
 // route components
-import AppContainer from './AppContainer';
-import RegistrationDialog from '../imports/components/RegistrationDialog';
+import AppContainer from './appContainer';
+import RegistrationDialog from '../imports/components/registrationDialog';
 import UserDetails from '../imports/components/forms/user-details';
 import FileUpload from '../imports/components/forms/file-upload';
 import Wallet from '../imports/components/wallet';

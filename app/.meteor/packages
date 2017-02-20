@@ -26,3 +26,6 @@ promise@0.8.8
 session@1.1.7
 ostrio:files
 ultimatejs:tracker-react
+email
+deanius:promise
+momentjs:moment

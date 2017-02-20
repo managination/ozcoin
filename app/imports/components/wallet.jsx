@@ -18,6 +18,10 @@ export default class Wallet extends PureComponent {
         this._submitTx.bind(this);
     }
 
+    componentWillMount() {
+        console.log("wallet will mount");
+    }
+
     _submitTx = () => {
         let privateKey = wallet.keystore.exportPrivateKey('0x' + Meteor.user().username, wallet.pwDerivedKey);
         Meteor.call('submit-predefined-tx', privateKey);

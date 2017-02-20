@@ -1,12 +1,21 @@
 import React, {PureComponent} from 'react';
+import TrackerReact from 'meteor/ultimatejs:tracker-react';
+
 import FileInput from 'react-md/lib/FileInputs';
 import Button from 'react-md/lib/Buttons';
 import TextField from 'react-md/lib/TextFields';
-import {signing} from 'eth-lightwallet';
-import {wallet} from '../../api/ethereum-services';
-import {add0x} from '../../api/ethereum-services';
+import List from 'react-md/lib/Lists/List';
+import ListItem from 'react-md/lib/Lists/ListItem';
+import Avatar from 'react-md/lib/Avatars';
+import FontIcon from 'react-md/lib/FontIcons';
+import Subheader from 'react-md/lib/Subheaders';
+import {signAndSubmit} from '../../api/ethereum-services';
 
-export default class FileUpload extends PureComponent {
+import {Documents} from '../../api/model/documents';
+
+const InfoIcon = () => <FontIcon>info</FontIcon>;
+
+export default class FileUpload extends TrackerReact(PureComponent) {
     constructor(props) {
         super(props);
 
@@ -16,11 +25,12 @@ export default class FileUpload extends PureComponent {
             documentId: '',
         };
 
-        this._interval = null;
-
         this._selectFile.bind(this);
         this._handleChange.bind(this);
         this._uploadFile.bind(this);
+
+        Meteor.subscribe('documents');
+
     }
 
     _selectFile = (file) => {
@@ -40,28 +50,24 @@ export default class FileUpload extends PureComponent {
     };
 
     _uploadFile = () => {
+        Session.set("showWait", true);
         let fileName = this.state.fileName;
         let documentId = this.state.documentId;
         let reader = new FileReader();
         let docType = this.props.params.docType;
         reader.onload = function (fileLoadEvent) {
-            Meteor.call('file-upload', docType, fileName, documentId, reader.result, (err, rawTx) => {
-                if (err) {
+            Session.set("showWait", true);
+            Meteor
+                .callPromise('file-upload', docType, fileName, documentId, reader.result)
+                .then((rawTx) => {
+                    signAndSubmit(rawTx, true)
+                        .then(() => Session.set("showWait", false))
+                        .catch(() => Session.set("showWait", false));
+                })
+                .catch((err) => {
                     console.log(err);
-                } else {
-                    /*
-                     let privateKey = wallet.keystore.exportPrivateKey('0x' + Meteor.user().username, wallet.pwDerivedKey);
-                     let tx = new Tx(rawTx);
-                     tx.sign(Buffer.from(privateKey, 'hex'));
-
-                     let signedTxString = tx.serialize();
-                     */
-                    let signedTxString = signing.signTx(wallet.keystore, wallet.pwDerivedKey, add0x(rawTx), add0x(Meteor.user().username));
-                    Meteor.call('submit-raw-tx', add0x(signedTxString.toString('hex')), (err, result) => {
-                        console.log(err, result);
-                    });
-                }
-            });
+                    Session.set("showWait", false);
+                });
         };
         reader.readAsBinaryString(this.state.file);
     };
@@ -109,6 +115,25 @@ export default class FileUpload extends PureComponent {
                         >cloud_upload</Button>
                     </div>
                 </form>
+                <div className="md-grid">
+                    <List className="md-cell md-cell--10 md-paper md-paper--1">
+                        <Subheader primaryText="Existing Files"/>
+                        {
+                            Documents.find({docType: this.props.params.docType}).fetch().map((doc) => {
+                                return <ListItem
+                                    key={doc._id}
+                                    leftAvatar={<Avatar icon={<FontIcon>insert_drive_file</FontIcon>}/>}
+                                    rightIcon={<InfoIcon />}
+                                    primaryText={doc.documentId}
+                                    secondaryText={moment(doc.uploadTime).format('DD.MM.YYYY, HH:mm:ss')}
+                                    onClick={() => {
+                                        window.open('https://ipfs.infura.io/ipfs/' + doc.hash)
+                                    }}
+                                />
+                            })
+                        }
+                    </List>
+                </div>
             </div>
         )
     }

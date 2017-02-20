@@ -9,8 +9,10 @@ import NavigationDrawer from 'react-md/lib/NavigationDrawers';
 import Button from 'react-md/lib/Buttons';
 import MenuButton from 'react-md/lib/Menus/MenuButton';
 import ListItem from 'react-md/lib/Lists/ListItem';
+import CopyToClipboard from 'react-copy-to-clipboard';
+import Snackbar from 'react-md/lib/Snackbars';
 
-import Wait from '../imports/components/Wait';
+import Wait from '../imports/components/wait';
 import {Profiles} from '../imports/api/model/profiles';
 import menuEntries from '../imports/components/menus/main-menu';
 import {add0x} from '../imports/api/ethereum-services';
@@ -18,11 +20,18 @@ import {add0x} from '../imports/api/ethereum-services';
 export default class AppContainer extends TrackerReact(PureComponent) {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            copiedAddress: '',
+            toasts: [],
+            autohide: true,
+            autohideTimeout: 0,
+        };
         Session.set("showWait", false);
         Session.set('currentProfile', {alias: 'Please login'});
 
-        console.log("constructing app.jsx");
+        this._showToast = this._showToast.bind(this);
+        this._removeToast = this._removeToast.bind(this);
+
     }
 
     componentWillMount() {
@@ -51,6 +60,22 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         console.log("componentWillReceiveProps app.jsx");
     }
 
+    _showToast() {
+        const text = "address copied", action = undefined;
+        const toasts = this.state.toasts.slice();
+        toasts.push({text, action});
+
+        const words = text.split(' ').length;
+        const autohideTimeout = Snackbar.defaultProps.autohideTimeout;
+
+        this.setState({toasts, autohideTimeout});
+    };
+
+    _removeToast() {
+        const [, ...toasts] = this.state.toasts;
+        this.setState({toasts});
+    }
+
     render() {
         console.log("rendering app.jsx");
 
@@ -73,6 +98,17 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         this.state.showWait = Session.get("showWait");
 
         const menuItems = menuEntries(Session.get('currentProfile'), this.props.location.pathname);
+        const toolbarTitle = (<div>
+                <span>{Session.get('currentProfile').alias}</span>
+                <span> - </span>
+                <CopyToClipboard text={Session.get('currentProfile').address || ''}
+                                 onCopy={this._showToast}>
+                    <Button flat iconBefore={false}
+                            label={Session.get('currentProfile').address}
+                            tooltipLabel="click here to copy the address">content_copy</Button>
+                </CopyToClipboard>
+            </div>
+        );
 
         // const { children } = this.props;
         if (this.state.initialized) {
@@ -84,13 +120,14 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                     desktopDrawerType={NavigationDrawer.DrawerTypes.FULL_HEIGHT}
                     contentClassName="md-grid"
                     autoclose={true}
-                    toolbarTitle={Session.get('currentProfile').alias}
+                    toolbarTitle={toolbarTitle}
                     toolbarActions={this.actions}
                 >
                     <div>
                         {this.props.children}
                         <Wait visible={this.state.showWait}/>
                     </div>
+                    <Snackbar toasts={this.state.toasts} autohide={this.state.autohide} onDismiss={this._removeToast}/>
                 </NavigationDrawer>
             );
         } else {
@@ -98,5 +135,6 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                 <Wait visible={true}/>
             )
         }
+
     }
 }

@@ -4,6 +4,7 @@ import {Session} from 'meteor/session'
 import {keystore} from 'eth-lightwallet';
 import W3 from 'web3';
 import * as LocalStorage from 'meteor/simply:reactive-local-storage';
+import {signing} from 'eth-lightwallet';
 
 import {Profiles} from './model/profiles';
 
@@ -41,11 +42,38 @@ let initialisedWeb3 = undefined;
 export const getWeb3 = () => {
     let w3 = initialisedWeb3;
     if (!w3) {
-        let provider = new W3.providers.HttpProvider('http://localhost:8545');
+        let provider = new W3.providers.HttpProvider(Meteor.settings.public.ethNodeAddress);
+        // let provider = new W3.providers.HttpProvider('http://localhost:8545');
+        //let provider = new W3.providers.HttpProvider('https://ropsten.infura.io/NgjvCOUF5UIhCgRKndzD');
         w3 = new W3(provider);
         initialisedWeb3 = w3;
     }
     return w3;
+};
+
+export const signAndSubmit = (rawTx, waitForMining) => {
+    return new Promise((resolve, reject) => {
+        let signedTxString = signing.signTx(wallet.keystore, wallet.pwDerivedKey, add0x(rawTx), add0x(Meteor.user().username));
+        Meteor.callPromise('submit-raw-tx', add0x(signedTxString.toString('hex')))
+            .then((result) => {
+                if (waitForMining) {
+                    Meteor.callPromise('wait-for-tx-mining', result)
+                        .then((result) => {
+                            resolve(result);
+                        })
+                        .catch((err) => {
+                            reject(err);
+                        });
+                } else {
+                    resolve(result);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                reject(err);
+            })
+    });
+
 };
 
 export let wallet = undefined;

@@ -16,25 +16,23 @@ Meteor.startup(() => {
     }
 });
 
-let certificatContract = {address: null};
-const createContract = (name, resolve, reject, observer) => {
+let contracts = {};
+const createContract = (name, resolve, reject) => {
+
     let newVersion = Contracts.findOne({name: name});
-    if (newVersion.address != certificatContract.address) try {
+    if (!contracts[name] || newVersion.address != contracts[name].address) try {
         if (Match.test(newVersion.abi, String)) {
             newVersion.abi = EJSON.parse(newVersion.abi.replace(/'/g, '"'));
-            console.log("had to convert abi from string");
         }
-        certificatContract = getWeb3().eth.contract(newVersion.abi).at(newVersion.address);
+        contracts[name] = getWeb3().eth.contract(newVersion.abi).at(newVersion.address);
     } catch (err) {
         reject(err);
         return;
     }
-    resolve(certificatContract);
-    // stop the cursor obeserver if appropriate
-    if (observer) observer.stop();
+    resolve(contracts[name]);
 };
 
-const getContract = (name) => {
+export const getContract = (name) => {
     return new Promise((resolve, reject) => {
         if (subscription.ready()) {
             createContract(name, resolve, reject);
@@ -42,7 +40,8 @@ const getContract = (name) => {
             /*this is executed if the call is made before the subscription is ready*/
             let observer = Contracts.find({name: name}).observe({
                 added: (document) => {
-                    createContract(name, resolve, reject, observer);
+                    createContract(name, resolve, reject);
+                    observer.stop();
                 }
             })
         }

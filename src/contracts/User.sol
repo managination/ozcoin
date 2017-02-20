@@ -20,7 +20,8 @@ contract User is BaseContract{
         Role role;
         string details;
         bool active;
-        address linkedAccount;
+        address affiliateAccount;
+        address affiliateCompany;
     }
 
     mapping(address => UserDetails) private users;
@@ -59,7 +60,9 @@ contract User is BaseContract{
     event UserRoleChanged(address indexed _account,Role _newRole);
     event UserDeactivated(address indexed _account);
     event UserReactivated(address indexed _account);
+    event UserDetailsChanged(address indexed _account);
     event AffiiateSet(address indexed _account,address affiliate);
+    event AffiiateCompanySet(address indexed _account,address affiliateCompany);
 
     function User(){
 
@@ -109,23 +112,27 @@ contract User is BaseContract{
     }
 
 
-    function createCoinOwner(address _account,address _linkedAccount,bytes32 _name,string _details) userActiveStatus(_account,false) accountIsValid(_account)  external returns (uint256){
-      users[_account]   = UserDetails({name : _name, role : Role.CoinOwner, details : _details ,linkedAccount : _linkedAccount, active : true});
+    function createCoinOwner(address _account,address _affiliateAccount,address _affiliateCompany,bytes32 _name,string _details) userActiveStatus(_account,false) accountIsValid(_account)  external returns (uint256){
+      users[_account]   = UserDetails({name : _name, role : Role.CoinOwner, details : _details , affiliateAccount : _affiliateAccount, affiliateCompany : _affiliateCompany, active : true});
       userAccounts.push(_account);
       UserAdded(_account,Role.CoinOwner);
     }
 
     function createAdminstrator(address _account,bytes32 _name,string _details) onlyowner {
-      users[_account]   = UserDetails({name : _name, role : Role.Administrator, details : _details ,linkedAccount : _account, active : true});
+      users[_account]   = UserDetails({name : _name, role : Role.Administrator, details : _details ,affiliateAccount : _account, affiliateCompany: _account,active : true});
       userAccounts.push(_account);
       UserAdded(_account,Role.Administrator);
 
     }
-    function setAffiliate(address _affiliate) userHasRole(msg.sender,Role.CoinOwner,true) {
-      users[msg.sender].linkedAccount = _affiliate;
 
+    function setAffiliate(address _affiliate) userHasRole(msg.sender,Role.CoinOwner,true) external {
+      users[msg.sender].affiliateAccount = _affiliate;
       AffiiateSet(msg.sender,_affiliate);
+    }
 
+    function setAffiliateCompany(address _affiliateCompany) userHasRole(msg.sender,Role.CoinOwner,true) external {
+      users[msg.sender].affiliateCompany = _affiliateCompany;
+      AffiiateCompanySet(msg.sender,_affiliateCompany);
     }
 
 
@@ -141,10 +148,14 @@ contract User is BaseContract{
     }
 
     // only allowed to change their own account
-    function updateUserDetails(bytes32 _name,string newDetails,address _linkedAccount){
+    function updateUserDetails(bytes32 _name,string newDetails,address _affiliateAccount,address _affiliateCompany){
         users[msg.sender].details = newDetails;
         users[msg.sender].name = _name;
-        users[msg.sender].linkedAccount = _linkedAccount;
+        users[msg.sender].affiliateAccount = _affiliateAccount;
+        users[msg.sender].affiliateCompany = _affiliateCompany;
+        UserDetailsChanged(msg.sender);
+        AffiiateSet(msg.sender,_affiliateAccount);
+        AffiiateCompanySet(msg.sender,_affiliateCompany);
 
     }
 

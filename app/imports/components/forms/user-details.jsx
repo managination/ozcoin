@@ -6,8 +6,8 @@ import Button from 'react-md/lib/Buttons';
 import TextField from 'react-md/lib/TextFields';
 import Toolbar from 'react-md/lib/Toolbars';
 
-import {Roles} from '../../api/profiles';
-import {Profiles} from '../../api/profiles';
+import {Roles} from '../../api/model/profiles';
+import {Profiles} from '../../api/model/profiles';
 
 export default class UserDetails extends PureComponent {
     constructor(props) {
@@ -69,6 +69,7 @@ export default class UserDetails extends PureComponent {
     }
 
     componentWillMount() {
+        console.log("user-details will mount");
         if (this.props.params.email) {
             this._handleSearch(this.props.params.email);
             delete this.props.params.email;
@@ -146,8 +147,8 @@ export default class UserDetails extends PureComponent {
                         />,
                         {/*
                          <Button className="md-cell md-cell--4" flat primary label="Search"
-                         onClick={this._handleSearchButton}>
-                            search
+                         onClick={this._requestAccess}>
+                         Request Role
                         </Button>
                          */}
                     </Toolbar>

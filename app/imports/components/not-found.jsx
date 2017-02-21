@@ -1,14 +1,21 @@
 import React, {PureComponent, PropTypes} from 'react';
 import Button from 'react-md/lib/Buttons/Button';
 import Media from 'react-md/lib/Media/Media';
+import {browserHistory} from 'react-router';
 
 export default class NotFound extends PureComponent {
+
+    componentWillMount() {
+        console.log("componentWillMount notfound.jsx");
+        browserHistory.push('/wallet');
+    }
 
     _handleClick = () => {
         this.props.router.replace('/');
     };
 
     render() {
+
         return (
             <Media className="react-md-404-page">
                 <img src="/images/404.svg" role="presentation"/>

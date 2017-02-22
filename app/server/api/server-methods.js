@@ -1,10 +1,27 @@
-import ipfsAPI from 'ipfs-api';
-import {Documents} from '../../imports/api/model/documents';
-import {createRawTx} from './ethereum';
+import ipfsAPI from "ipfs-api";
+import {EJSON} from "meteor/ejson";
+import {Documents} from "../../imports/api/model/documents";
+import {createRawTx} from "./ethereum";
+import {Profiles} from "../../imports/api/model/profiles";
+
 const fs = require('fs');
-const ipfs = ipfsAPI({host: 'ipfs.infura.io', port: '5001', protocol: 'https'});
+// const ipfs = ipfsAPI({host: 'localhost', port: '5001', protocol: 'http'});
+const ipfs = ipfsAPI(Meteor.settings.ipfsNode);
 
 Meteor.methods({
+    'register-user': function () {
+        let profile = Profiles.findOne({owner: this.userId});
+        delete profile._id;
+        delete profile.owner;
+        let alias = profile.alias;
+        delete profile.alias;
+        let address = profile.address;
+        delete profile.address;
+        delete profile.balance;
+        let details = EJSON.stringify(profile);
+        return createRawTx(this.userId, 'User', 'createCoinOwner', address, profile.affiliate, profile.affiliateCompany, alias, details);
+    },
+
     'file-upload': function (docType, fileName, documentId, fileData) {
         console.log("received file ", fileName, " data: ", fileData.size, fileData.name);
         let fileStream = new Buffer(fileData, 'binary');

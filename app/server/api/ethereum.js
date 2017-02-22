@@ -1,9 +1,10 @@
-import {Promise} from 'meteor/promise';
-import {txutils} from 'eth-lightwallet';
-import {getWeb3} from '../../imports/api/ethereum-services';
-import {getContract} from '../../imports/api/contracts/ethereum-contracts';
-import {add0x} from '../../imports/api/ethereum-services';
-import {Profiles} from '../../imports/api/model/profiles';
+import {Promise} from "meteor/promise";
+import {txutils} from "eth-lightwallet";
+import BigNumber from "bignumber.js";
+import {getWeb3, add0x, ether} from "../../imports/api/ethereum-services";
+import {getContract} from "../../imports/api/contracts/ethereum-contracts";
+import {Profiles} from "../../imports/api/model/profiles";
+
 
 export const createRawTx = function (userId, contractNme, funcName) {
     let web3 = getWeb3();
@@ -20,6 +21,7 @@ export const createRawTx = function (userId, contractNme, funcName) {
             }) + 10000);
 
         let nonce = web3.eth.getTransactionCount(profile.address);
+        console.log("the nonce is", nonce);
 
         var rawTx = {
             nonce: nonce,
@@ -33,7 +35,11 @@ export const createRawTx = function (userId, contractNme, funcName) {
 
         let rawTxString = txutils.functionTx(contract.abi, funcName, args, rawTx);
 
-        return rawTxString;
+        return {
+            rawTx: rawTxString,
+            transactionCost: new BigNumber(gasEstimate * gasPrice).dividedBy(ether).toNumber(),
+            accountBalance: web3.eth.getBalance(profile.address).dividedBy(ether).toNumber(),
+        };
     }).catch((err) => {
         throw new Meteor.Error("create function call for contract", err.message);
     });
@@ -54,7 +60,6 @@ Meteor.methods({
                         resolve(hash);
                     }
                 });
-                console.log("transaction hash", txHash);
             } else {
                 console.log("transaction already exists", txHash);
                 resolve(txHash);

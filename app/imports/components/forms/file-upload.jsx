@@ -1,17 +1,16 @@
-import React, {PureComponent} from 'react';
-import TrackerReact from 'meteor/ultimatejs:tracker-react';
-
-import FileInput from 'react-md/lib/FileInputs';
-import Button from 'react-md/lib/Buttons';
-import TextField from 'react-md/lib/TextFields';
-import List from 'react-md/lib/Lists/List';
-import ListItem from 'react-md/lib/Lists/ListItem';
-import Avatar from 'react-md/lib/Avatars';
-import FontIcon from 'react-md/lib/FontIcons';
-import Subheader from 'react-md/lib/Subheaders';
-import {signAndSubmit} from '../../api/ethereum-services';
-
-import {Documents} from '../../api/model/documents';
+import React, {PureComponent} from "react";
+import TrackerReact from "meteor/ultimatejs:tracker-react";
+import FileInput from "react-md/lib/FileInputs";
+import Button from "react-md/lib/Buttons";
+import TextField from "react-md/lib/TextFields";
+import List from "react-md/lib/Lists/List";
+import ListItem from "react-md/lib/Lists/ListItem";
+import Avatar from "react-md/lib/Avatars";
+import FontIcon from "react-md/lib/FontIcons";
+import Subheader from "react-md/lib/Subheaders";
+import {signAndSubmit} from "../../api/ethereum-services";
+import GetPassword from "./confirm-transaction";
+import {Documents} from "../../api/model/documents";
 
 const InfoIcon = () => <FontIcon>info</FontIcon>;
 
@@ -23,11 +22,14 @@ export default class FileUpload extends TrackerReact(PureComponent) {
             file: null,
             fileName: '',
             documentId: '',
+            getPasswordVisible: false,
         };
 
         this._selectFile.bind(this);
         this._handleChange.bind(this);
         this._uploadFile.bind(this);
+        this._transactionConfirmed.bind(this);
+        this._transactionCanceled.bind(this);
 
         Meteor.subscribe('documents');
 
@@ -50,6 +52,7 @@ export default class FileUpload extends TrackerReact(PureComponent) {
     };
 
     _uploadFile = () => {
+        let self = this;
         Session.set("showWait", true);
         let fileName = this.state.fileName;
         let documentId = this.state.documentId;
@@ -59,10 +62,13 @@ export default class FileUpload extends TrackerReact(PureComponent) {
             Session.set("showWait", true);
             Meteor
                 .callPromise('file-upload', docType, fileName, documentId, reader.result)
-                .then((rawTx) => {
-                    signAndSubmit(rawTx, true)
-                        .then(() => Session.set("showWait", false))
-                        .catch(() => Session.set("showWait", false));
+                .then((response) => {
+                    response.getPasswordVisible = true;
+                    Session.set("showWait", false);
+                    return response;
+                })
+                .then((response) => {
+                    self.setState(response);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -72,9 +78,28 @@ export default class FileUpload extends TrackerReact(PureComponent) {
         reader.readAsBinaryString(this.state.file);
     };
 
+    _transactionConfirmed = (password) => {
+        this.setState({getPasswordVisible: false});
+        Session.set("showWait", true);
+        signAndSubmit(password, this.state.rawTx, true)
+            .then(() => Session.set("showWait", false))
+            .catch(() => Session.set("showWait", false));
+    };
+
+    _transactionCanceled = () => {
+        Session.set("showWait", false);
+        this.setState({getPasswordVisible: false});
+    };
+
     render() {
         return (
             <div>
+                <GetPassword visible={this.state.getPasswordVisible}
+                             cost={this.state.transactionCost}
+                             balance={this.state.accountBalance}
+                             confirm={this._transactionConfirmed}
+                             cancel={this._transactionCanceled}
+                />
                 <h2>{this.props.params.docType}</h2>
 
                 <form className="md-grid">

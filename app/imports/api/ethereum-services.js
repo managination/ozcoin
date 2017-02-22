@@ -1,12 +1,11 @@
-import {Meteor} from 'meteor/meteor';
-import {Promise} from 'meteor/promise';
-import {Session} from 'meteor/session'
-import {keystore} from 'eth-lightwallet';
-import W3 from 'web3';
-import * as LocalStorage from 'meteor/simply:reactive-local-storage';
-import {signing} from 'eth-lightwallet';
+import {Meteor} from "meteor/meteor";
+import {Promise} from "meteor/promise";
+import {keystore, signing} from "eth-lightwallet";
+import W3 from "web3";
+import * as LocalStorage from "meteor/simply:reactive-local-storage";
+import BigNumber from "bignumber.js";
 
-import {Profiles} from './model/profiles';
+export const ether = new BigNumber(1000000000000000000);
 
 export const initializeKeystore = (() => {
     return new Promise((resolve, reject) => {
@@ -51,56 +50,52 @@ export const getWeb3 = () => {
     return w3;
 };
 
-export const signAndSubmit = (rawTx, waitForMining) => {
+export const signAndSubmit = (password, rawTx, waitForMining) => {
     return new Promise((resolve, reject) => {
-        let signedTxString = signing.signTx(wallet.keystore, wallet.pwDerivedKey, add0x(rawTx), add0x(Meteor.user().username));
-        Meteor.callPromise('submit-raw-tx', add0x(signedTxString.toString('hex')))
-            .then((result) => {
-                if (waitForMining) {
-                    Meteor.callPromise('wait-for-tx-mining', result)
-                        .then((result) => {
-                            resolve(result);
-                        })
-                        .catch((err) => {
-                            reject(err);
-                        });
-                } else {
-                    resolve(result);
-                }
-            })
-            .catch((err) => {
-                console.log(err);
+        wallet.keyFromPassword(password, (err, pwDerivedKey) => {
+            if (err) {
                 reject(err);
-            })
-    });
-
+                return;
+            }
+            let signedTxString = signing.signTx(wallet, pwDerivedKey, add0x(rawTx), add0x(Meteor.user().username));
+            return Meteor.callPromise('submit-raw-tx', add0x(signedTxString.toString('hex')))
+                .then((result) => {
+                    if (waitForMining) {
+                        return Meteor.callPromise('wait-for-tx-mining', result)
+                            .then((result) => {
+                                resolve(result);
+                            });
+                    } else {
+                        resolve(result);
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    reject(err);
+                })
+        });
+    })
 };
 
-export let wallet = undefined;
+let wallet = undefined;
+let pdk = undefined;
 export const createKeystore = (alias, email, password, salt, mnemonic) => {
     let _resolve;
     let _reject;
     let keystoreCallback = (err, ks) => {
         if (err) reject(err);
+        wallet = ks;
 
         // Some methods will require providing the `pwDerivedKey`,
         // Allowing you to only decrypt private keys on an as-needed basis.
         // You can generate that value with this convenient method:
         ks.keyFromPassword(password, (err, pwDerivedKey) => {
-            wallet = {keystore: ks, pwDerivedKey: pwDerivedKey};
-
+            pdk = pwDerivedKey;
             if (err) _reject(err);
 
             // generate one new address/private key pair
             // the corresponding private key is also encrypted
             ks.generateNewAddress(pwDerivedKey);
-
-            // set the preferred way to get a password from the user
-            // TODO: change this to full screen or modal dialog
-            ks.passwordProvider = (callback) => {
-                var pw = prompt("Please enter password", "Password");
-                callback(null, pw);
-            };
 
             //TODO: encrypt the seed with the user's password before storing
             LocalStorage.setItem('mnemonic', ks.getSeed(pwDerivedKey));

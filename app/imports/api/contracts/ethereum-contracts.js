@@ -1,9 +1,9 @@
-import {Meteor} from 'meteor/meteor';
-import {EJSON} from 'meteor/ejson';
-import {Match} from 'meteor/check'
-import {Promise} from 'meteor/promise';
-import {Contracts} from '../model/contracts';
-import {getWeb3} from '../ethereum-services';
+import {Meteor} from "meteor/meteor";
+import {EJSON} from "meteor/ejson";
+import {Match} from "meteor/check";
+import {Promise} from "meteor/promise";
+import {Contracts} from "../model/contracts";
+import {getWeb3} from "../ethereum-services";
 
 let subscription = undefined;
 Meteor.startup(() => {
@@ -45,6 +45,13 @@ export const getContract = (name) => {
                 }
             })
         }
+    })
+};
+
+export const callContractMethod = function (contract, funcName) {
+    let args = Array.from(arguments).slice(2);
+    return getContract(contract).then((contract) => {
+        return contract[funcName].call.apply(this, args);
     })
 };
 

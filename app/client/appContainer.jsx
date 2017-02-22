@@ -1,21 +1,19 @@
-import {Meteor} from 'meteor/meteor';
-import {Session} from 'meteor/session'
-import TrackerReact from 'meteor/ultimatejs:tracker-react';
-import {browserHistory} from 'react-router';
-
-import React, {PureComponent, PropTypes, cloneElement} from 'react';
-import {createContainer} from 'meteor/react-meteor-data';
-import NavigationDrawer from 'react-md/lib/NavigationDrawers';
-import Button from 'react-md/lib/Buttons';
-import MenuButton from 'react-md/lib/Menus/MenuButton';
-import ListItem from 'react-md/lib/Lists/ListItem';
-import CopyToClipboard from 'react-copy-to-clipboard';
-import Snackbar from 'react-md/lib/Snackbars';
-
-import Wait from '../imports/components/wait';
-import {Profiles} from '../imports/api/model/profiles';
-import menuEntries from '../imports/components/menus/main-menu';
-import {add0x} from '../imports/api/ethereum-services';
+import {Meteor} from "meteor/meteor";
+import {Session} from "meteor/session";
+import TrackerReact from "meteor/ultimatejs:tracker-react";
+import {browserHistory} from "react-router";
+import React, {PureComponent, PropTypes, cloneElement} from "react";
+import {createContainer} from "meteor/react-meteor-data";
+import NavigationDrawer from "react-md/lib/NavigationDrawers";
+import Button from "react-md/lib/Buttons";
+import MenuButton from "react-md/lib/Menus/MenuButton";
+import ListItem from "react-md/lib/Lists/ListItem";
+import CopyToClipboard from "react-copy-to-clipboard";
+import Snackbar from "react-md/lib/Snackbars";
+import Wait from "../imports/components/wait";
+import {Profiles} from "../imports/api/model/profiles";
+import menuEntries from "../imports/components/menus/main-menu";
+import {add0x} from "../imports/api/ethereum-services";
 
 export default class AppContainer extends TrackerReact(PureComponent) {
     constructor(props) {
@@ -56,7 +54,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         }
     }
 
-    componentWillReceiveProps() {
+    static componentWillReceiveProps() {
         console.log("componentWillReceiveProps app.jsx");
     }
 

@@ -1,16 +1,14 @@
-import {Meteor} from 'meteor/meteor';
-import {Accounts} from 'meteor/accounts-base'
-import TrackerReact from 'meteor/ultimatejs:tracker-react';
-import React, {PureComponent} from 'react';
-import Dialog from 'react-md/lib/Dialogs';
-import Button from 'react-md/lib/Buttons/Button';
-import TextField from 'react-md/lib/TextFields';
-import Toolbar from 'react-md/lib/Toolbars';
-import {browserHistory} from 'react-router';
-
-import {createKeystore} from '../api/ethereum-services'
-import {Profiles} from '../api/model/profiles.js';
-import {Roles} from '../api/model/profiles.js';
+import {Meteor} from "meteor/meteor";
+import {Accounts} from "meteor/accounts-base";
+import TrackerReact from "meteor/ultimatejs:tracker-react";
+import React, {PureComponent} from "react";
+import Dialog from "react-md/lib/Dialogs";
+import Button from "react-md/lib/Buttons/Button";
+import TextField from "react-md/lib/TextFields";
+import Toolbar from "react-md/lib/Toolbars";
+import {browserHistory} from "react-router";
+import {createKeystore} from "../api/ethereum-services";
+import {Profiles, Roles} from "../api/model/profiles.js";
 
 
 export default class RegistrationDialog extends TrackerReact(PureComponent) {
@@ -66,7 +64,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                             role: Roles.coinowner,
                             address: '0x' + keystore.username,
                             affiliate: self.props.params.affiliate,
-                            nonce: 1,
+                            isRegistered: false,
                         });
                         Session.set('showWait', false);
                     }
@@ -98,7 +96,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                         colored
                         nav={nav}
                         actions={action}
-                        title={toolbarTitle + ' ' + this.props.params.affiliate}
+                        title={toolbarTitle + ' ' + (this.props.params.affiliate || '')}
                         fixed
                     />
                     <form className="md-toolbar-relative md-grid" ref="keystoreCreation">

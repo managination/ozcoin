@@ -1,6 +1,15 @@
-import { Mongo } from 'meteor/mongo';
+import {Mongo} from "meteor/mongo";
+import BigNumber from "bignumber.js";
+import {ether} from "../ethereum-services";
 
-export const Profiles = new Mongo.Collection('profiles');
+export const Profiles = new Mongo.Collection('profiles',
+    {
+        transform: (profile) => {
+            if (profile.balance)
+                profile.balance = new BigNumber(profile.balance, 16).dividedBy(ether);
+            return profile;
+        }
+    });
 
 Profiles.allow({
     insert: function (userId, doc) {

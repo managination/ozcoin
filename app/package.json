@@ -7,6 +7,7 @@
   "dependencies": {
     "babel-runtime": "6.18.0",
     "bcrypt": "^1.0.2",
+    "bignumber.js": "^4.0.0",
     "crypto-js": "^3.1.9-1",
     "eth-lightwallet": "^2.5.3",
     "fibers": "^1.0.15",

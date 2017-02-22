@@ -1,0 +1,10 @@
+{
+  "public": {
+    "ethNodeAddress": "http://eth.mngn.io:8545"
+  },
+  "ipfsNode": {
+    "host": "ipfs.infura.io",
+    "port": "5001",
+    "protocol": "https"
+  }
+}

@@ -1,13 +1,10 @@
-import React, {PureComponent} from 'react';
-import {EJSON} from 'meteor/ejson';
-
-import SelectField from 'react-md/lib/SelectFields';
-import Button from 'react-md/lib/Buttons';
-import TextField from 'react-md/lib/TextFields';
-import Toolbar from 'react-md/lib/Toolbars';
-
-import {Roles} from '../../api/model/profiles';
-import {Profiles} from '../../api/model/profiles';
+import React, {PureComponent} from "react";
+import {EJSON} from "meteor/ejson";
+import SelectField from "react-md/lib/SelectFields";
+import Button from "react-md/lib/Buttons";
+import TextField from "react-md/lib/TextFields";
+import Toolbar from "react-md/lib/Toolbars";
+import {Roles, Profiles} from "../../api/model/profiles";
 
 export default class UserDetails extends PureComponent {
     constructor(props) {
@@ -15,6 +12,7 @@ export default class UserDetails extends PureComponent {
         this.state = {
             _id: false,
             role: Roles.administrator,
+            address: '',
             email: '',
             companyName: '',
             website: '',
@@ -70,9 +68,9 @@ export default class UserDetails extends PureComponent {
 
     componentWillMount() {
         console.log("user-details will mount");
-        if (this.props.params.email) {
-            this._handleSearch(this.props.params.email);
-            delete this.props.params.email;
+        if (this.props.params.address) {
+            this._handleSearch(this.props.params.address);
+            delete this.props.params.address;
         }
     }
 
@@ -82,7 +80,7 @@ export default class UserDetails extends PureComponent {
     };
 
     _handleChange = (value, event) => {
-        if (event.target.id === 'email') {
+        if (event.target.id === 'address') {
             this._handleSearch(value);
         }
         this.user[event.target.id] = value;
@@ -91,11 +89,14 @@ export default class UserDetails extends PureComponent {
         this.setState(change);
     };
 
-    _handleSearch = (email) => {
+    _handleSearch = (address) => {
         let self = this;
         if (this.profileSub) this.profileSub.stop();
-        this.profileSub = Meteor.subscribe("user-profile", email, () => {
-            this.user = Profiles.findOne({email: email}, {fields: {owner: 0}}) || {_id: false, email: email || ''};
+        this.profileSub = Meteor.subscribe("user-profile", address, () => {
+            this.user = Profiles.findOne({address: address}, {fields: {owner: 0}}) || {
+                    _id: false,
+                    address: address || ''
+                };
             self.setState(this.user);
         })
     };
@@ -136,14 +137,23 @@ export default class UserDetails extends PureComponent {
                             helpText="Select a role for the user"
                         />,
                         <TextField
+                            id="address"
+                            ref="address"
+                            label="address"
+                            value={this.state.address}
+                            className="md-cell md-cell--4"
+                            required
+                            onChange={this._handleChange}
+                            helpText="enter an ethereum address"
+                        />,
+                        <TextField
                             id="email"
                             ref="email"
                             label="e-mail"
                             value={this.state.email}
                             className="md-cell md-cell--4"
-                            required
                             onChange={this._handleChange}
-                            helpText="enter an e-mail address. The search is automatic"
+                            disabled={true}
                         />,
                         {/*
                          <Button className="md-cell md-cell--4" flat primary label="Search"

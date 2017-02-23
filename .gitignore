@@ -1,3 +1,4 @@
 .idea
 bin/
 geth.log
+galaxy-settings.json

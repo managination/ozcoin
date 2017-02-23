@@ -85,7 +85,9 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             <MediaOverlay>
                                 <CardTitle title={profile.ozcBalance + " OZC"}
                                            subtitle={"balance for " + profile.alias}>
-                                    <Button className="md-cell--right" icon>star_outline</Button>
+                                    <Button className="md-cell--right" icon>
+                                        shopping_cart
+                                    </Button>
                                 </CardTitle>
                             </MediaOverlay>
                         </Media>

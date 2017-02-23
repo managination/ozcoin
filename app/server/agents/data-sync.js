@@ -20,10 +20,13 @@ Meteor.startup(() => {
                     .then((result) => {
                         let role = result[1];
                         if (role.comparedTo(profile.role) != 0) {
-                            profileToUpdate.role = role;
+                            /*
+                             profileToUpdate.role = role.toNumber();
                             profileToUpdate.update = true;
+                             */
                         }
                         if (result[0] != "‌0x0000000000000000000000000000000000000000000000000000000000000000" && !profile.isRegistered) {
+                            console.log("registering", result[0]);
                             profileToUpdate.isRegistered = true;
                             profileToUpdate.update = true;
                         }

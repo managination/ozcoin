@@ -23,7 +23,7 @@ Meteor.methods({
     },
 
     'file-upload': function (docType, fileName, documentId, fileData) {
-        console.log("received file ", fileName, " data: ", fileData.size, fileData.name);
+        console.log("received file ", fileName, " data: ", fileData.size);
         let fileStream = new Buffer(fileData, 'binary');
 
         return ipfs.util.addFromStream(fileStream).then((result) => {
@@ -35,8 +35,7 @@ Meteor.methods({
             result.docType = docType;
             result.uploadTime = new Date();
             Documents.upsert({hash: result.hash}, result);
-            console.log(result);
-            fs.writeFile(result.hash, fileData, fileStream);
+            console.log("file uploaded to IPFS", result);
 
             let funcName = undefined;
             if (docType == 'audit-report') {
@@ -44,6 +43,7 @@ Meteor.methods({
             } else {
                 funcName = 'registerProofOfAsset';
             }
+            console.log("creating raw transaction");
             let promise = createRawTx(this.userId, 'Certificate', funcName, result.hash, documentId);
             return promise;
         }).catch((err) => {

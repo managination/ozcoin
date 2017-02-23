@@ -108,6 +108,7 @@ export default class UserDetails extends PureComponent {
     _save = () => {
         let user = EJSON.clone(this.user);
         delete user._id;
+        delete user.balance;
         Profiles.update({_id: this.user._id}, {$set: user}, (err, docCount) => {
             console.log(err, docCount);
         });

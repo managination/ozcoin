@@ -5,7 +5,7 @@ import {ether} from "../ethereum-services";
 export const Profiles = new Mongo.Collection('profiles',
     {
         transform: (profile) => {
-            if (profile.balance)
+            if (profile.balance && typeof profile.balance == 'string')
                 profile.balance = new BigNumber(profile.balance, 16).dividedBy(ether);
             else
                 profile.balance = new BigNumber(0);

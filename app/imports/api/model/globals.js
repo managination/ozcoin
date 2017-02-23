@@ -1,9 +1,9 @@
 import {Meteor} from "meteor/meteor";
 import {Mongo} from "meteor/mongo";
 
-export const Transfers = new Mongo.Collection('transfers');
+export const Globals = new Mongo.Collection('globals');
 
-Transfers.deny({
+Globals.deny({
     insert: function (userId, doc) {
         return !Meteor.isServer;
     },

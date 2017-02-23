@@ -34,7 +34,7 @@ Meteor.startup(() => {
                     })
                     .then((profileToUpdate) => {
                         return callContractMethod('TokenData', 'balanceOf', profile.address).then((balance) => {
-                            if (profile.ozcBalance != balance.toNumber()) {
+                            if (balance.comparedTo(profile.ozcBalance) != 0) {
                                 profileToUpdate.update = true;
                                 profileToUpdate.ozcBalance = balance.toNumber();
                             }

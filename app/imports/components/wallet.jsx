@@ -7,24 +7,11 @@ import CardTitle from "react-md/lib/Cards/CardTitle";
 import CardActions from "react-md/lib/Cards/CardActions";
 import CardText from "react-md/lib/Cards/CardText";
 import Media, {MediaOverlay} from "react-md/lib/Media";
-import Avatar from "react-md/lib/Avatars";
-import {add0x, signAndSubmit} from "../api/ethereum-services";
+import TextField from "react-md/lib/TextFields";
+import {add0x, signAndSubmit, isValidAddress} from "../api/ethereum-services";
 import GetPassword from "./forms/confirm-transaction";
 import {Profiles} from "../api/model/profiles";
-
-const filterIcons = [
-    "filter_none",
-    "filter_",
-    "filter_",
-    "filter_",
-    "filter_",
-    "filter_",
-    "filter_",
-    "filter_",
-    "filter_",
-    "filter_",
-    "filter_",
-];
+import {Globals} from "../api/model/globals";
 
 export default class Wallet extends TrackerReact(PureComponent) {
     constructor(props) {
@@ -36,13 +23,22 @@ export default class Wallet extends TrackerReact(PureComponent) {
             showUserRegistrationDialog: false,
             transactionCost: 0,
             accountBalance: 0,
-            profile: {balance: new BigNumber(0)}
+            profile: {balance: new BigNumber(0)},
+            ethAmount: '',
+            ozcAmount: '',
+            recipient: '',
         };
 
         this._submitTx.bind(this);
+        this._transferEth.bind(this);
+        this._transferOzc.bind(this);
+        this._handleChange.bind(this);
     }
 
     componentWillMount() {
+        Meteor.subscribe('globals', (err) => {
+        });
+
         Meteor.subscribe('current-profile', (err) => {
             let profile = Profiles.findOne({address: add0x(Meteor.user().username)});
             if (profile && !profile.isRegistered && profile.balance && profile.balance.comparedTo(0) === 1) {
@@ -63,9 +59,9 @@ export default class Wallet extends TrackerReact(PureComponent) {
         signAndSubmit(password, this.state.rawTx, true)
             .then(() => {
                 Session.set("showWait", false);
-
             })
-            .catch(() => {
+            .catch((err) => {
+                console.log("submitting signed transaction", err);
                 Session.set("showWait", false)
             });
     };
@@ -78,66 +74,146 @@ export default class Wallet extends TrackerReact(PureComponent) {
     _submitTx = () => {
     };
 
+    _transferEth = () => {
+        const self = this;
+        Session.set("showWait", true);
+        Meteor.callPromise('transfer-eth', this.state.recipient, this.state.ethAmount)
+            .then((response) => {
+                response.getPasswordVisible = true;
+                Session.set("showWait", false);
+                self.setState(response);
+            })
+            .catch((err) => {
+                console.log(err);
+                Session.set("showWait", false);
+            })
+    };
+
+    _transferOzc = () => {
+
+    };
+
+    _handleChange = (value, event) => {
+        let change = {};
+        change[event.target.id] = value;
+        this.setState(change);
+    };
+
+
     componentDidUpdate(prevProps, prevState) {
     }
 
     render() {
-        const profile = Profiles.findOne({address: add0x(Meteor.user().username)}) || {balance: new BigNumber(0)};
+        const profile = Profiles.findOne({address: add0x(Meteor.user().username)})
+            || {balance: new BigNumber(0), ozcBalance: new BigNumber(0)};
+        const prices = Globals.findOne({name: "prices"}) || {ozc: 0, eth: 0};
+        const ozcBalanceUSD = new BigNumber(profile.ozcBalance * prices.ozc).toFormat(2);
+        const ethBalanceUSD = new BigNumber(profile.ozcBalance * prices.ozc).toFormat(2);
+        let dialogTitle;
+        if (this.state.getPasswordVisible)
+            dialogTitle = "Enter our password to validate the transaction";
+        else
+            dialogTitle = "Please confirm this transaction in order to register your account";
+
         return (
             <div style={{width: "100%"}}>
-                <GetPassword visible={this.state.showUserRegistrationDialog}
+                <GetPassword visible={this.state.showUserRegistrationDialog || this.state.getPasswordVisible}
                              cost={this.state.transactionCost}
                              balance={profile.balance.toNumber()}
                              confirm={this._transactionConfirmed}
                              cancel={this._transactionCanceled}
-                             title="Please confirm this transaction in order to register your account"
+                             title={dialogTitle}
                 />
                 <div className="md-grid md-toolbar-relative">
-                    <Card style={{maxWidth: 600}} className="md-cell md-cell--6">
+                    <Card style={{maxWidth: 400}} className="md-cell md-cell--6">
                         <Media>
                             <img src="/images/gold-ounces.jpg" role="presentation"/>
                             <MediaOverlay>
-                                <CardTitle title={profile.ozcBalance + " OZC"}
-                                           subtitle={"balance for " + profile.alias}>
+                                <CardTitle title={profile.formattedOzcBalance + " OZC = " + ozcBalanceUSD + " USD"}
+                                           subtitle={"price for OZC in USD " + (new BigNumber(prices.ozc).toFormat(2))}>
                                     <Button className="md-cell--right" icon>
                                         shopping_cart
                                     </Button>
                                 </CardTitle>
                             </MediaOverlay>
                         </Media>
-                        <CardTitle
-                            avatar={<Avatar src="" role="presentation"/>}
-                            title="Card Title"
-                            subtitle="Card Subtitle"
-                        />
+                        <form onSubmit={(e) => e.preventDefault()} className="md-grid">
+                            < TextField
+                                id="recipient"
+                                label="Recipient address"
+                                placeholder="0x77454e832261aeed81422348efee52d5bd3a3684"
+                                className="md-cell md-cell--12"
+                                disabled={!profile.ozcBalance.toNumber()}
+                                value={this.state.recipient}
+                                onChange={this._handleChange}
+                            />
+                            < TextField
+                                id="ozcAmount"
+                                label="amount in OZC"
+                                placeholder="0.00"
+                                className="md-cell md-cell--12"
+                                disabled={!profile.ozcBalance.toNumber()}
+                                value={this.state.ozcAmount}
+                                onChange={this._handleChange}
+                            />
+                        </form>
                         <CardActions expander>
-                            <Button flat label="Action 1"/>
-                            <Button flat label="Action 2"/>
+                            <Button primary={this.state.ozcAmount > 0}
+                                    flat label="Transfer"
+                                    onClick={this._transferOzc}
+                                    disabled={!profile.balance.toNumber() || !(this.state.ethAmount > 0)
+                                    || !isValidAddress(this.state.recipient)}>
+                                check
+                            </Button>
                         </CardActions>
-                        <CardText expandable>
+                        <CardText>
                             Lorem Ipsum
                         </CardText>
                     </Card>
-                    <Card style={{maxWidth: 600}} className="md-cell md-cell--6">
+                    <Card style={{maxWidth: 400}} className="md-cell md-cell--6">
                         <Media>
                             <img src="/images/ethereum-logo.jpg" role="presentation"/>
                             <MediaOverlay>
-                                <CardTitle title={profile.formattedBalance + " ETH"}
-                                           subtitle={"balance for " + profile.alias}>
-                                    <Button className="md-cell--right" icon>
-                                        shopping_cart
+                                <CardTitle title={profile.formattedEthBalance + " ETH = " + ethBalanceUSD + " USD"}
+                                           subtitle={"price for ETH in USD " + (new BigNumber(prices.eth).toFormat(2))}>
+                                    <Button className="md-cell--right"
+                                            style={profile.transferFees ? {color: "#8BC34A"} : {}}
+                                            disabled={!profile.transferFees}
+                                            onClick={() => alert("I was clicked")}
+                                            icon>
+                                        monetization_on
                                     </Button>
                                 </CardTitle>
                             </MediaOverlay>
                         </Media>
-                        <CardTitle
-                            avatar={<Avatar src="" role="presentation"/>}
-                            title="Card Title"
-                            subtitle="Card Subtitle"
-                        />
+                        <form onSubmit={(e) => e.preventDefault()} className="md-grid">
+                            < TextField
+                                id="recipient"
+                                label="Recipient address"
+                                placeholder="0x77454e832261aeed81422348efee52d5bd3a3684"
+                                className="md-cell md-cell--12"
+                                disabled={!profile.balance.toNumber()}
+                                value={this.state.recipient}
+                                onChange={this._handleChange}
+                            />
+                            < TextField
+                                id="ethAmount"
+                                label="amount in ETH"
+                                placeholder="0.00"
+                                className="md-cell md-cell--12"
+                                disabled={!profile.balance.toNumber()}
+                                value={this.state.ethAmount}
+                                onChange={this._handleChange}
+                            />
+                        </form>
                         <CardActions expander>
-                            <Button flat label="Action 1"/>
-                            <Button flat label="Action 2"/>
+                            <Button primary={this.state.ethAmount > 0}
+                                    flat label="Transfer"
+                                    onClick={this._transferEth}
+                                    disabled={!profile.balance.toNumber() || !(this.state.ethAmount > 0)
+                                    || !isValidAddress(this.state.recipient)}>
+                                check
+                            </Button>
                         </CardActions>
                         <CardText expandable>
                             Lorem Ipsum

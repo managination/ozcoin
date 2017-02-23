@@ -10,7 +10,13 @@ export const Profiles = new Mongo.Collection('profiles',
             else
                 profile.balance = new BigNumber(0);
 
-            profile.formattedBalance = profile.balance.toFormat(2);
+            if (profile.ozcBalance)
+                profile.ozcBalance = new BigNumber(profile.ozcBalance).dividedBy(1000000);
+            else
+                profile.ozcBalance = new BigNumber(0);
+
+            profile.formattedEthBalance = profile.balance.toFormat(2);
+            profile.formattedOzcBalance = profile.ozcBalance.toFormat(2);
             return profile;
         }
     });

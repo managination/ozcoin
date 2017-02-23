@@ -1,18 +1,51 @@
 import {Promise} from "meteor/promise";
 import {txutils} from "eth-lightwallet";
 import BigNumber from "bignumber.js";
-import {getWeb3, add0x, ether} from "../../imports/api/ethereum-services";
+import {getWeb3, add0x} from "../../imports/api/ethereum-services";
 import {getContract} from "../../imports/api/contracts/ethereum-contracts";
 import {Profiles} from "../../imports/api/model/profiles";
 
+export const ether = new BigNumber("1000000000000000000");
 
-export const createRawTx = function (userId, contractNme, funcName) {
+export const createRawValueTx = function (userId, recipient, value) {
+    return new Promise((resolve, reject) => {
+        let web3 = getWeb3();
+        let gasPrice = web3.toHex(web3.eth.gasPrice);
+        let profile = Profiles.findOne({owner: userId});
+
+        let gasEstimate = web3.toHex(web3.eth.estimateGas({
+            to: recipient,
+            value: web3.toHex(value),
+        }));
+
+        let nonce = web3.eth.getTransactionCount(profile.address);
+        console.log("the nonce is", nonce);
+
+        var rawTx = {
+            nonce: nonce,
+            gasPrice: gasPrice,
+            gasLimit: gasEstimate,
+            to: recipient,
+            from: profile.address,
+            value: web3.toHex(value),
+        };
+
+        let rawTxString = txutils.valueTx(rawTx);
+
+        resolve({
+            rawTx: rawTxString,
+            transactionCost: new BigNumber(gasEstimate * gasPrice).dividedBy(ether).toNumber(),
+            accountBalance: web3.eth.getBalance(profile.address).dividedBy(ether).toNumber(),
+        });
+    })
+};
+
+export const createRawTx = function (userId, contractName, funcName, value) {
     let web3 = getWeb3();
     let gasPrice = web3.toHex(web3.eth.gasPrice);
     let profile = Profiles.findOne({owner: userId});
 
-    return getContract(contractNme).then((contract) => {
-        let functionName = undefined;
+    return getContract(contractName).then((contract) => {
         let args = Array.from(arguments).slice(3);
         let payloadData = contract[funcName].getData.apply(this, args);
         let gasEstimate = web3.toHex(web3.eth.estimateGas({
@@ -29,7 +62,7 @@ export const createRawTx = function (userId, contractNme, funcName) {
             gasLimit: gasEstimate,
             to: contract.address,
             from: profile.address,
-            value: '0x00',
+            value: web3.toHex(value),
             data: payloadData,
         };
 

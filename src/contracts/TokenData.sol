@@ -15,9 +15,17 @@ struct PendingTransfer{
   uint256 transferTime;
 }
 
-address controller;
+struct Arbitration {
+  address requester;
+  bool requesterVote;
+  bool adminVote;
+  bool arbitratorVote;
+}
+
+address exchangeController;
+address walletController;
 address ozCoinAccount;
-string public name;
+string  public name;
 uint256 totalSupply;
 uint256 transactionFee;
 
@@ -26,13 +34,17 @@ uint256 transactionFee;
 
 mapping (address=>uint256) coins;
 mapping (address=>uint256) etherBalance;
-mapping(address=>Price) prices;
+mapping (address=>Price) prices;
+mapping (bytes32=>Arbitration) arbitrations;
+
 
 PendingTransfer[] pendingTransfers;
 
 event ControllerChanged(address controller);
-event ozCoinAccountChanged(address ozCoin);
-event pendingActivated(address sender,address recipient,uint256 value);
+event OzCoinAccountChanged(address ozCoin);
+event PendingActivated(address sender,address recipient,uint256 value);
+
+event PriceSet(address seller,bool side,uint256 price);
 
 // reinstate
 modifier onlyController(){
@@ -49,19 +61,25 @@ modifier sufficientFunds(address _sender,uint256 _amount){
   }
 }
 
-function TokenData(uint256 _totalSupply,address _controller,address _ozCoinAccount){
+function TokenData(uint256 _totalSupply,address _exchangeController,address _walletController,address _ozCoinAccount){
   totalSupply = _totalSupply;
-  coins[_ozCoinAccount] = totalSupply;
-  controller = _controller;
   ozCoinAccount = _ozCoinAccount;
+  coins[_ozCoinAccount] = totalSupply;
+  exchangeController = _exchangeController;
+  walletController = _walletController;
   activateContract();
 }
 
 
 
-function setController(address _controller) onlyowner external{
-     controller = _controller;
+function setWalletController(address _walletController) onlyowner external{
+     walletController = _walletController;
 }
+
+function setExchangeController(address _exchangeController) onlyowner external{
+     exchangeController = _exchangeController;
+}
+
 
 
 // some security even though a constant function
@@ -72,11 +90,12 @@ function getOzCoinAccount() onlyController constant returns (address)  {
 // only allow next two when contract is inactive
 function setOzCoinAccount(address _account) onlyController contractIsAdminOnly {
    ozCoinAccount = _account;
+   OzCoinAccountChanged(_account);
 }
 
 
-function checkStatus() returns (ContractState,uint8,address) {
-    return (contractState,version,controller);
+function checkStatus() returns (ContractState,uint8,address,address) {
+    return (contractState,version,exchangeController,walletController);
 }
 
 function getTotalSupply() onlyController  constant external returns (uint256) {
@@ -114,22 +133,21 @@ function getFeeRate() onlyController constant returns (uint256){
     return transactionFee;
 }
 
-function getPrice(address _seller,bool _isBuy) onlyController constant returns (uint256) {
+function getPrices(address _seller) constant returns (uint256,uint256) {
+      return (prices[_seller].buy,prices[_seller].sell);
+}
+
+function setPrice(address _seller,bool _isBuy,uint256 _price) {
     if(_isBuy){
-      return prices[_seller].buy;
+      prices[_seller].buy = _price;
     }
     else{
-      return prices[_seller].sell;
+      prices[_seller].sell = _price;
     }
-}
-
-function addEther() onlyController {
+    PriceSet(_seller,_isBuy,_price);
 
 }
 
-function withdrawEther() onlyController returns (bool){
-
-}
 
 // returns the index of the transfer in the array
 function getPendingTransfers() onlyController constant returns (uint256 []) {
@@ -150,7 +168,7 @@ function activatePendingTransfer(uint256 _index){
   coins[recipient]  =  coins[recipient] + value;
 
   deletePendingTransfer(_index);
-  pendingActivated(sender,recipient,value);
+  PendingActivated(sender,recipient,value);
 
 }
 
@@ -160,5 +178,21 @@ function deletePendingTransfer(uint256 index) internal{
   }
   pendingTransfers.length--;
 }
+
+// ID should be hash of requester + arbitrater + nonce
+function requestArbitration(bytes32 _ID, address _requester){
+  if(arbitrations[_ID].requesterVote==false){
+    arbitrations[_ID].requester = _requester;
+    arbitrations[_ID].requesterVote = true;
+    arbitrations[_ID].adminVote = false;
+    arbitrations[_ID].arbitratorVote = false;
+  }
+
+}
+
+function aribtrateTransfer(address _source,address _destination, uint256 _value, bytes32 _ID){
+
+}
+
 
 }

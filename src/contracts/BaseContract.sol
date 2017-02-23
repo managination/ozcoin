@@ -25,10 +25,17 @@ contract mortal is owned {
      active
    }
 
-  ContractState contractState;
+  ContractState public contractState;
+  uint8 public version;
 
-  modifier contractIsActive(){ if (contractState==ContractState.active) _;
+  modifier contractIsActive(){
+      if (contractState==ContractState.active) _;
   }
+
+  modifier contractIsAdminOnly(){
+      if (contractState==ContractState.adminOnly) _;
+  }
+
   function activateContract() onlyowner {
      contractState = ContractState.active;
   }
@@ -37,32 +44,34 @@ contract mortal is owned {
      contractState = ContractState.adminOnly;
   }
 
+  function setVersion(uint8 _version){
+    version = _version;
+  }
+
   function kill() onlyowner {
         setContractAdminOnly();
         selfdestruct(owner);
       }
+
+
 }
 
 
-contract NameRegistry is owned,mortal{
 
-  mapping (string=>address) contracts;
-  mapping (string=>string) abi;
-
-  function NameRegistry(){
-  }
-
-  function addMapping(string _name,address _address,string _abi) external {
-        contracts[_name]=_address;
-        abi[_name] = _abi;
-  }
-
-  function getContractDetails(string _name) external constant returns (address,string){
-        return (contracts[_name],abi[_name]);
-  }
-}
 
 contract BaseContract is mortal {
+
+  modifier addressesDifferent(address address1,address address2){
+    if(address1 != address2 ){
+      _;
+    }
+  }
+
+  modifier valueInRange(uint256 value,uint256 min,uint256 max){
+    if(value >= min && value <= max ){
+      _;
+    }
+  }
 
 
 }

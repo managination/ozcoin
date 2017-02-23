@@ -99,7 +99,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                         title={toolbarTitle + ' ' + (this.props.params.affiliate || '')}
                         fixed
                     />
-                    <form className="md-toolbar-relative md-grid" ref="keystoreCreation">
+                    <form className="md-toolbar-relative md-grid" onSubmit={(e) => e.preventDefault()}>
                         <TextField
                             id="ksEMail"
                             ref="email"

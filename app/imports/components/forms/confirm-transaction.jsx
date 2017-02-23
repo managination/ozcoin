@@ -41,7 +41,7 @@ export default class TransactionConfirmationOverlay extends PureComponent {
                     title={title}
                     fixed
                 />
-                <form className="md-toolbar-relative md-grid" ref="keystoreCreation">
+                <form className="md-toolbar-relative md-grid" onSubmit={(e) => e.preventDefault()}>
                     <div className="md-cell--12">
                         <h1>Transaction costs {cost} ETH your balance is {balance} ETH</h1>
                     </div>

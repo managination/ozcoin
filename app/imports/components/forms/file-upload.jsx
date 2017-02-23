@@ -102,7 +102,7 @@ export default class FileUpload extends TrackerReact(PureComponent) {
                 />
                 <h2>{this.props.params.docType}</h2>
 
-                <form className="md-grid">
+                <form className="md-grid" onSubmit={(e) => e.preventDefault()}>
                     < TextField
                         id="fileName"
                         ref="fileName"

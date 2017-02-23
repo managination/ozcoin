@@ -165,7 +165,7 @@ export default class UserDetails extends PureComponent {
                     </Toolbar>
                 </div>
                 <div>
-                    <form id="user-details" className="md-grid">
+                    <form id="user-details" className="md-grid" onSubmit={(e) => e.preventDefault()}>
                         < TextField
                             id="companyName"
                             ref="companyName"

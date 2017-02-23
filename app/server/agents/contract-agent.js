@@ -1,4 +1,6 @@
 import {Meteor} from "meteor/meteor";
+import {Match} from "meteor/check";
+import {EJSON} from "meteor/ejson";
 import {Contracts} from "../../imports/api/model/contracts";
 import {getWeb3} from "../../imports/api/ethereum-services";
 import {nameRegistry} from "../../imports/api/contracts/name-registry";
@@ -23,6 +25,7 @@ Meteor.startup(() => {
     Meteor.setInterval(() => {
         getContracts("User");
         getContracts("Certificate");
+        getContracts("TokenData");
     }, 10000);
 });
 

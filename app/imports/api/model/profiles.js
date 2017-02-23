@@ -7,6 +7,8 @@ export const Profiles = new Mongo.Collection('profiles',
         transform: (profile) => {
             if (profile.balance)
                 profile.balance = new BigNumber(profile.balance, 16).dividedBy(ether);
+            else
+                profile.balance = new BigNumber(0);
             return profile;
         }
     });

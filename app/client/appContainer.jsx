@@ -121,7 +121,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                     toolbarTitle={toolbarTitle}
                     toolbarActions={this.actions}
                 >
-                    <div>
+                    <div style={{width: "100%"}}>
                         {this.props.children}
                         <Wait visible={this.state.showWait}/>
                     </div>

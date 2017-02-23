@@ -11,28 +11,39 @@ Meteor.startup(() => {
             Profiles.find({}).forEach((profile) => {
                 let balance = getWeb3().eth.getBalance(add0x(profile.address));
                 let profileToUpdate = {update: false};
-                if (balance.dividedBy(ether).comparedTo(profile.balance) != 0) {
+                if (balance.dividedBy(ether).comparedTo(profile.balance || 0) != 0) {
                     console.log("updating balance of", profile.address, "from", profile.balance.toString(10), "to", balance.toString(10));
                     profileToUpdate.balance = balance.toString(16);
                     profileToUpdate.update = true;
                 }
-                callContractMethod('User', 'getUserDetails', profile.address).then((result) => {
-                    let role = result[1];
-                    if (role.comparedTo(profile.role) != 0) {
-                        profileToUpdate.role = role;
-                        profileToUpdate.update = true;
-                    }
-                    if (result[0] != "‌0x0000000000000000000000000000000000000000000000000000000000000000" && !profile.isRegistered) {
-                        profileToUpdate.isRegistered = true;
-                        profileToUpdate.update = true;
-                    }
-                    return profileToUpdate;
-                }).then((profileToUpdate) => {
-                    if (profileToUpdate.update) {
-                        delete profileToUpdate.update;
-                        Profiles.update({_id: profile._id}, {$set: profileToUpdate});
-                    }
-                })
+                callContractMethod('User', 'getUserDetails', profile.address)
+                    .then((result) => {
+                        let role = result[1];
+                        if (role.comparedTo(profile.role) != 0) {
+                            profileToUpdate.role = role;
+                            profileToUpdate.update = true;
+                        }
+                        if (result[0] != "‌0x0000000000000000000000000000000000000000000000000000000000000000" && !profile.isRegistered) {
+                            profileToUpdate.isRegistered = true;
+                            profileToUpdate.update = true;
+                        }
+                        return profileToUpdate;
+                    })
+                    .then((profileToUpdate) => {
+                        return callContractMethod('TokenData', 'balanceOf', profile.address).then((balance) => {
+                            if (profile.ozcBalance != balance.toNumber()) {
+                                profileToUpdate.update = true;
+                                profileToUpdate.ozcBalance = balance.toNumber();
+                            }
+                            return profileToUpdate;
+                        })
+                    })
+                    .then((profileToUpdate) => {
+                        if (profileToUpdate.update) {
+                            delete profileToUpdate.update;
+                            Profiles.update({_id: profile._id}, {$set: profileToUpdate});
+                        }
+                    })
             });
             updating = false;
         }

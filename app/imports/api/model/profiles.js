@@ -9,6 +9,8 @@ export const Profiles = new Mongo.Collection('profiles',
                 profile.balance = new BigNumber(profile.balance, 16).dividedBy(ether);
             else
                 profile.balance = new BigNumber(0);
+
+            profile.formattedBalance = profile.balance.toFormat(2);
             return profile;
         }
     });

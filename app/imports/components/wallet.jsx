@@ -12,6 +12,20 @@ import {add0x, signAndSubmit} from "../api/ethereum-services";
 import GetPassword from "./forms/confirm-transaction";
 import {Profiles} from "../api/model/profiles";
 
+const filterIcons = [
+    "filter_none",
+    "filter_",
+    "filter_",
+    "filter_",
+    "filter_",
+    "filter_",
+    "filter_",
+    "filter_",
+    "filter_",
+    "filter_",
+    "filter_",
+];
+
 export default class Wallet extends TrackerReact(PureComponent) {
     constructor(props) {
         super(props);
@@ -84,6 +98,31 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             <img src="/images/gold-ounces.jpg" role="presentation"/>
                             <MediaOverlay>
                                 <CardTitle title={profile.ozcBalance + " OZC"}
+                                           subtitle={"balance for " + profile.alias}>
+                                    <Button className="md-cell--right" icon>
+                                        shopping_cart
+                                    </Button>
+                                </CardTitle>
+                            </MediaOverlay>
+                        </Media>
+                        <CardTitle
+                            avatar={<Avatar src="" role="presentation"/>}
+                            title="Card Title"
+                            subtitle="Card Subtitle"
+                        />
+                        <CardActions expander>
+                            <Button flat label="Action 1"/>
+                            <Button flat label="Action 2"/>
+                        </CardActions>
+                        <CardText expandable>
+                            Lorem Ipsum
+                        </CardText>
+                    </Card>
+                    <Card style={{maxWidth: 600}} className="md-cell md-cell--6">
+                        <Media>
+                            <img src="/images/ethereum-logo.jpg" role="presentation"/>
+                            <MediaOverlay>
+                                <CardTitle title={profile.formattedBalance + " ETH"}
                                            subtitle={"balance for " + profile.alias}>
                                     <Button className="md-cell--right" icon>
                                         shopping_cart

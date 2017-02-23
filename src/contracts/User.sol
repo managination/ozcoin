@@ -72,6 +72,14 @@ contract User is BaseContract{
       return (users[_account].name,users[_account].role,users[_account].details);
     }
 
+    function getAffiliate(address _account) external constant returns (address){
+      return (users[_account].affiliateAccount);
+    }
+
+    function getAffiliateCompany(address _account) external constant returns (address){
+      return (users[_account].affiliateCompany);
+    }
+
     function getTotalNumberOfUsers() external constant returns (uint256){
         return userAccounts.length;
     }
@@ -85,44 +93,24 @@ contract User is BaseContract{
 
     }
 
-   function createMinter(address _account) userHasRole(_account,Role.CoinOwner,true) external {
-        users[_account].role = Role.Minter;
-        UserRoleChanged(_account,Role.Minter);
-    }
-
-    function createCertificateCreator(address _account) userHasRole(_account,Role.CoinOwner,true)  external {
-        users[_account].role = Role.CertificateCreator;
-        UserRoleChanged(_account,Role.CertificateCreator);
-    }
-
-    function createAuditor(address _account)  userHasRole(_account,Role.CoinOwner,true) external {
-       users[_account].role = Role.Auditor;
-       UserRoleChanged(_account,Role.Auditor);
-
-    }
-
-    function createEscrowAgent(address _account) userHasRole(_account,Role.CoinOwner,true) external {
-        users[_account].role = Role.EscrowAgent;
-        UserRoleChanged(_account,Role.EscrowAgent);
-    }
-
-   function createAffiliateCompany(address _account) userHasRole(_account,Role.CoinOwner,true) external {
-       users[_account].role = Role.AffiliateCompany;
-       UserRoleChanged(_account,Role.AffiliateCompany);
-    }
-
-
     function createCoinOwner(address _account,address _affiliateAccount,address _affiliateCompany,bytes32 _name,string _details) userActiveStatus(_account,false) accountIsValid(_account)  external returns (uint256){
       users[_account]   = UserDetails({name : _name, role : Role.CoinOwner, details : _details , affiliateAccount : _affiliateAccount, affiliateCompany : _affiliateCompany, active : true});
       userAccounts.push(_account);
       UserAdded(_account,Role.CoinOwner);
     }
 
-    function createAdminstrator(address _account,bytes32 _name,string _details) onlyowner {
+    function createAdministrator(address _account,bytes32 _name,string _details) onlyowner {
       users[_account]   = UserDetails({name : _name, role : Role.Administrator, details : _details ,affiliateAccount : _account, affiliateCompany: _account,active : true});
       userAccounts.push(_account);
       UserAdded(_account,Role.Administrator);
 
+    }
+
+    function changeRole(address _account,Role _role) userActiveStatus(_account,true) userHasRole(msg.sender,Role.Administrator,true) external {
+      if(_role!=Role.Administrator){
+        users[_account].role = _role;
+        UserRoleChanged(_account,_role);
+      }
     }
 
     function setAffiliate(address _affiliate) userHasRole(msg.sender,Role.CoinOwner,true) external {
@@ -136,13 +124,13 @@ contract User is BaseContract{
     }
 
 
-    function deActivateUser(address _account) userActiveStatus(_account,true) userHasRole(_account,Role.Administrator,true) external {
+    function deActivateUser(address _account) userActiveStatus(_account,true) userHasRole(msg.sender,Role.Administrator,true) external {
         users[_account].active = false;
         UserDeactivated(_account);
 
     }
 
-    function reActivateUser(address _account) userActiveStatus(_account,false) userHasRole(_account,Role.Administrator,true) external {
+    function reActivateUser(address _account) userActiveStatus(_account,false) userHasRole(msg.sender,Role.Administrator,true) external {
         users[_account].active = true;
         UserReactivated(_account);
     }

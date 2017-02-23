@@ -8,13 +8,6 @@ import "BaseContract.sol";
 contract ExchangeToken is ExchangeTokenInterface,BaseContract{
 
 TokenData tokenData;  // address of data contract
-//NameRegistry nameRegistry;
-
-/*modifier sufficientFunds(address _sender,uint256 _amount){
-  if (tokenData.balanceOf(_sender) >= _amount){
-    _;
-  }
-}*/
 
 
 function ExchangeToken(){
@@ -32,11 +25,6 @@ function totalSupply() constant returns (uint256 totalSupply){
 
 function balanceOf(address _owner) constant returns (uint256 balance){
   return tokenData.balanceOf(_owner);
-
-}
-
-function testMySender() constant returns (address){
-  return tokenData.testSender();
 
 }
 
@@ -65,7 +53,7 @@ function getFeeRate() constant returns (uint256){
   return tokenData.getFeeRate();
 }
 
-function calculateTransactionFee(uint256 _value) internal returns(uint256){
+function calculateTransactionFee(uint256 _value)  returns(uint256){
   // for a fixed fee
   return tokenData.getFeeRate();
 }

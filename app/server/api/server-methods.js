@@ -19,7 +19,7 @@ Meteor.methods({
         delete profile.address;
         delete profile.balance;
         let details = EJSON.stringify(profile);
-        return createRawTx(this.userId, 'User', 'createCoinOwner', address, profile.affiliate, profile.affiliateCompany, alias, details);
+        return createRawTx(this.userId, 'User', 'createCoinOwner', 0, address, profile.affiliate, profile.affiliateCompany, alias, details);
     },
 
     'file-upload': function (docType, fileName, documentId, fileData) {
@@ -44,7 +44,7 @@ Meteor.methods({
                 funcName = 'registerProofOfAsset';
             }
             console.log("creating raw transaction");
-            let promise = createRawTx(this.userId, 'Certificate', funcName, result.hash, documentId);
+            let promise = createRawTx(this.userId, 'Certificate', funcName, 0, result.hash, documentId);
             return promise;
         }).catch((err) => {
             console.log(err);

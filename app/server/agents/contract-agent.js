@@ -11,7 +11,7 @@ const getContracts = (name) => {
         let contract = nameRegistryContract.getContractDetails.call(name);
         // console.log("contract: ", name, 'address:', contract[0]);
         let contractAbi = contract[1];
-        if (Match.test(contractAbi, String)) {
+        if (Match.test(contractAbi, String) && contractAbi.length > 2) {
             contractAbi = EJSON.parse(contractAbi.replace(/'/g, '"'));
         }
         Contracts.upsert({name: name}, {name: name, address: contract[0], abi: contractAbi});
@@ -25,7 +25,8 @@ Meteor.startup(() => {
     Meteor.setInterval(() => {
         getContracts("User");
         getContracts("Certificate");
-        getContracts("TokenData");
-    }, 10000);
+        getContracts("ExchangeToken");
+        // getContracts("StandardToken");
+    }, Meteor.settings.contractPollInterval);
 });
 

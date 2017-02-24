@@ -106,9 +106,13 @@ export default class Wallet extends TrackerReact(PureComponent) {
     render() {
         const profile = Profiles.findOne({address: add0x(Meteor.user().username)})
             || {balance: new BigNumber(0), ozcBalance: new BigNumber(0)};
-        const prices = Globals.findOne({name: "prices"}) || {ozc: 0, eth: 0};
-        const ozcBalanceUSD = new BigNumber(profile.ozcBalance * prices.ozc).toFormat(2);
-        const ethBalanceUSD = new BigNumber(profile.ozcBalance * prices.ozc).toFormat(2);
+        const prices = {
+            eth: Globals.findOne({name: "ethPrice"}) || {BTC: 0, USD: 0, EUR: 0},
+            ozc: Globals.findOne({name: "ozcPrice"}) || {ETH: 0, USD: 0, BTC: 0},
+        };
+
+        const ozcBalanceUSD = new BigNumber(profile.ozcBalance * prices.ozc.USD).toFormat(2);
+        const ethBalanceUSD = new BigNumber(profile.ozcBalance * prices.eth.USD).toFormat(2);
         let dialogTitle;
         if (this.state.getPasswordVisible)
             dialogTitle = "Enter our password to validate the transaction";
@@ -130,7 +134,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             <img src="/images/gold-ounces.jpg" role="presentation"/>
                             <MediaOverlay>
                                 <CardTitle title={profile.formattedOzcBalance + " OZC = " + ozcBalanceUSD + " USD"}
-                                           subtitle={"price for OZC in USD " + (new BigNumber(prices.ozc).toFormat(2))}>
+                                           subtitle={"price for OZC in USD " + (new BigNumber(prices.ozc.USD).toFormat(2))}>
                                     <Button className="md-cell--right" icon>
                                         shopping_cart
                                     </Button>
@@ -175,7 +179,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             <img src="/images/ethereum-logo.jpg" role="presentation"/>
                             <MediaOverlay>
                                 <CardTitle title={profile.formattedEthBalance + " ETH = " + ethBalanceUSD + " USD"}
-                                           subtitle={"price for ETH in USD " + (new BigNumber(prices.eth).toFormat(2))}>
+                                           subtitle={"price for ETH in USD " + (new BigNumber(prices.eth.USD).toFormat(2))}>
                                     <Button className="md-cell--right"
                                             style={profile.transferFees ? {color: "#8BC34A"} : {}}
                                             disabled={!profile.transferFees}
@@ -215,8 +219,8 @@ export default class Wallet extends TrackerReact(PureComponent) {
                                 check
                             </Button>
                         </CardActions>
-                        <CardText expandable>
-                            Lorem Ipsum
+                        <CardText>
+                            {profile.transferFees ? "click on the green dollar sign ($) to redeem your transfer fees" : ""}
                         </CardText>
                     </Card>
                 </div>

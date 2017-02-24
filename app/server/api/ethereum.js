@@ -46,7 +46,7 @@ export const createRawTx = function (userId, contractName, funcName, value) {
     let profile = Profiles.findOne({owner: userId});
 
     return getContract(contractName).then((contract) => {
-        let args = Array.from(arguments).slice(3);
+        let args = Array.from(arguments).slice(4);
         let payloadData = contract[funcName].getData.apply(this, args);
         let gasEstimate = web3.toHex(web3.eth.estimateGas({
                 to: contract.address,

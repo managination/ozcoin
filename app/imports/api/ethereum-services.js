@@ -6,6 +6,7 @@ import * as LocalStorage from "meteor/simply:reactive-local-storage";
 import BigNumber from "bignumber.js";
 
 export const ether = new BigNumber("1000000000000000000");
+export const ozcoin = new BigNumber("1000000");
 
 export const initializeKeystore = (() => {
     return new Promise((resolve, reject) => {

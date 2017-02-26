@@ -1,9 +1,10 @@
 {
   "public": {
-    "ethNodeAddress": "http://eth.mngn.io:8545"
+    "ethNodeAddress": "http://localhost:8545"
   },
-  "userPollInterval": 10000,
-  "userBalancePollInterval": 10000,
+  "userPollInterval": 86400000,
+  "userBalancePollInterval": 3600000,
+  "ethPricePollInterval": 60000,
   "contractPollInterval": 60000,
   "ipfsNode": {
     "host": "ipfs.infura.io",

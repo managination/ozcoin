@@ -90,7 +90,18 @@ export default class Wallet extends TrackerReact(PureComponent) {
     };
 
     _transferOzc = () => {
-
+        const self = this;
+        Session.set("showWait", true);
+        Meteor.callPromise('transfer-ozc', this.state.recipient, this.state.ozcAmount)
+            .then((response) => {
+                response.getPasswordVisible = true;
+                Session.set("showWait", false);
+                self.setState(response);
+            })
+            .catch((err) => {
+                console.log(err);
+                Session.set("showWait", false);
+            })
     };
 
     _handleChange = (value, event) => {
@@ -111,8 +122,8 @@ export default class Wallet extends TrackerReact(PureComponent) {
             ozc: Globals.findOne({name: "ozcPrice"}) || {ETH: 0, USD: 0, BTC: 0},
         };
 
-        const ozcBalanceUSD = new BigNumber(profile.ozcBalance * prices.ozc.USD).toFormat(2);
-        const ethBalanceUSD = new BigNumber(profile.ozcBalance * prices.eth.USD).toFormat(2);
+        const ozcBalanceUSD = new BigNumber(profile.ozcBalance).times(prices.ozc.USD).toFormat(2);
+        const ethBalanceUSD = new BigNumber(profile.balance).times(prices.eth.USD).toFormat(2);
         let dialogTitle;
         if (this.state.getPasswordVisible)
             dialogTitle = "Enter our password to validate the transaction";
@@ -165,7 +176,8 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             <Button primary={this.state.ozcAmount > 0}
                                     flat label="Transfer"
                                     onClick={this._transferOzc}
-                                    disabled={!profile.balance.toNumber() || !(this.state.ethAmount > 0)
+                                    disabled={!profile.balance.toNumber() || !(this.state.ozcAmount > 0)
+                                    || this.state.ozcAmount > profile.ozcBalance.toNumber()
                                     || !isValidAddress(this.state.recipient)}>
                                 check
                             </Button>
@@ -215,6 +227,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                                     flat label="Transfer"
                                     onClick={this._transferEth}
                                     disabled={!profile.balance.toNumber() || !(this.state.ethAmount > 0)
+                                    || this.state.ethAmount > profile.balance.toNumber()
                                     || !isValidAddress(this.state.recipient)}>
                                 check
                             </Button>

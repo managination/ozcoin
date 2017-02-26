@@ -55,6 +55,39 @@ export const callContractMethod = function (contract, funcName) {
     })
 };
 
+/*start listening for events of this type*/
+export const listenToEvent = function (contractName, event, filter, callback) {
+    return getContract(contractName).then((contract) => {
+        let listener = {
+            callback: callback,
+            failures: 0,
+            event: contract[event](filter, {fromBlock: 'latest', toBlock: 'latest'})
+        };
+
+        (function startWatching() {
+            listener.event.watch(function (error, result) {
+                if (error) {
+                    try {
+                        listener.event.stopWatching();
+                        if (listener.failures++ < 10) {
+                            startWatching();
+                            console.log("WARNING watcher restarted", contractName, event, error);
+                        } else {
+                            console.log("ERROR stopped watching", contractName, event, error);
+                        }
+                    } catch (exception) {
+                        console.log("ERROR exception in", contractName, event, error, exception);
+                    }
+                } else {
+                    listener.failures = 0;
+                    if (typeof result == 'object' && result.args)
+                        listener.callback(result);
+                }
+            })
+        })();
+    })
+};
+
 export const getCertificateContract = () => {
     return getContract('Certificate');
 };

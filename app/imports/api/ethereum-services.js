@@ -28,6 +28,10 @@ export const initializeKeystore = (() => {
                                 reject(err);
                             else {
                                 resolve(ks);
+                                Meteor.call('update-balance', function (err, result) {
+                                    if (err)
+                                        console.log("ERROR", err);
+                                })
                             }
                         });
                     })

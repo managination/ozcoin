@@ -6,6 +6,7 @@ import {getContract} from "../../imports/api/contracts/ethereum-contracts";
 import {Profiles} from "../../imports/api/model/profiles";
 
 export const ether = new BigNumber("1000000000000000000");
+export const ozcoin = new BigNumber("1000000");
 
 export const createRawValueTx = function (userId, recipient, value) {
     return new Promise((resolve, reject) => {
@@ -50,8 +51,9 @@ export const createRawTx = function (userId, contractName, funcName, value) {
         let payloadData = contract[funcName].getData.apply(this, args);
         let gasEstimate = web3.toHex(web3.eth.estimateGas({
                 to: contract.address,
+                value: web3.toHex(value),
                 data: payloadData
-            }) + 10000);
+            }) * 5);
 
         let nonce = web3.eth.getTransactionCount(profile.address);
         console.log("the nonce is", nonce);

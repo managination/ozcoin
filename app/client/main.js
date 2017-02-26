@@ -1,11 +1,10 @@
-import {Meteor} from 'meteor/meteor';
-import {render} from 'react-dom';
-import {renderRoutes} from './router';
-import React from 'react';
-
-import Wait from '../imports/components/wait';
-
-import {initializeKeystore} from '../imports/api/ethereum-services';
+import {Meteor} from "meteor/meteor";
+import {render} from "react-dom";
+import {renderRoutes} from "./router";
+import React from "react";
+import BigNumber from "bignumber.js";
+import Wait from "../imports/components/wait";
+import {initializeKeystore} from "../imports/api/ethereum-services";
 
 if (!window.console) {
     window.console = {
@@ -16,6 +15,7 @@ if (!window.console) {
 }
 
 Meteor.startup(() => {
+    BigNumber.config({ERRORS: false});
     render(<Wait visible={true}/>, document.getElementById('render-target'));
     initializeKeystore().then((keystore) => {
         Session.set('initialized', true);

@@ -1,6 +1,6 @@
 import {Mongo} from "meteor/mongo";
 import BigNumber from "bignumber.js";
-import {ether} from "../ethereum-services";
+import {ozcoin, ether} from "../ethereum-services";
 
 export const Profiles = new Mongo.Collection('profiles',
     {
@@ -11,7 +11,7 @@ export const Profiles = new Mongo.Collection('profiles',
                 profile.balance = new BigNumber(0);
 
             if (profile.ozcBalance)
-                profile.ozcBalance = new BigNumber(profile.ozcBalance).dividedBy(1000000);
+                profile.ozcBalance = new BigNumber(profile.ozcBalance).dividedBy(ozcoin);
             else
                 profile.ozcBalance = new BigNumber(0);
 
@@ -52,13 +52,13 @@ Profiles.deny({
 
 export const Roles = {
     all: -1,
-    administrator: 0,
-    minter: 1,
-    arbitrator: 2,
-    certificatecreator: 3,
-    coinowner: 4,
+    coinowner: 0,
+    administrator: 1,
+    minter: 2,
+    arbitrator: 3,
+    certificatecreator: 4,
     auditor: 5,
     escrowagent: 6,
     affiliate: 7,
-    affiliatecompany: 8
+    affiliatecompany: 8,
 };

@@ -8,6 +8,17 @@ import {Profiles} from "../../imports/api/model/profiles";
 export const ether = new BigNumber("1000000000000000000");
 export const ozcoin = new BigNumber("1000000");
 
+const getNonce = function (address) {
+    let web3 = getWeb3();
+    /*the nonce is the count of the next transaction*/
+    let nonce = web3.eth.getTransactionCount(address);
+    console.log("mined transactions", nonce);
+    /*if the user has a pending transaction it needs to be added too*/
+    if (web3.eth.pendingTransactions)
+        nonce += web3.eth.pendingTransactions.filter((tx) => tx.from == address).lenght;
+    return nonce;
+};
+
 export const createRawValueTx = function (userId, recipient, value) {
     return new Promise((resolve, reject) => {
         let web3 = getWeb3();
@@ -19,7 +30,7 @@ export const createRawValueTx = function (userId, recipient, value) {
             value: web3.toHex(value),
         }));
 
-        let nonce = web3.eth.getTransactionCount(profile.address);
+        let nonce = getNonce(profile.address);
         console.log("the nonce is", nonce);
 
         var rawTx = {
@@ -55,8 +66,8 @@ export const createRawTx = function (userId, contractName, funcName, value) {
                 data: payloadData
             }) * 5);
 
-        let nonce = web3.eth.getTransactionCount(profile.address);
-        console.log("the nonce is", nonce);
+        let nonce = getNonce(profile.address);
+        console.log("the nonce is", nonce, "gas estimate", gasEstimate / 5);
 
         var rawTx = {
             nonce: nonce,
@@ -105,6 +116,7 @@ Meteor.methods({
     'wait-for-tx-mining': function (txHash) {
         if (txHash && typeof txHash === 'string' && getWeb3().eth.getTransaction(txHash)) {
             return new Promise((resolve, reject) => {
+                console.log("pending transactions", getWeb3().eth.pendingTransactions);
                 let txloop = Meteor.setInterval(Meteor.bindEnvironment(function () {
                     try {
                         let tx = getWeb3().eth.getTransaction(txHash);

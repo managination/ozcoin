@@ -35,29 +35,29 @@ Meteor.startup(() => { //Wallet events
 });
 
 Meteor.startup(() => { //User events
-    listenToEvent('User', 'UserRoleChanged', {}, (result) => {
+    listenToEvent('User', 'UserRoleChanged', {}, Meteor.bindEnvironment((result) => {
         Profiles.update({address: result.args._account}, {$set: {role: result.args._newRole.toNumber()}})
-    });
-    listenToEvent('User', 'UserAdded', null, (result) => {
+    }));
+    listenToEvent('User', 'UserAdded', null, Meteor.bindEnvironment((result) => {
         Profiles.update({address: result.args._account}, {
             $set: {
                 role: result.args._role.toNumber(), isRegistered: true, status: "active"
             }
         })
-    });
-    listenToEvent('User', 'UserDeactivated', {}, (result) => {
+    }));
+    listenToEvent('User', 'UserDeactivated', {}, Meteor.bindEnvironment((result) => {
         Profiles.update({address: result.args._account}, {$set: {status: "inactive"}})
-    });
-    listenToEvent('User', 'UserReactivated', {}, (result) => {
+    }));
+    listenToEvent('User', 'UserReactivated', {}, Meteor.bindEnvironment((result) => {
         Profiles.update({address: result.args._account}, {$set: {status: "active"}})
-    });
-    listenToEvent('User', 'UserDetailsChanged', {}, (result) => {
+    }));
+    listenToEvent('User', 'UserDetailsChanged', {}, Meteor.bindEnvironment((result) => {
         Profiles.update({address: result.args._account}, {
             $set: {
                 status: "active"
             }
         })
-    });
+    }));
 });
 
 Meteor.startup(() => {

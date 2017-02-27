@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 import {getWeb3, add0x} from "../../imports/api/ethereum-services";
 import {getContract} from "../../imports/api/contracts/ethereum-contracts";
 import {Profiles} from "../../imports/api/model/profiles";
+import {updateProfileEthBalance} from "../agents/data-sync";
 
 export const ether = new BigNumber("1000000000000000000");
 export const ozcoin = new BigNumber("1000000");
@@ -113,16 +114,21 @@ Meteor.methods({
         })
     },
 
-    'wait-for-tx-mining': function (txHash) {
+    'wait-for-tx-mining': function (txHash, sender, recipient) {
         if (txHash && typeof txHash === 'string' && getWeb3().eth.getTransaction(txHash)) {
             return new Promise((resolve, reject) => {
                 console.log("pending transactions", getWeb3().eth.pendingTransactions);
                 let txloop = Meteor.setInterval(Meteor.bindEnvironment(function () {
                     try {
-                        let tx = getWeb3().eth.getTransaction(txHash);
+                        const web3 = getWeb3();
+                        let tx = web3.eth.getTransaction(txHash);
                         if (tx.blockNumber) {
                             Meteor.clearInterval(txloop);
-                            resolve(tx);
+                            if (sender)
+                                updateProfileEthBalance(Profiles.findOne({address: sender}));
+                            if (recipient)
+                                updateProfileEthBalance(Profiles.findOne({address: recipient}));
+                            resolve(web3.eth.getTransactionReceipt(txHash));
                         }
                     } catch (err) {
                         reject(new Meteor.Error("wait for TX to mine", err.message));

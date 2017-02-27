@@ -33,6 +33,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
         this._transferEth.bind(this);
         this._transferOzc.bind(this);
         this._handleChange.bind(this);
+        this._transactionConfirmed.bind(this);
     }
 
     componentWillMount() {
@@ -41,6 +42,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
 
         Meteor.subscribe('current-profile', (err) => {
             let profile = Profiles.findOne({address: add0x(Meteor.user().username)});
+            /*only create the coinowner if it does not exist yet and the ETH balance is positive*/
             if (profile && !profile.isRegistered && profile.balance && profile.balance.comparedTo(0) === 1) {
                 Meteor.callPromise('register-user').then((response) => {
                     response.showUserRegistrationDialog = true;
@@ -56,7 +58,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
     _transactionConfirmed = (password) => {
         this.setState({getPasswordVisible: false});
         Session.set("showWait", true);
-        signAndSubmit(password, this.state.rawTx, true)
+        signAndSubmit(password, this.state.rawTx, true, this.state.profile.address, this.state.recipient)
             .then(() => {
                 Session.set("showWait", false);
             })

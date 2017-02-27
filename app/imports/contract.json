@@ -397,7 +397,7 @@
     ]
   },
   "StandardToken": {
-    "address": "0x2fe046e2bcd1acad924c4609beea3bd307891f13",
+    "address": "0x3483bB50bB9C775950545B10bc63acD1469aa95A",
     "abi": [
       {
         "constant": false,

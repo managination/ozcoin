@@ -4,6 +4,7 @@ import {Match} from "meteor/check";
 import {Promise} from "meteor/promise";
 import {Contracts} from "../model/contracts";
 import {getWeb3} from "../ethereum-services";
+import contractDefs from "../../contract.json";
 
 let subscription = undefined;
 Meteor.startup(() => {
@@ -19,12 +20,11 @@ Meteor.startup(() => {
 let contracts = {};
 const createContract = (name, resolve, reject) => {
 
-    let newVersion = Contracts.findOne({name: name});
-    if (!contracts[name] || newVersion.address != contracts[name].address) try {
-        if (Match.test(newVersion.abi, String)) {
-            newVersion.abi = EJSON.parse(newVersion.abi.replace(/'/g, '"'));
+    if (!contracts[name]) try {
+        if (Match.test(contractDefs[name].abi, String)) {
+            contractDefs[name].abi = EJSON.parse(contractDefs[name].abi.replace(/'/g, '"'));
         }
-        contracts[name] = getWeb3().eth.contract(newVersion.abi).at(newVersion.address);
+        contracts[name] = getWeb3().eth.contract(contractDefs[name].abi).at(contractDefs[name].address);
     } catch (err) {
         reject(err);
         return;

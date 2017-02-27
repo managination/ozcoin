@@ -55,7 +55,7 @@ export const getWeb3 = () => {
     return w3;
 };
 
-export const signAndSubmit = (password, rawTx, waitForMining) => {
+export const signAndSubmit = (password, rawTx, waitForMining, sender, recipient) => {
     return new Promise((resolve, reject) => {
         wallet.keyFromPassword(password, (err, pwDerivedKey) => {
             if (err) {
@@ -66,7 +66,7 @@ export const signAndSubmit = (password, rawTx, waitForMining) => {
             return Meteor.callPromise('submit-raw-tx', add0x(signedTxString.toString('hex')))
                 .then((result) => {
                     if (waitForMining) {
-                        return Meteor.callPromise('wait-for-tx-mining', result)
+                        return Meteor.callPromise('wait-for-tx-mining', result, sender, recipient)
                             .then((result) => {
                                 resolve(result);
                             });

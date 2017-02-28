@@ -40,19 +40,20 @@ export default class Wallet extends TrackerReact(PureComponent) {
         Meteor.subscribe('globals', (err) => {
         });
 
-        Meteor.subscribe('current-profile', (err) => {
-            let profile = Profiles.findOne({address: add0x(Meteor.user().username)});
-            /*only create the coinowner if it does not exist yet and the ETH balance is positive*/
-            if (profile && !profile.isRegistered && profile.balance && profile.balance.comparedTo(0) === 1) {
-                Meteor.callPromise('register-user').then((response) => {
-                    response.showUserRegistrationDialog = true;
-                    response.profile = profile;
-                    this.setState(response);
-                })
-            } else {
-                this.setState({profile: profile});
-            }
-        });
+        if (Meteor.user())
+            Meteor.subscribe('current-profile', (err) => {
+                let profile = Profiles.findOne({address: add0x(Meteor.user().username)});
+                /*only create the coinowner if it does not exist yet and the ETH balance is positive*/
+                if (profile && !profile.isRegistered && profile.balance && profile.balance.comparedTo(0) === 1) {
+                    Meteor.callPromise('register-user').then((response) => {
+                        response.showUserRegistrationDialog = true;
+                        response.profile = profile;
+                        this.setState(response);
+                    })
+                } else {
+                    this.setState({profile: profile});
+                }
+            });
     };
 
     _transactionConfirmed = (password) => {
@@ -117,6 +118,8 @@ export default class Wallet extends TrackerReact(PureComponent) {
     }
 
     render() {
+        if (!Meteor.user()) return null;
+
         const profile = Profiles.findOne({address: add0x(Meteor.user().username)})
             || {balance: new BigNumber(0), ozcBalance: new BigNumber(0)};
         const prices = {

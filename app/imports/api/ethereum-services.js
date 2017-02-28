@@ -18,20 +18,21 @@ export const initializeKeystore = (() => {
             let email = LocalStorage.getItem('email');
             //TODO: remove password from localstorage and ask the user to enter it
             let password = LocalStorage.getItem('password');
-            let mnemonic = CryptoJS.AES.decrypt(LocalStorage.getItem('encrypted-mnemonic'), password).toString(CryptoJS.enc.Utf8);
+            mnemonic = CryptoJS.AES.decrypt(mnemonic, password).toString(CryptoJS.enc.Utf8);
 
             createKeystore(alias, email, password, salt, mnemonic)
                 .then((ks) => {
                     return new Promise((resolve, reject) => {
-                        Meteor.loginWithPassword(ks.username, ks.password, (err) => {
+                        Meteor.loginWithPassword(ks.username, mnemonic, (err) => {
                             if (err)
                                 reject(err);
                             else {
-                                resolve(ks);
-                                Meteor.call('update-balance', function (err, result) {
+                                Meteor.call('update-user-details', (err) => {
                                     if (err)
                                         console.log("ERROR", err);
-                                })
+                                    resolve(ks);
+                                });
+                                Meteor.call('store-salt', CryptoJS.SHA256(mnemonic).toString(), salt)
                             }
                         });
                     })
@@ -102,8 +103,6 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
             // the corresponding private key is also encrypted
             ks.generateNewAddress(pwDerivedKey);
 
-            //TODO: encrypt the seed with the user's password before storing
-            LocalStorage.setItem('mnemonic', ks.getSeed(pwDerivedKey));
             LocalStorage.setItem('encrypted-mnemonic', CryptoJS.AES.encrypt(mnemonic, password).toString());
             LocalStorage.setItem('salt', ks.salt);
             LocalStorage.setItem('alias', alias);
@@ -112,7 +111,12 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
             LocalStorage.setItem('password', password);
             LocalStorage.setItem('username', ks.getAddresses()[0]);
 
-            _resolve({username: ks.getAddresses()[0], password: pwDerivedKey.toString()});
+            _resolve({
+                username: ks.getAddresses()[0],
+                password: mnemonic,
+                salt: ks.salt,
+                mnemonicHash: CryptoJS.SHA256(mnemonic).toString()
+            });
         });
     };
 
@@ -132,11 +136,14 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
         return new Promise((resolve, reject) => {
             _resolve = resolve;
             _reject = reject;
-            keystore.createVault({
-                password: password,
-                seedPhrase: mnemonic,
-            }, keystoreCallback);
-
+            Meteor.call('get-salt-from-mnemonic', CryptoJS.SHA256(mnemonic).toString(), function (salt) {
+                let options = {
+                    password: password,
+                    seedPhrase: mnemonic,
+                };
+                if (salt) options.salt = salt;
+                keystore.createVault(options, keystoreCallback);
+            })
         });
     }
     return new Promise((resolve, reject) => {

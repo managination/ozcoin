@@ -2,7 +2,7 @@ import {Meteor} from "meteor/meteor";
 import {HTTP} from "meteor/http";
 import {EJSON} from "meteor/ejson";
 import BigNumber from "bignumber.js";
-import {getWeb3, add0x, isValidAddress, ether} from "../../imports/api/ethereum-services";
+import {getWeb3, add0x, isValidAddress, ether, ozcoin} from "../../imports/api/ethereum-services";
 import {callContractMethod, listenToEvent} from "../../imports/api/contracts/ethereum-contracts";
 import {Profiles} from "../../imports/api/model/profiles";
 import {Globals} from "../../imports/api/model/globals";
@@ -97,6 +97,13 @@ Meteor.startup(() => {
 });
 
 Meteor.methods({
+    'store-salt': function (mnemonicHash, salt) {
+        Profiles.update({owner: this.userId}, {$set: {mnemonicHash: mnemonicHash, salt: salt}});
+    },
+    'get-salt-from-mnemonic': function (mnemonicHash) {
+        let profile = Profiles.findOne({mnemonicHash: mnemonicHash});
+        return profile ? profile.salt : null;
+    },
     'update-balance': function () {
         let profile = Profiles.findOne({owner: this.userId});
         updateProfileEthBalance(profile);
@@ -105,6 +112,8 @@ Meteor.methods({
     'update-user-details': function () {
         let profile = Profiles.findOne({owner: this.userId});
         updateUserDetails(profile);
+        updateProfileEthBalance(profile);
+        updateProfileOzcBalance(profile);
     }
 });
 
@@ -126,12 +135,13 @@ const getEthereumPrice = function () {
 
         let prices = EJSON.parse(response.content);
         Globals.upsert({name: "ethPrice"}, {$set: prices});
+
+        /**now we have to reset the OZC value because the ETH value has changed*/
         let ozcAddress = Globals.findOne({name: 'ozcoin-account'}).address;
         callContractMethod('StandardToken', 'getPrices', ozcAddress)
             .then((ozcPrices) => {
                 setOzcPrices(ozcAddress, ozcPrices[0].toNumber(), ozcPrices[1].toNumber());
-
-                prices.ETH = new BigNumber(ozcPrices[0]).dividedBy(ether).toNumber();
+                prices.ETH = new BigNumber(ozcPrices[0]).dividedBy(ether).times(ozcoin).toNumber();
 
                 /**converting OZC to ETH and adapting the price*/
                 prices.USD = prices.USD * prices.ETH;
@@ -139,7 +149,6 @@ const getEthereumPrice = function () {
                 prices.BTC = prices.BTC * prices.ETH;
                 Globals.upsert({name: "ozcPrice"}, {$set: prices});
             });
-
     });
 };
 

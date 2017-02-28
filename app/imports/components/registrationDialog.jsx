@@ -6,10 +6,10 @@ import Dialog from "react-md/lib/Dialogs";
 import Button from "react-md/lib/Buttons/Button";
 import TextField from "react-md/lib/TextFields";
 import Toolbar from "react-md/lib/Toolbars";
+import Paper from "react-md/lib/Papers";
 import {browserHistory} from "react-router";
-import {createKeystore} from "../api/ethereum-services";
+import {createKeystore, add0x} from "../api/ethereum-services";
 import {Profiles, Roles} from "../api/model/profiles.js";
-
 
 export default class RegistrationDialog extends TrackerReact(PureComponent) {
     constructor(props) {
@@ -36,6 +36,18 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
         this.setState({visible: false});
     }
 
+    _setProfile() {
+        Meteor.call('update-user-details', (err) => {
+            if (err)
+                console.log("ERROR", err);
+            Meteor.subscribe("current-profile", () => {
+                let profile = Profiles.findOne({address: add0x(Meteor.user().username)});
+                Session.set('currentProfile', profile || {alias: "not logged in"});
+                Session.set('showWait', false);
+            });
+        });
+    }
+
     _createKeystore() {
         let self = this;
         let alias = this.refs.alias.getField().value;
@@ -56,6 +68,14 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                     browserHistory.push(Session.get('initialLocation') || '/wallet');
                     if (err) {
                         console.log("user creation error ", err);
+                        Meteor.loginWithPassword(options.username, options.password, (err) => {
+                            if (err) {
+                                console.log("ERROR could not login", err);
+                                Session.set('showWait', false);
+                            } else {
+                                self._setProfile();
+                            }
+                        });
                     } else {
                         Profiles.insert({
                             owner: Meteor.userId(),
@@ -64,14 +84,17 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                             role: Roles.coinowner,
                             address: '0x' + keystore.username,
                             affiliate: self.props.params.affiliate,
+                            salt: keystore.salt,
+                            mnemonicHash: keystore.mnemonicHash,
                             isRegistered: false,
+                        }, (err) => {
+                            self._setProfile();
                         });
-                        Session.set('showWait', false);
                     }
                 })
             })
             .catch((error) => {
-                console.log("keystore creation error ", err);
+                console.log("keystore creation error ", error);
             });
     }
 
@@ -131,15 +154,26 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                             className="md-cell md-cell--12"
                             required
                         />
-                        <TextField
-                            id="mnemonic"
-                            ref="mnemonic"
-                            label="mnemonic"
-                            placeholder="if you know your mnemonic paste it here"
-                            customSize="title"
+                        <Paper
+                            key={1}
+                            zDepth={1}
+                            raiseOnHover={true}
                             className="md-cell md-cell--12"
-                            helpText="if you do not provide a mnemonic a random one will be created for you"
-                        />
+                        >
+                            <h1 style={{"textAlign": "center"}}>if you have an existing mnemonic paste it below</h1>
+                            <TextField
+                                id="mnemonic"
+                                ref="mnemonic"
+                                label="mnemonic"
+                                placeholder="if you know your mnemonic paste it here"
+                                customSize="title"
+                                className="md-cell md-cell--12"
+                                helpText="if you do not provide a mnemonic a random one will be created for you"
+                            />
+                            <h1 style={{"textAlign": "center"}}>
+                                a random mnemonic will be generated if left empty
+                            </h1>
+                        </Paper>
                     </form>
                 </Dialog>
             </div>

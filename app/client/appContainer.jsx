@@ -44,7 +44,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                 Session.set('currentProfile', profile || {alias: "not logged in"});
 
                 if (this.props.location.pathname.indexOf('register') >= 0) {
-                    browserHistory.push('/edit-user/' + profile.email);
+                    browserHistory.push('/edit-user/' + profile.address);
                 } else if (this.props.location.pathname == '/') {
                     browserHistory.push('/wallet');
                 }

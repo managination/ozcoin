@@ -1,6 +1,7 @@
 import {Meteor} from "meteor/meteor";
 import {Promise} from "meteor/promise";
 import {keystore, signing} from "eth-lightwallet";
+import CryptoJS from "crypto-js";
 import W3 from "web3";
 import * as LocalStorage from "meteor/simply:reactive-local-storage";
 import BigNumber from "bignumber.js";
@@ -10,15 +11,14 @@ export const ozcoin = new BigNumber("1000000");
 
 export const initializeKeystore = (() => {
     return new Promise((resolve, reject) => {
-        let mnemonic = LocalStorage.getItem('mnemonic');
+        let mnemonic = LocalStorage.getItem('encrypted-mnemonic');
         if (mnemonic) {
-            //TODO: decrypt the mnemonic before creating the keystore
-            let mnemonic = LocalStorage.getItem('mnemonic');
             let salt = LocalStorage.getItem('salt');
             let alias = LocalStorage.getItem('alias');
             let email = LocalStorage.getItem('email');
             //TODO: remove password from localstorage and ask the user to enter it
             let password = LocalStorage.getItem('password');
+            let mnemonic = CryptoJS.AES.decrypt(LocalStorage.getItem('encrypted-mnemonic'), password).toString(CryptoJS.enc.Utf8);
 
             createKeystore(alias, email, password, salt, mnemonic)
                 .then((ks) => {
@@ -104,6 +104,7 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
 
             //TODO: encrypt the seed with the user's password before storing
             LocalStorage.setItem('mnemonic', ks.getSeed(pwDerivedKey));
+            LocalStorage.setItem('encrypted-mnemonic', CryptoJS.AES.encrypt(mnemonic, password).toString());
             LocalStorage.setItem('salt', ks.salt);
             LocalStorage.setItem('alias', alias);
             LocalStorage.setItem('email', email);

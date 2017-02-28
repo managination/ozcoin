@@ -122,6 +122,8 @@ const setOzcPrices = function (address, sell, buy) {
 
 const getEthereumPrice = function () {
     HTTP.get("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=BTC,USD,EUR", (error, response) => {
+        if (!response) return;
+
         let prices = EJSON.parse(response.content);
         Globals.upsert({name: "ethPrice"}, {$set: prices});
         let ozcAddress = Globals.findOne({name: 'ozcoin-account'}).address;

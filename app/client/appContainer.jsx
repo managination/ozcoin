@@ -11,6 +11,7 @@ import ListItem from "react-md/lib/Lists/ListItem";
 import CopyToClipboard from "react-copy-to-clipboard";
 import Snackbar from "react-md/lib/Snackbars";
 import Wait from "../imports/components/wait";
+import CopyMnemonic from "../imports/components/forms/copy-mnemonic";
 import {Profiles} from "../imports/api/model/profiles";
 import menuEntries from "../imports/components/menus/main-menu";
 import {add0x} from "../imports/api/ethereum-services";
@@ -25,11 +26,13 @@ export default class AppContainer extends TrackerReact(PureComponent) {
             autohideTimeout: 0,
         };
         Session.set("showWait", false);
+        Session.set("showCopyMnemonic", false);
         Session.set('currentProfile', {alias: 'Please login'});
 
         this._showToast = this._showToast.bind(this);
         this._removeToast = this._removeToast.bind(this);
-
+        this._copyMnemonic = this._copyMnemonic.bind(this);
+        this._showAddressCopiedToast = this._showAddressCopiedToast.bind(this);
     }
 
     componentWillMount() {
@@ -58,8 +61,8 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         console.log("componentWillReceiveProps app.jsx");
     }
 
-    _showToast() {
-        const text = "address copied", action = undefined;
+    _showToast(text) {
+        const action = undefined;
         const toasts = this.state.toasts.slice();
         toasts.push({text, action});
 
@@ -69,38 +72,49 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         this.setState({toasts, autohideTimeout});
     };
 
+    _showAddressCopiedToast() {
+        this._showToast("address copied");
+    }
+
     _removeToast() {
         const [, ...toasts] = this.state.toasts;
         this.setState({toasts});
     }
 
+    _copyMnemonic() {
+        Session.set("showCopyMnemonic", true);
+    }
+
     render() {
         console.log("rendering app.jsx");
+        let toolbarMenuItems = Profiles.find().fetch().map((profile) => {
+            return (
+                <ListItem key={profile._id} primaryText={profile.alias}
+                          onClick={() => {
+                              Session.set('currentProfile', profile)
+                          }}/>
 
+            );
+        });
+        toolbarMenuItems.push(
+            <ListItem key="copyMnemonic" primaryText="Copy mnemonic"
+                      onClick={this._copyMnemonic}/>
+        );
         this.actions = [
-            <Button key="search" icon>search</Button>,
+            <Button key="refresh" icon onClick={() => Meteor.call('update-balance')}>refresh</Button>,
             <MenuButton id="aliases" buttonChildren="more_vert" key="menu" icon>
-                {Profiles.find().fetch().map((profile) => {
-                    return (
-                        <ListItem key={profile._id} primaryText={profile.alias}
-                                  onClick={() => {
-                                      Session.set('currentProfile', profile)
-                                  }}/>
-
-                    );
-                })}
+                {toolbarMenuItems}
             </MenuButton>
         ];
 
         this.state.initialized = Session.get('initialized');
-        this.state.showWait = Session.get("showWait");
 
         const menuItems = menuEntries(Session.get('currentProfile'), this.props.location.pathname);
         const toolbarTitle = (<div>
                 <span>{Session.get('currentProfile').alias}</span>
                 <span> - </span>
                 <CopyToClipboard text={Session.get('currentProfile').address || ''}
-                                 onCopy={this._showToast}>
+                                 onCopy={this._showAddressCopiedToast}>
                     <Button flat iconBefore={false}
                             label={Session.get('currentProfile').address}
                             tooltipLabel="click here to copy the address">content_copy</Button>
@@ -123,7 +137,9 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                 >
                     <div style={{width: "100%"}}>
                         {this.props.children}
-                        <Wait visible={this.state.showWait}/>
+                        <Wait visible={Session.get("showWait")}/>
+                        <CopyMnemonic visible={Session.get("showCopyMnemonic")}
+                                      showToast={this._showToast}/>
                     </div>
                     <Snackbar toasts={this.state.toasts} autohide={this.state.autohide} onDismiss={this._removeToast}/>
                 </NavigationDrawer>

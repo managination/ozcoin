@@ -29,7 +29,7 @@ contract User is BaseContract{
 
 
     modifier accountIsValid(address _account){
-        if (_account != 0x0){
+        if (isContract(_account)==false && _account != 0x0){
             _;
         }
     }
@@ -41,6 +41,12 @@ contract User is BaseContract{
       }
       if(hasRole==_expected){
         _;
+      }
+    }
+
+    modifier userIsAdmin(address _account) {
+      if (users[_account].active==true && users[_account].role==Role.Administrator){
+       _;
       }
     }
 
@@ -88,6 +94,9 @@ contract User is BaseContract{
       return checkRegistration(_account);
     }
 
+
+
+
     function checkRegistration(address _account) constant returns (bool,Role){
       return ((users[_account].active==true),users[_account].role);
 
@@ -106,7 +115,7 @@ contract User is BaseContract{
 
     }
 
-    function changeRole(address _account,Role _role) userActiveStatus(_account,true) userHasRole(msg.sender,Role.Administrator,true) external {
+    function changeRole(address _account,Role _role) userActiveStatus(_account,true) userIsAdmin(msg.sender) external {
       if(_role!=Role.Administrator){
         users[_account].role = _role;
         UserRoleChanged(_account,_role);
@@ -114,29 +123,33 @@ contract User is BaseContract{
     }
 
     function setAffiliate(address _affiliate) userHasRole(msg.sender,Role.CoinOwner,true) external {
-      users[msg.sender].affiliateAccount = _affiliate;
-      AffiiateSet(msg.sender,_affiliate);
+      if(_affiliate!=msg.sender){
+        users[msg.sender].affiliateAccount = _affiliate;
+        AffiiateSet(msg.sender,_affiliate);
+      }
     }
 
     function setAffiliateCompany(address _affiliateCompany) userHasRole(msg.sender,Role.CoinOwner,true) external {
+      if(_affiliateCompany!=msg.sender){
       users[msg.sender].affiliateCompany = _affiliateCompany;
       AffiiateCompanySet(msg.sender,_affiliateCompany);
+      }
     }
 
 
-    function deActivateUser(address _account) userActiveStatus(_account,true) userHasRole(msg.sender,Role.Administrator,true) external {
+    function deActivateUser(address _account) userActiveStatus(_account,true) userIsAdmin(msg.sender) external {
         users[_account].active = false;
         UserDeactivated(_account);
 
     }
 
-    function reActivateUser(address _account) userActiveStatus(_account,false) userHasRole(msg.sender,Role.Administrator,true) external {
+    function reActivateUser(address _account) userActiveStatus(_account,false) userIsAdmin(msg.sender) external {
         users[_account].active = true;
         UserReactivated(_account);
     }
 
     // only allowed to change their own account
-    function updateUserDetails(bytes32 _name,string newDetails,address _affiliateAccount,address _affiliateCompany){
+    function updateUserDetails(bytes32 _name,string newDetails,address _affiliateAccount,address _affiliateCompany) userHasRole(msg.sender,Role.CoinOwner,true) {
         users[msg.sender].details = newDetails;
         users[msg.sender].name = _name;
         users[msg.sender].affiliateAccount = _affiliateAccount;

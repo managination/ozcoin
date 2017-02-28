@@ -8,16 +8,23 @@ import "BaseContract.sol";
 contract ExchangeToken is ExchangeTokenInterface,BaseContract{
 
 TokenData tokenData;  // address of data contract
+address ozCoinAccount;
 
+event TransactionFeeChanged(uint256 oldRate,uint256 newRate);
 
 function ExchangeToken(){
 
 }
 
+
 function resetTokenData(TokenData _tokenData) onlyowner {
   tokenData = _tokenData;
+  ozCoinAccount = tokenData.getOzCoinAccount();
 }
 
+function getOzAccount() returns (address){
+  return ozCoinAccount;
+}
 
 function totalSupply() constant returns (uint256 totalSupply){
   return tokenData.getTotalSupply();
@@ -33,29 +40,30 @@ function balanceOf(address _owner) constant returns (uint256 balance){
 // can't assume user is registered
 //sufficientFunds(msg.sender,_value)
 function transfer(address _to, uint256 _value) returns (bool success){
-  //if (coins[_recipient] + _value < coins[_recipient]) throw;
-  uint256 fee = calculateTransactionFee(_value);
-  uint256 transferTime = 0;
-  uint256 transferAmount = _value - fee;//safeSub(_value,fee);
-  // first transfer to ozcoin account
-  address ozCoin = tokenData.getOzCoinAccount();
-  // send fee back to issuer account, not a pending transfer
-  tokenData.transfer(msg.sender,ozCoin,fee,0);
-  //check return value
-  Transfer(msg.sender, ozCoin, fee);
-  // send rest to recipient
-  tokenData.transfer(msg.sender,_to,transferAmount,transferTime);
-  //check return value
-  Transfer(msg.sender, _to, transferAmount);
+  // change for pending
+  uint64 transferTime = 0;
+  uint256 received = tokenData.transfer(msg.sender,_to,_value,transferTime);
+  if(received > 0){
+    //check return value
+    Transfer(msg.sender, _to, received);
+    // difference is fee
+    Transfer(msg.sender, ozCoinAccount, _value - received);
+  }
 }
 
-function getFeeRate() constant returns (uint256){
-  return tokenData.getFeeRate();
+function setFeePercent(uint8 _fee) external onlyowner {
+    uint256 old = tokenData.getFeePercent();
+      tokenData.setFeePercent(_fee);
+      TransactionFeeChanged(old,_fee);
 }
 
-function calculateTransactionFee(uint256 _value)  returns(uint256){
-  // for a fixed fee
-  return tokenData.getFeeRate();
+function getFeePercent() constant external returns (uint8){
+  return tokenData.getFeePercent();
+}
+
+function calculateFee(uint256 _amount) internal constant returns (uint256){
+  uint256 fee = tokenData.getFeePercent()*_amount/100;
+  return fee;
 }
 
 // disallow these

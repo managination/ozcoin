@@ -1,1506 +1,1576 @@
 {
-  "Certificate": {
-    "address": "0x196f3a37dc3c7b378f504201545971e9d9b3d466",
-    "abi": [
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_IPFSAddress",
-            "type": "string"
-          },
-          {
-            "name": "_reportID",
-            "type": "string"
-          }
-        ],
-        "name": "registerAuditReport",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "index",
-            "type": "uint256"
-          }
-        ],
-        "name": "getCertificateDetailsByIndex",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint8"
-          },
-          {
-            "name": "",
-            "type": "string"
-          },
-          {
-            "name": "",
-            "type": "string"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "getNumberOfCertificates",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_IPFSAddress",
-            "type": "string"
-          },
-          {
-            "name": "_certificateID",
-            "type": "string"
-          }
-        ],
-        "name": "registerProofOfAsset",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "name": "cType",
-            "type": "uint8"
-          },
-          {
-            "indexed": false,
-            "name": "IPFS",
-            "type": "string"
-          },
-          {
-            "indexed": false,
-            "name": "ID",
-            "type": "string"
-          }
-        ],
-        "name": "CertificateAdded",
-        "type": "event"
-      }
-    ]
-  },
-  "ExchangeToken": {
-    "address": "0xe79a2dac4659d92e0854537452a01ee4d4adc62f",
-    "abi": [
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_tokenData",
-            "type": "address"
-          }
-        ],
-        "name": "resetTokenData",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_spender",
-            "type": "address"
-          },
-          {
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "approve",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "totalSupply",
-        "outputs": [
-          {
+    "Certificate": {
+        "address": "0x196f3a37dc3c7b378f504201545971e9d9b3d466",
+        "abi": [{
+                "constant": false,
+                "inputs": [{
+                        "name": "_IPFSAddress",
+                        "type": "string"
+                    },
+                    {
+                        "name": "_reportID",
+                        "type": "string"
+                    }
+                ],
+                "name": "registerAuditReport",
+                "outputs": [],
+                "payable": false,
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [{
+                    "name": "index",
+                    "type": "uint256"
+                }],
+                "name": "getCertificateDetailsByIndex",
+                "outputs": [{
+                        "name": "",
+                        "type": "uint8"
+                    },
+                    {
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "payable": false,
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "getNumberOfCertificates",
+                "outputs": [{
+                    "name": "",
+                    "type": "uint256"
+                }],
+                "payable": false,
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{
+                        "name": "_IPFSAddress",
+                        "type": "string"
+                    },
+                    {
+                        "name": "_certificateID",
+                        "type": "string"
+                    }
+                ],
+                "name": "registerProofOfAsset",
+                "outputs": [],
+                "payable": false,
+                "type": "function"
+            },
+            {
+                "anonymous": false,
+                "inputs": [{
+                        "indexed": false,
+                        "name": "cType",
+                        "type": "uint8"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "IPFS",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "ID",
+                        "type": "string"
+                    }
+                ],
+                "name": "CertificateAdded",
+                "type": "event"
+            }
+        ]
+    },
+    "ExchangeToken": {
+        "address": "0x02ed79dbc96106804dda53a1104249fd37434942",
+        "abi": [{
+            "constant": false,
+            "inputs": [{
+                "name": "_tokenData",
+                "type": "address"
+            }],
+            "name": "resetTokenData",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_spender",
+                "type": "address"
+            }, {
+                "name": "_value",
+                "type": "uint256"
+            }],
+            "name": "approve",
+            "outputs": [{
+                "name": "success",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "addr",
+                "type": "address"
+            }],
+            "name": "isContract",
+            "outputs": [{
+                "name": "",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
             "name": "totalSupply",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_from",
-            "type": "address"
-          },
-          {
-            "name": "_to",
-            "type": "address"
-          },
-          {
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "transferFrom",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "kill",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "version",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint8"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_admin",
-            "type": "address"
-          }
-        ],
-        "name": "setAdmin",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_owner",
-            "type": "address"
-          }
-        ],
-        "name": "balanceOf",
-        "outputs": [
-          {
-            "name": "balance",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "getFeeRate",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "contractState",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint8"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "activateContract",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_to",
-            "type": "address"
-          },
-          {
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "transfer",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "calculateTransactionFee",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_owner",
-            "type": "address"
-          },
-          {
-            "name": "_spender",
-            "type": "address"
-          }
-        ],
-        "name": "allowance",
-        "outputs": [
-          {
-            "name": "remaining",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_version",
-            "type": "uint8"
-          }
-        ],
-        "name": "setVersion",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "setContractAdminOnly",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "payable": false,
-        "type": "constructor"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_from",
-            "type": "address"
-          },
-          {
-            "indexed": true,
-            "name": "_to",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "Transfer",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_owner",
-            "type": "address"
-          },
-          {
-            "indexed": true,
-            "name": "_spender",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "Approval",
-        "type": "event"
-      }
-    ]
-  },
-  "StandardToken": {
-    "address": "0x3483bB50bB9C775950545B10bc63acD1469aa95A",
-    "abi": [
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_tokenData",
-            "type": "address"
-          }
-        ],
-        "name": "resetTokenData",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_amount",
-            "type": "uint256"
-          },
-          {
-            "name": "_seller",
-            "type": "address"
-          }
-        ],
-        "name": "buyCoins",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": true,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_spender",
-            "type": "address"
-          },
-          {
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "approve",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_fee",
-            "type": "uint256"
-          }
-        ],
-        "name": "setTransactionFee",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "totalSupply",
-        "outputs": [
-          {
+            "outputs": [{
+                "name": "totalSupply",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_from",
+                "type": "address"
+            }, {
+                "name": "_to",
+                "type": "address"
+            }, {
+                "name": "_value",
+                "type": "uint256"
+            }],
+            "name": "transferFrom",
+            "outputs": [{
+                "name": "success",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "kill",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_owner",
+                "type": "address"
+            }],
+            "name": "balanceOf",
+            "outputs": [{
+                "name": "balance",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "contractState",
+            "outputs": [{
+                "name": "",
+                "type": "uint8"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "activateContract",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_to",
+                "type": "address"
+            }, {
+                "name": "_value",
+                "type": "uint256"
+            }],
+            "name": "transfer",
+            "outputs": [{
+                "name": "success",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "getFeePercent",
+            "outputs": [{
+                "name": "",
+                "type": "uint8"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "getOzAccount",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_owner",
+                "type": "address"
+            }, {
+                "name": "_spender",
+                "type": "address"
+            }],
+            "name": "allowance",
+            "outputs": [{
+                "name": "remaining",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_fee",
+                "type": "uint8"
+            }],
+            "name": "setFeePercent",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "setContractAdminOnly",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "inputs": [],
+            "payable": false,
+            "type": "constructor"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "oldRate",
+                "type": "uint256"
+            }, {
+                "indexed": false,
+                "name": "newRate",
+                "type": "uint256"
+            }],
+            "name": "TransactionFeeChanged",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_from",
+                "type": "address"
+            }, {
+                "indexed": true,
+                "name": "_to",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_value",
+                "type": "uint256"
+            }],
+            "name": "Transfer",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_owner",
+                "type": "address"
+            }, {
+                "indexed": true,
+                "name": "_spender",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_value",
+                "type": "uint256"
+            }],
+            "name": "Approval",
+            "type": "event"
+        }]
+    },
+    "StandardToken": {
+        "address": "0xd15833752a565650f152c5274992f79d5f2ee70d",
+        "abi": [{
+            "constant": false,
+            "inputs": [{
+                "name": "_tokenData",
+                "type": "address"
+            }],
+            "name": "resetTokenData",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_amount",
+                "type": "uint256"
+            }, {
+                "name": "_seller",
+                "type": "address"
+            }],
+            "name": "buyCoins",
+            "outputs": [],
+            "payable": true,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_spender",
+                "type": "address"
+            }, {
+                "name": "_value",
+                "type": "uint256"
+            }],
+            "name": "approve",
+            "outputs": [{
+                "name": "success",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "addr",
+                "type": "address"
+            }],
+            "name": "isContract",
+            "outputs": [{
+                "name": "",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
             "name": "totalSupply",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_from",
-            "type": "address"
-          },
-          {
-            "name": "_to",
-            "type": "address"
-          },
-          {
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "transferFrom",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_userContract",
-            "type": "address"
-          }
-        ],
-        "name": "resetUser",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "getAffiliateBalance",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "kill",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "unFreezeAccount",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "version",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint8"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_seller",
-            "type": "address"
-          }
-        ],
-        "name": "getPrices",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          },
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_admin",
-            "type": "address"
-          }
-        ],
-        "name": "setAdmin",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_owner",
-            "type": "address"
-          }
-        ],
-        "name": "balanceOf",
-        "outputs": [
-          {
-            "name": "balance",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "withdrawEther",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "getAffiliateInfo",
-        "outputs": [
-          {
-            "name": "",
-            "type": "address"
-          },
-          {
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "getFeeRate",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "contractState",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint8"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "activateContract",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_to",
-            "type": "address"
-          },
-          {
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "transfer",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "calculateTransactionFee",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_owner",
-            "type": "address"
-          },
-          {
-            "name": "_spender",
-            "type": "address"
-          }
-        ],
-        "name": "allowance",
-        "outputs": [
-          {
-            "name": "remaining",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_isBuy",
-            "type": "bool"
-          },
-          {
-            "name": "_price",
-            "type": "uint256"
-          }
-        ],
-        "name": "setPrice",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_ID",
-            "type": "bytes32"
-          },
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "requestArbitration",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "freezeAccount",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_version",
-            "type": "uint8"
-          }
-        ],
-        "name": "setVersion",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "setContractAdminOnly",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "payable": false,
-        "type": "constructor"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "name": "oldRate",
-            "type": "uint256"
-          },
-          {
-            "indexed": false,
-            "name": "newRate",
-            "type": "uint256"
-          }
-        ],
-        "name": "TransactionFeeChanged",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "name": "_sender",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_amount",
-            "type": "uint256"
-          }
-        ],
-        "name": "OzCoinPaid",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "name": "_sender",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_affiliate",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_amount",
-            "type": "uint256"
-          }
-        ],
-        "name": "AffiliatePaid",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "name": "_account",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_offered",
-            "type": "uint256"
-          },
-          {
-            "indexed": false,
-            "name": "_required",
-            "type": "uint256"
-          }
-        ],
-        "name": "InsufficientFunds",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "AccountFrozen",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "AccountUnFrozen",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "name": "_account",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "ID",
-            "type": "bytes32"
-          }
-        ],
-        "name": "ArbitrationRequested",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "name": "seller",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "side",
-            "type": "bool"
-          },
-          {
-            "indexed": false,
-            "name": "price",
-            "type": "uint256"
-          }
-        ],
-        "name": "PriceSet",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_from",
-            "type": "address"
-          },
-          {
-            "indexed": true,
-            "name": "_to",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "Transfer",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_owner",
-            "type": "address"
-          },
-          {
-            "indexed": true,
-            "name": "_spender",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_value",
-            "type": "uint256"
-          }
-        ],
-        "name": "Approval",
-        "type": "event"
-      }
-    ]
-  },
-  "User": {
-    "address": "0x9204783e3e16523b06b094605822238899baf6df",
-    "abi": [
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          },
-          {
-            "name": "_name",
-            "type": "bytes32"
-          },
-          {
-            "name": "_details",
-            "type": "string"
-          }
-        ],
-        "name": "createAdministrator",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "getAffiliateCompany",
-        "outputs": [
-          {
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_name",
-            "type": "bytes32"
-          },
-          {
-            "name": "newDetails",
-            "type": "string"
-          },
-          {
-            "name": "_affiliateAccount",
-            "type": "address"
-          },
-          {
-            "name": "_affiliateCompany",
-            "type": "address"
-          }
-        ],
-        "name": "updateUserDetails",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_affiliate",
-            "type": "address"
-          }
-        ],
-        "name": "setAffiliate",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "kill",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "version",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint8"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "getTotalNumberOfUsers",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "testSender",
-        "outputs": [
-          {
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_admin",
-            "type": "address"
-          }
-        ],
-        "name": "setAdmin",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "findUserRole",
-        "outputs": [
-          {
-            "name": "",
-            "type": "bool"
-          },
-          {
-            "name": "",
-            "type": "uint8"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "reActivateUser",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "contractState",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint8"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "activateContract",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "getAffiliate",
-        "outputs": [
-          {
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_affiliateCompany",
-            "type": "address"
-          }
-        ],
-        "name": "setAffiliateCompany",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          },
-          {
-            "name": "_affiliateAccount",
-            "type": "address"
-          },
-          {
-            "name": "_affiliateCompany",
-            "type": "address"
-          },
-          {
-            "name": "_name",
-            "type": "bytes32"
-          },
-          {
-            "name": "_details",
-            "type": "string"
-          }
-        ],
-        "name": "createCoinOwner",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "deActivateUser",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "getUserDetails",
-        "outputs": [
-          {
-            "name": "",
-            "type": "bytes32"
-          },
-          {
-            "name": "",
-            "type": "uint8"
-          },
-          {
-            "name": "",
-            "type": "string"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          },
-          {
-            "name": "_role",
-            "type": "uint8"
-          }
-        ],
-        "name": "changeRole",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "checkRegistration",
-        "outputs": [
-          {
-            "name": "",
-            "type": "bool"
-          },
-          {
-            "name": "",
-            "type": "uint8"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_version",
-            "type": "uint8"
-          }
-        ],
-        "name": "setVersion",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "setContractAdminOnly",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "payable": false,
-        "type": "constructor"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_account",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_role",
-            "type": "uint8"
-          }
-        ],
-        "name": "UserAdded",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_account",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_newRole",
-            "type": "uint8"
-          }
-        ],
-        "name": "UserRoleChanged",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "UserDeactivated",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "UserReactivated",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_account",
-            "type": "address"
-          }
-        ],
-        "name": "UserDetailsChanged",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_account",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "affiliate",
-            "type": "address"
-          }
-        ],
-        "name": "AffiiateSet",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "name": "_account",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "affiliateCompany",
-            "type": "address"
-          }
-        ],
-        "name": "AffiiateCompanySet",
-        "type": "event"
-      }
-    ]
-  }
+            "outputs": [{
+                "name": "totalSupply",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_from",
+                "type": "address"
+            }, {
+                "name": "_to",
+                "type": "address"
+            }, {
+                "name": "_value",
+                "type": "uint256"
+            }],
+            "name": "transferFrom",
+            "outputs": [{
+                "name": "success",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_userContract",
+                "type": "address"
+            }],
+            "name": "resetUser",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "kill",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "unFreezeAccount",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "requestArbitration",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_seller",
+                "type": "address"
+            }],
+            "name": "getPrices",
+            "outputs": [{
+                "name": "",
+                "type": "uint256"
+            }, {
+                "name": "",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_owner",
+                "type": "address"
+            }],
+            "name": "balanceOf",
+            "outputs": [{
+                "name": "balance",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "withdrawEther",
+            "outputs": [{
+                "name": "success",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_percentage",
+                "type": "uint8"
+            }],
+            "name": "setAffiliatePercent",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "getAffiliateInfo",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }, {
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "contractState",
+            "outputs": [{
+                "name": "",
+                "type": "uint8"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "activateContract",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "withdrawOzCoinEther",
+            "outputs": [{
+                "name": "success",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_to",
+                "type": "address"
+            }, {
+                "name": "_value",
+                "type": "uint256"
+            }],
+            "name": "transfer",
+            "outputs": [{
+                "name": "success",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "getFeePercent",
+            "outputs": [{
+                "name": "",
+                "type": "uint8"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "getOzAccount",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_owner",
+                "type": "address"
+            }, {
+                "name": "_spender",
+                "type": "address"
+            }],
+            "name": "allowance",
+            "outputs": [{
+                "name": "remaining",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_isBuy",
+                "type": "bool"
+            }, {
+                "name": "_price",
+                "type": "uint256"
+            }],
+            "name": "setPrice",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "getAffiliateBalance",
+            "outputs": [{
+                "name": "",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "freezeAccount",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_fee",
+                "type": "uint8"
+            }],
+            "name": "setFeePercent",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "setContractAdminOnly",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "inputs": [],
+            "payable": false,
+            "type": "constructor"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "oldRate",
+                "type": "uint8"
+            }, {
+                "indexed": false,
+                "name": "newRate",
+                "type": "uint8"
+            }],
+            "name": "AffilliatePercentageChanged",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_sender",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_amount",
+                "type": "uint256"
+            }],
+            "name": "OzCoinPaid",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_sender",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_affiliate",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_amount",
+                "type": "uint256"
+            }],
+            "name": "AffiliatePaid",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_offered",
+                "type": "uint256"
+            }, {
+                "indexed": false,
+                "name": "_required",
+                "type": "uint256"
+            }],
+            "name": "InsufficientFunds",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "recipient",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "amount",
+                "type": "uint256"
+            }],
+            "name": "FailedToSend",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "AccountFrozen",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "AccountUnFrozen",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "ID",
+                "type": "bytes32"
+            }],
+            "name": "ArbitrationRequested",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "seller",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "side",
+                "type": "bool"
+            }, {
+                "indexed": false,
+                "name": "price",
+                "type": "uint256"
+            }],
+            "name": "PriceSet",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "oldRate",
+                "type": "uint256"
+            }, {
+                "indexed": false,
+                "name": "newRate",
+                "type": "uint256"
+            }],
+            "name": "TransactionFeeChanged",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_from",
+                "type": "address"
+            }, {
+                "indexed": true,
+                "name": "_to",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_value",
+                "type": "uint256"
+            }],
+            "name": "Transfer",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_owner",
+                "type": "address"
+            }, {
+                "indexed": true,
+                "name": "_spender",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_value",
+                "type": "uint256"
+            }],
+            "name": "Approval",
+            "type": "event"
+        }]
+    },
+    "User": {
+        "address": "0x67d7f4560b291ccb0d20e55a9c7c22923cd6bce8",
+        "abi": [{
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }, {
+                "name": "_name",
+                "type": "bytes32"
+            }, {
+                "name": "_details",
+                "type": "string"
+            }],
+            "name": "createAdministrator",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "addr",
+                "type": "address"
+            }],
+            "name": "isContract",
+            "outputs": [{
+                "name": "",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "getAffiliateCompany",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_name",
+                "type": "bytes32"
+            }, {
+                "name": "newDetails",
+                "type": "string"
+            }, {
+                "name": "_affiliateAccount",
+                "type": "address"
+            }, {
+                "name": "_affiliateCompany",
+                "type": "address"
+            }],
+            "name": "updateUserDetails",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_affiliate",
+                "type": "address"
+            }],
+            "name": "setAffiliate",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "kill",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "getTotalNumberOfUsers",
+            "outputs": [{
+                "name": "",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "findUserRole",
+            "outputs": [{
+                "name": "",
+                "type": "bool"
+            }, {
+                "name": "",
+                "type": "uint8"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "reActivateUser",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "contractState",
+            "outputs": [{
+                "name": "",
+                "type": "uint8"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "activateContract",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "getAffiliate",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_affiliateCompany",
+                "type": "address"
+            }],
+            "name": "setAffiliateCompany",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }, {
+                "name": "_affiliateAccount",
+                "type": "address"
+            }, {
+                "name": "_affiliateCompany",
+                "type": "address"
+            }, {
+                "name": "_name",
+                "type": "bytes32"
+            }, {
+                "name": "_details",
+                "type": "string"
+            }],
+            "name": "createCoinOwner",
+            "outputs": [{
+                "name": "",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "deActivateUser",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "getUserDetails",
+            "outputs": [{
+                "name": "",
+                "type": "bytes32"
+            }, {
+                "name": "",
+                "type": "uint8"
+            }, {
+                "name": "",
+                "type": "string"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }, {
+                "name": "_role",
+                "type": "uint8"
+            }],
+            "name": "changeRole",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "checkRegistration",
+            "outputs": [{
+                "name": "",
+                "type": "bool"
+            }, {
+                "name": "",
+                "type": "uint8"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "setContractAdminOnly",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "inputs": [],
+            "payable": false,
+            "type": "constructor"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_role",
+                "type": "uint8"
+            }],
+            "name": "UserAdded",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_newRole",
+                "type": "uint8"
+            }],
+            "name": "UserRoleChanged",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "UserDeactivated",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "UserReactivated",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "UserDetailsChanged",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "affiliate",
+                "type": "address"
+            }],
+            "name": "AffiiateSet",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "affiliateCompany",
+                "type": "address"
+            }],
+            "name": "AffiiateCompanySet",
+            "type": "event"
+        }]
+    },
+    "TokenData": {
+        "address": "0x21eb8b0d2d063554bb194f4a1b39b9874146a947",
+        "abi": [{
+            "constant": false,
+            "inputs": [{
+                "name": "addr",
+                "type": "address"
+            }],
+            "name": "isContract",
+            "outputs": [{
+                "name": "",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_ID",
+                "type": "bytes32"
+            }],
+            "name": "approveArbitration",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "checkStatus",
+            "outputs": [{
+                "name": "",
+                "type": "uint8"
+            }, {
+                "name": "",
+                "type": "address"
+            }, {
+                "name": "",
+                "type": "address"
+            }, {
+                "name": "",
+                "type": "address"
+            }, {
+                "name": "",
+                "type": "address"
+            }, {
+                "name": "",
+                "type": "uint16"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "getOzCoinAccount",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_source",
+                "type": "address"
+            }, {
+                "name": "_destination",
+                "type": "address"
+            }, {
+                "name": "_value",
+                "type": "uint256"
+            }, {
+                "name": "_ID",
+                "type": "bytes32"
+            }],
+            "name": "aribtrateTransfer",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "kill",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "getPendingTransfers",
+            "outputs": [{
+                "name": "",
+                "type": "uint256[]"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_requester",
+                "type": "address"
+            }],
+            "name": "requestArbitration",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_owner",
+                "type": "address"
+            }],
+            "name": "balanceOf",
+            "outputs": [{
+                "name": "",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "setArbitrationAccount",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_exchangeController",
+                "type": "address"
+            }],
+            "name": "setExchangeController",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "contractState",
+            "outputs": [{
+                "name": "",
+                "type": "uint8"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "getOwner",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "activateContract",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_sender",
+                "type": "address"
+            }, {
+                "name": "_recipient",
+                "type": "address"
+            }, {
+                "name": "_value",
+                "type": "uint256"
+            }, {
+                "name": "_transferTime",
+                "type": "uint64"
+            }],
+            "name": "transfer",
+            "outputs": [{
+                "name": "",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_limit",
+                "type": "uint16"
+            }],
+            "name": "setArbitrationLimit",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_walletController",
+                "type": "address"
+            }],
+            "name": "setWalletController",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "setOzCoinAccount",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "getFeePercent",
+            "outputs": [{
+                "name": "",
+                "type": "uint8"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "getTotalSupply",
+            "outputs": [{
+                "name": "",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_index",
+                "type": "uint256"
+            }],
+            "name": "activatePendingTransfer",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_fee",
+                "type": "uint8"
+            }],
+            "name": "setFeePercent",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "setContractAdminOnly",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "inputs": [{
+                "name": "_totalSupply",
+                "type": "uint256"
+            }, {
+                "name": "_ozCoinAccount",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "constructor"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "controller",
+                "type": "address"
+            }],
+            "name": "ControllerChanged",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "ozCoin",
+                "type": "address"
+            }],
+            "name": "OzCoinAccountChanged",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "arbiterAccount",
+                "type": "address"
+            }],
+            "name": "ArbiterChanged",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "requester",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "ID",
+                "type": "bytes32"
+            }],
+            "name": "ArbitrationRequested",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "approver",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "ID",
+                "type": "bytes32"
+            }],
+            "name": "ArbitrationApproved",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "source",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "destination",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "sender",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "amount",
+                "type": "uint256"
+            }],
+            "name": "ArbitrationTransfer",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "sender",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "recipient",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "value",
+                "type": "uint256"
+            }],
+            "name": "PendingActivated",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "_seller",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_buyer",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "requiredAmount",
+                "type": "uint256"
+            }],
+            "name": "InsufficientOZCBalance",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "sender",
+                "type": "address"
+            }],
+            "name": "Sender",
+            "type": "event"
+        }]
+    }
+
 }

@@ -17,18 +17,28 @@ contract StandardToken is ExchangeToken {
       uint256 sell;
   }
 
+struct EtherShare{
+  uint256 ozcoinShare;
+  address affiliate;
+  uint256 affiliateShare;
+  address company;
+  uint256 companyShare;
+
+}
+
+uint8 affiliatePercent;
 User userContract;
-address ozCoinAccount;
 
 mapping (address=>uint256) etherBalances;
-
 mapping (address=>Price) prices;
+// true = frozen
+mapping (address=>bool) accountFrozen;
 
-event TransactionFeeChanged(uint256 oldRate,uint256 newRate);
+event AffilliatePercentageChanged(uint8 oldRate,uint8 newRate);
 event OzCoinPaid(address indexed _sender,uint256 _amount);
 event AffiliatePaid(address indexed _sender,address _affiliate,uint256 _amount);
 event InsufficientFunds(address indexed _account,uint256 _offered, uint256 _required);
-
+event FailedToSend(address recipient, uint256 amount);
 event AccountFrozen(address indexed _account);
 event AccountUnFrozen(address indexed _account);
 event ArbitrationRequested(address indexed  _account,bytes32 ID);
@@ -44,75 +54,112 @@ function resetUser(User _userContract) onlyowner {
   userContract = _userContract;
 }
 
-function resetTokenData(TokenData _tokenData) onlyowner {
-  tokenData = _tokenData;
-  ozCoinAccount = tokenData.getOzCoinAccount();
+
+modifier accountFrozenStatus(address _account, bool _expected){
+  if(accountFrozen[_account]==_expected){
+    _;
+  }
 }
 
-    // modifier only admin
-  function setTransactionFee(uint256 _fee) returns(bool success){
-    uint256 old = tokenData.getFeeRate();
-    tokenData.setFeeRate(_fee);
-    TransactionFeeChanged(old,_fee);
-    return (true);
-  }
 
+
+
+
+ function setAffiliatePercent(uint8 _percentage) onlyowner {
+    if(_percentage>=0 && _percentage<100 ){
+     uint8 old = affiliatePercent;
+     affiliatePercent = _percentage;
+     AffilliatePercentageChanged(old,_percentage);
+   }
+  }
 
 
   // modifiers needed
   // check buyer has enough ether for coin plus fee
   // need to check amount is greater than fee
-   function buyCoins (uint256 _amount,address _seller) payable returns (bool success){
-     uint256 fee = calculateTransactionFee(_amount);
-     uint256 sellPrice;
+
+   function buyCoins (uint256 _amount,address _seller) payable accountFrozenStatus(_seller, false) accountFrozenStatus(msg.sender, false) {
+     uint256 sellPrice = 1;
      (sellPrice,)  = getPrices(_seller);
 
-     if(_amount<=fee || sellPrice <= 0){
-       return (false);
+     uint256 etherCost = sellPrice*_amount;
+
+     if(validatePurchase(_amount,_seller,etherCost,msg.value)==false){
+       return;
      }
+      EtherShare memory shares = calculateAffiliateShares(msg.sender,msg.value);
 
-     if(sellPrice > msg.value){
-      InsufficientFunds(msg.sender,_amount,fee+sellPrice);
-      return (false);
+      bool sendEtherSuccess =  _seller.send(shares.ozcoinShare);
+      if(sendEtherSuccess){
+        if(_seller==ozCoinAccount){
+          OzCoinPaid(msg.sender,shares.ozcoinShare);
         }
-     else{
 
-
-      address affiliateAccount;
-      address affiliateCompany;
-
-      (affiliateAccount,affiliateCompany) = getAffiliateInfo(msg.sender);
-
-       // distribute ether
-       // 90% to ozcoin
-       // 5% each to affiliate and company
-       uint256 affiliateShare = 5 * msg.value / 100;
-       uint256 ozShare = msg.value;
-
-      if(affiliateAccount!=0x0){
-         etherBalances[affiliateAccount] += affiliateShare;
-         ozShare = ozShare - affiliateShare;
-         AffiliatePaid(msg.sender,affiliateAccount,affiliateShare);
-      }
-      if(affiliateCompany!=0x0){
-         etherBalances[affiliateCompany] += affiliateShare;
-         ozShare = ozShare - affiliateShare;
-         AffiliatePaid(msg.sender,affiliateCompany,affiliateShare);
-      }
-
-        tokenData.transfer(_seller,msg.sender,_amount-fee,0);
-        Transfer(_seller,msg.sender, _amount-fee);
-        // send fee to ozcoin
-        tokenData.transfer(_seller,ozCoinAccount,fee,0);
-        Transfer(_seller,msg.sender, fee);
-
-       bool sendSuccess =  _seller.send(ozShare);
-       if(_seller==ozCoinAccount){
-            OzCoinPaid(msg.sender,ozShare);
+        if(shares.affiliateShare>0){
+          etherBalances[shares.affiliate] += shares.affiliateShare;
+          AffiliatePaid(msg.sender,shares.affiliate,shares.affiliateShare);
         }
-     }
+        if(shares.companyShare>0){
+          etherBalances[shares.company] += shares.companyShare;
+          AffiliatePaid(msg.sender,shares.company,shares.companyShare);
+        }
+        // transfer tokens
+        uint256  sent = tokenData.transfer(_seller,msg.sender,_amount,0);
+        if(sent > 0){
+          Transfer(_seller,msg.sender, sent);
+          Transfer(_seller,ozCoinAccount, _amount - sent);
+        }
+
+        }
+        else{
+          FailedToSend(_seller,shares.ozcoinShare);
+        }
+
    }
 
+function validatePurchase(uint256 _amount, address _seller,uint256 _etherCost, uint256 _etherSupplied) internal returns (bool){
+
+  if(_seller==msg.sender){
+    return false;
+  }
+
+  if(_etherCost <= 0){
+    return false;
+  }
+
+  if(_etherCost > _etherSupplied){
+    InsufficientFunds(msg.sender,_etherSupplied,_etherCost);
+    return false;
+  }
+
+  return true;
+}
+
+// returns ozcoin share, affiliate address affiliate share , company address compnay share
+function  calculateAffiliateShares(address _buyer, uint256 _cost) internal returns (EtherShare){
+
+  EtherShare memory thisShare;
+  address affiliate;
+  address company;
+  (affiliate,company) = getAffiliateInfo(_buyer);
+  thisShare.affiliate = affiliate;
+  thisShare.company = company;
+
+   // distribute ether to ozcoin and shares to affiliate and company
+   uint256 standardShare = affiliatePercent * _cost / 100;
+   uint256 ozShare = msg.value;
+
+  if(thisShare.affiliate!=0x0){
+    thisShare.affiliateShare = standardShare;
+    ozShare = ozShare - standardShare;
+  }
+  if(thisShare.company!=0x0){
+     thisShare.companyShare = standardShare;
+     ozShare = ozShare - standardShare;
+  }
+  thisShare.ozcoinShare = ozShare;
+  return thisShare;
+}
 
 function getAffiliateInfo(address _account) constant returns (address,address){
   address affiliate = userContract.getAffiliate(_account);
@@ -122,11 +169,11 @@ function getAffiliateInfo(address _account) constant returns (address,address){
 
 }
 
-function getAffiliateBalance() constant returns(uint256){
-    return etherBalances[msg.sender];
+function getAffiliateBalance(address _account) constant returns(uint256){
+    return etherBalances[_account];
 }
 
-function withdrawEther () returns (bool success){
+function withdrawEther () accountFrozenStatus(msg.sender, false) external returns (bool success){
         uint amount = etherBalances[msg.sender];
         etherBalances[msg.sender] = 0;
         if (msg.sender.send(amount)) {
@@ -137,11 +184,24 @@ function withdrawEther () returns (bool success){
         }
 }
 
+function withdrawOzCoinEther () external returns (bool success){
+        if(msg.sender!=ozCoinAccount){
+          return false;
+        }
+        uint256 amount = this.balance;
+        if (ozCoinAccount.send(amount)) {
+            return true;
+        } else {
+          return false;
+        }
+}
+
 function getPrices(address _seller) constant returns (uint256,uint256) {
       return (prices[_seller].buy,prices[_seller].sell);
 }
 
-function setPrice(bool _isBuy,uint256 _price) {
+// anyone can change their own price
+function setPrice(bool _isBuy,uint256 _price) accountFrozenStatus(msg.sender, false) external {
     if(_isBuy){
       prices[msg.sender].buy = _price;
     }
@@ -153,15 +213,15 @@ function setPrice(bool _isBuy,uint256 _price) {
 }
 
 //Admin functions
-function freezeAccount(address _account) returns (bool success){
-
+function freezeAccount(address _account) external {
+  accountFrozen[_account]=true;
 }
-function unFreezeAccount(address _account) returns (bool success){
-
+function unFreezeAccount(address _account) external {
+  accountFrozen[_account]=false;
 }
 
-function requestArbitration(bytes32 _ID, address _account) returns (bool success){
-  tokenData.requestArbitration(_ID, _account);
+function requestArbitration(){
+  tokenData.requestArbitration( msg.sender);
   // ? auto freezeAccount
 }
 

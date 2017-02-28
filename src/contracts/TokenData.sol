@@ -1,59 +1,76 @@
 pragma solidity ^0.4.0;
 import "BaseContract.sol";
 
-contract TokenData is BaseContract {
-
-struct Price{
-    uint256 buy;
-    uint256 sell;
-}
+contract TokenData is Mortal {
 
 struct PendingTransfer{
   uint256 value;
   address sender;
   address recipient;
-  uint256 transferTime;
+  uint64 transferTime;
 }
 
 struct Arbitration {
   address requester;
-  bool requesterVote;
-  bool adminVote;
-  bool arbitratorVote;
+  uint256 requesterVote;
+  uint256 ozVote;
 }
+
+uint16 arbitrationLimit = 500;
+uint8 transactionFeePercent;
 
 address exchangeController;
 address walletController;
 address ozCoinAccount;
-string  public name;
+address arbiterAccount;
 uint256 totalSupply;
-uint256 transactionFee;
+
 
 
 // have total ether amount so can do checks of before and after
 
 mapping (address=>uint256) coins;
-mapping (address=>uint256) etherBalance;
-mapping (address=>Price) prices;
 mapping (bytes32=>Arbitration) arbitrations;
-
 
 PendingTransfer[] pendingTransfers;
 
 event ControllerChanged(address controller);
 event OzCoinAccountChanged(address ozCoin);
+event ArbiterChanged(address arbiterAccount);
+event ArbitrationRequested(address indexed requester,bytes32 ID);
+event ArbitrationApproved(address indexed approver,bytes32 ID);
+event ArbitrationTransfer(address indexed source,address destination, address sender,uint256 amount);
+
 event PendingActivated(address sender,address recipient,uint256 value);
 
-event PriceSet(address seller,bool side,uint256 price);
+event InsufficientOZCBalance(address _seller, address _buyer, uint256 requiredAmount);
 
-// reinstate
+// remove
+event Sender(address sender);
+
 modifier onlyController(){
-//   if (msg.sender==controller){
-//     _;
-//   }
-    _;
+   if (msg.sender==exchangeController||msg.sender==walletController){
+     _;
+   }
 }
 
+modifier onlyOzCoin(){
+   if (msg.sender==ozCoinAccount){
+     _;
+   }
+}
+
+modifier onlyArbiter(){
+   if (msg.sender==arbiterAccount){
+     _;
+   }
+}
+
+modifier contractOnly(address _contract, bool expected){
+  if(isContract(_contract)==expected){
+    _;
+  }
+}
 
 modifier sufficientFunds(address _sender,uint256 _amount){
   if (_amount > 0 && coins[_sender] >= _amount){
@@ -61,106 +78,120 @@ modifier sufficientFunds(address _sender,uint256 _amount){
   }
 }
 
-function TokenData(uint256 _totalSupply,address _exchangeController,address _walletController,address _ozCoinAccount){
+function TokenData(uint256 _totalSupply,address _ozCoinAccount){
   totalSupply = _totalSupply;
   ozCoinAccount = _ozCoinAccount;
-  coins[_ozCoinAccount] = totalSupply;
-  exchangeController = _exchangeController;
-  walletController = _walletController;
-  activateContract();
+  coins[ozCoinAccount] = _totalSupply;
 }
 
-
-
-function setWalletController(address _walletController) onlyowner external{
+function setWalletController(address _walletController) onlyowner contractIsAdminOnly contractOnly(msg.sender, false) external{
      walletController = _walletController;
 }
 
-function setExchangeController(address _exchangeController) onlyowner external{
+function setExchangeController(address _exchangeController) onlyowner contractIsAdminOnly contractOnly(msg.sender,false) external{
      exchangeController = _exchangeController;
 }
 
-
-
-// some security even though a constant function
-function getOzCoinAccount() onlyController constant returns (address)  {
+// reinstate onlyController
+function getOzCoinAccount() constant  returns (address)  {
   return ozCoinAccount;
 }
 
-// only allow next two when contract is inactive
-function setOzCoinAccount(address _account) onlyController contractIsAdminOnly {
+// only allow next two when contract is inactive, can't be called from a contract
+function setOzCoinAccount(address _account) onlyowner contractIsAdminOnly contractOnly(msg.sender,false) {
    ozCoinAccount = _account;
    OzCoinAccountChanged(_account);
 }
 
-
-function checkStatus() returns (ContractState,uint8,address,address) {
-    return (contractState,version,exchangeController,walletController);
+function setArbitrationAccount(address _account) onlyowner contractIsAdminOnly contractOnly(msg.sender,false) {
+  if(_account!=ozCoinAccount){
+    arbiterAccount = _account;
+    ArbiterChanged(_account);
+ }
 }
 
-function getTotalSupply() onlyController  constant external returns (uint256) {
+function setArbitrationLimit(uint16 _limit) onlyowner contractIsAdminOnly contractOnly(msg.sender,false) {
+  if(_limit > 0){
+    arbitrationLimit = _limit;
+  }
+}
+
+function checkStatus() constant external returns (ContractState,address,address,address,address,uint16)  {
+    return (contractState,ozCoinAccount,exchangeController,walletController,arbiterAccount,arbitrationLimit);
+}
+
+function getTotalSupply() constant  external returns (uint256) {
   return totalSupply;
 }
 
-function balanceOf(address _owner) onlyController constant external returns (uint256){
+function balanceOf(address _owner) constant external returns (uint256){
   return coins[_owner];
 
 }
+function getOwner() returns(address){
+  return owner;
+}
 
-// this is just the actual transfer, the fee has already been taken care of
-// this may be called more than once in a transaction
-function transfer(address _sender,address _recipient, uint256 _value,uint256 _transferTime)
- onlyController contractIsActive sufficientFunds(_sender,_value)
-  returns (bool){
+function transfer(address _sender,address _recipient, uint256 _value,uint64 _transferTime)
+  onlyController
+  contractIsActive contractOnly (msg.sender,true)
+  returns (uint256){
 
+  // test for sufficientFunds in seller account
+  if(_value > coins[_sender] ){
+    InsufficientOZCBalance(_sender,_recipient,_value);
+    return 0;
+  }
+
+  uint256 fee = calculateFee(_value);
+  uint256 transferAmount = _value - fee;//safeSub(_value,fee);
+  if(transferAmount<=0){
+    return (0);
+  }
+  // first send fee to ozcoin
+  coins[_sender]  = coins[_sender] - fee;
+  coins[ozCoinAccount]  =  coins[ozCoinAccount] + fee;
+  //now send rest to recipient
   if(_transferTime>0){
-    coins[_sender]  = coins[_sender] - _value;
-    pendingTransfers.push(PendingTransfer({sender : _sender,recipient : _recipient, value : _value, transferTime : _transferTime}));
+    coins[_sender]  = coins[_sender] - transferAmount;
+    pendingTransfers.push(PendingTransfer({sender : _sender,recipient : _recipient, value : transferAmount, transferTime : _transferTime}));
   }
   else{
-    coins[_sender]  = coins[_sender] - _value;
-    coins[_recipient]  =  coins[_recipient] + _value;
+    coins[_sender]  = coins[_sender] - transferAmount;
+    coins[_recipient]  =  coins[_recipient] + transferAmount;
   }
 
-  return true;
+  return (transferAmount);
 }
 
-function setFeeRate(uint256 _fee) onlyController contractIsActive {
-    transactionFee = _fee;
-}
-
-function getFeeRate() onlyController constant returns (uint256){
-    return transactionFee;
-}
-
-function getPrices(address _seller) constant returns (uint256,uint256) {
-      return (prices[_seller].buy,prices[_seller].sell);
-}
-
-function setPrice(address _seller,bool _isBuy,uint256 _price) {
-    if(_isBuy){
-      prices[_seller].buy = _price;
+function setFeePercent(uint8 _fee) external onlyowner contractIsActive {
+    if(_fee>=0 && _fee <100 ){
+      transactionFeePercent = _fee;
     }
-    else{
-      prices[_seller].sell = _price;
-    }
-    PriceSet(_seller,_isBuy,_price);
+}
 
+function getFeePercent()  constant external returns (uint8){
+    return transactionFeePercent;
+}
+
+function calculateFee(uint256 _amount) internal constant returns (uint256){
+  uint256 fee = transactionFeePercent*_amount/100;
+  return fee;
 }
 
 
 // returns the index of the transfer in the array
-function getPendingTransfers() onlyController constant returns (uint256 []) {
+function getPendingTransfers() constant external onlyController contractIsActive contractOnly(msg.sender,true)  returns (uint256 []) {
 uint256 [] memory validTransfers = new uint256 [] (pendingTransfers.length);
 for (uint256 ii= 0;ii<pendingTransfers.length;ii++){
   validTransfers[ii] = pendingTransfers[ii].transferTime;
   }
 
-
 return validTransfers;
 }
 
-function activatePendingTransfer(uint256 _index){
+// ? where would this sbe called from
+function activatePendingTransfer(uint256 _index) onlyController contractIsActive contractOnly(msg.sender,true) external contractIsActive {
 
   address sender = pendingTransfers[_index].sender;
   address recipient = pendingTransfers[_index].recipient;
@@ -179,19 +210,47 @@ function deletePendingTransfer(uint256 index) internal{
   pendingTransfers.length--;
 }
 
-// ID should be hash of requester + arbitrater + nonce
-function requestArbitration(bytes32 _ID, address _requester){
-  if(arbitrations[_ID].requesterVote==false){
-    arbitrations[_ID].requester = _requester;
-    arbitrations[_ID].requesterVote = true;
-    arbitrations[_ID].adminVote = false;
-    arbitrations[_ID].arbitratorVote = false;
-  }
 
+function requestArbitration( address _requester) external onlyController contractIsActive contractOnly(msg.sender,true){
+  uint256 blk = block.number;
+  bytes32 ID = sha3(msg.sender,blk);
+
+  if(arbitrations[ID].requesterVote==0){
+    arbitrations[ID].requester = _requester;
+    arbitrations[ID].requesterVote = blk;
+    arbitrations[ID].ozVote = 0;
+    ArbitrationRequested(_requester,ID);
+  }
 }
 
-function aribtrateTransfer(address _source,address _destination, uint256 _value, bytes32 _ID){
+// ozcoin account approves arbitration
+function approveArbitration(bytes32 _ID) external onlyOzCoin contractIsActive contractOnly(msg.sender,false) {
+  uint256 blockNum = block.number;
+  if(arbitrations[_ID].requesterVote!=0){
+    arbitrations[_ID].ozVote = blockNum;
+    ArbitrationApproved(msg.sender,_ID);
+  }
+}
 
+
+function aribtrateTransfer(address _source,address _destination, uint256 _value, bytes32 _ID) external onlyArbiter contractIsActive sufficientFunds(_source,_value) {
+  uint256 currentBlock = block.number;
+  if(arbitrations[_ID].requesterVote==0){
+    return;
+  }
+  if(arbitrations[_ID].requester!=_source && arbitrations[_ID].requester!=_destination){
+    return;
+  }
+  uint256 ozBlock = arbitrations[_ID].ozVote;
+  if (currentBlock - ozBlock > arbitrationLimit ){
+    return;
+  }
+
+  delete arbitrations[_ID];
+  // do transfer
+  coins[_source]  = coins[_source] - _value;
+  coins[_destination]  =  coins[_destination] + _value;
+  ArbitrationTransfer(_source,_destination,msg.sender,_value);
 }
 
 

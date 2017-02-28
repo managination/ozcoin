@@ -1,8 +1,7 @@
 pragma solidity ^0.4.0;
 
-contract owned {
-    address owner;
-    address admin;
+contract Owned {
+    address public owner;
 
     modifier onlyowner() {
         if (msg.sender == owner) {
@@ -10,23 +9,19 @@ contract owned {
         }
     }
 
-    function owned() {
+    function Owned() {
         owner = msg.sender;
     }
 
-    function setAdmin(address _admin) onlyowner() {
-      admin = _admin;
-    }
 }
 
-contract mortal is owned {
+contract Mortal is Owned {
    enum ContractState{
      adminOnly,
      active
    }
 
   ContractState public contractState;
-  uint8 public version;
 
   modifier contractIsActive(){
       if (contractState==ContractState.active) _;
@@ -44,9 +39,17 @@ contract mortal is owned {
      contractState = ContractState.adminOnly;
   }
 
-  function setVersion(uint8 _version){
-    version = _version;
+  function isContract(address addr) returns (bool) {
+    uint size;
+    assembly { size := extcodesize(addr) }
+    return size > 1;
   }
+
+  /*function isContract2(address addr) returns (uint256) {
+    uint size;
+    assembly { size := extcodesize(addr) }
+    return size;
+  }*/
 
   function kill() onlyowner {
         setContractAdminOnly();
@@ -59,19 +62,8 @@ contract mortal is owned {
 
 
 
-contract BaseContract is mortal {
+contract BaseContract is Mortal {
 
-  modifier addressesDifferent(address address1,address address2){
-    if(address1 != address2 ){
-      _;
-    }
-  }
-
-  modifier valueInRange(uint256 value,uint256 min,uint256 max){
-    if(value >= min && value <= max ){
-      _;
-    }
-  }
 
 
 }

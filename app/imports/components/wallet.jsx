@@ -35,15 +35,17 @@ export default class Wallet extends TrackerReact(PureComponent) {
         this._redeemAffiliateBalance.bind(this);
         this._handleChange.bind(this);
         this._transactionConfirmed.bind(this);
+        this._setProfile.bind(this);
     }
 
     _setProfile(profile) {
+        let self = this;
         /*only create the coinowner if it does not exist yet and the ETH balance is positive*/
         if (profile && !profile.isRegistered && profile.balance && profile.balance.comparedTo(0) === 1) {
             Meteor.callPromise('register-user').then((response) => {
                 response.showUserRegistrationDialog = true;
                 response.profile = profile;
-                this.setState(response);
+                self.setState(response);
             })
         } else {
             this.setState({profile: profile});
@@ -51,14 +53,19 @@ export default class Wallet extends TrackerReact(PureComponent) {
     }
 
     componentWillMount() {
-        Meteor.subscribe('globals', (err) => {
-        });
+        let self = this;
+
+        Meteor.subscribe('globals');
 
         if (Meteor.user()) {
             Meteor.subscribe('current-profile');
             Profiles.find({owner: Meteor.userId()}).observe({
-                added: this._setProfile,
-                changed: this._setProfile,
+                added: function (profile) {
+                    self._setProfile.bind(profile);
+                },
+                changed: function (profile) {
+                    self._setProfile.bind(profile);
+                },
             })
         }
     };

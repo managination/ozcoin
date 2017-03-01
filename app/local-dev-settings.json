@@ -7,7 +7,8 @@
     "appId": "K52Z9zawP2CBxSKYt",
     "appSecret": "6ea66336-9041-4ec2-83d7-8bd5127cf79f"
   },
-  "listeners": true,
+  "listeners": false,
+  "polling": true,
   "userPollInterval": 86400000,
   "userBalancePollInterval": 3600000,
   "ethPricePollInterval": 60000,

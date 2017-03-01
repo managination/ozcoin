@@ -79,26 +79,69 @@ if (Meteor.settings.listeners) {
         }));
     });
 }
-
+let balancesPollCounter = 0;
+let pricePollCounter = 0;
 if (Meteor.settings.polling) {
     Meteor.startup(() => {
-        getEthereumPrice();
+        SyncedCron.config({
+            // Log job run details to console
+            log: true,
 
-        Meteor.setInterval(() => {
-            if (!updatingBalance) {
-                updatingBalance = true;
+            // Use a custom logger function (defaults to Meteor's logging package)
+            logger: null,
+
+            // Name of collection to use for synchronisation and logging
+            collectionName: 'cronHistory',
+
+            // Default to using localTime
+            utc: false,
+
+            /*
+             TTL in seconds for history records in collection to expire
+             NOTE: Unset to remove expiry but ensure you remove the index from
+             mongo by hand
+
+             ALSO: SyncedCron can't use the `_ensureIndex` command to modify
+             the TTL index. The best way to modify the default value of
+             `collectionTTL` is to remove the index by hand (in the mongo shell
+             run `db.cronHistory.dropIndex({startedAt: 1})`) and re-run your
+             project. SyncedCron will recreate the index with the updated TTL.
+             */
+            collectionTTL: 172800
+        });
+
+        SyncedCron.add({
+            name: 'Update the ETH and OCZ balances for logged in users',
+            schedule: function (parser) {
+                // parser is a later.parse object
+                return parser.text('every 1 min');
+            },
+            job: function () {
                 Meteor.users.find({"status.online": true}).forEach((user) => {
                     updateProfileEthBalance(Profiles.findOne({owner: user._id}));
                 });
-                updatingBalance = false;
+                return true;
             }
-        }, Meteor.settings.userBalancePollInterval);
-        Meteor.setInterval(() => {
-            getEthereumPrice();
-        }, Meteor.settings.ethPricePollInterval);
-    });
+        });
+        SyncedCron.add({
+            name: 'Update the ETH and OCZ price',
+            schedule: function (parser) {
+                // parser is a later.parse object
+                return parser.text('every 1 min');
+            },
+            job: function () {
+                getEthereumPrice();
+                return true;
+            }
+        });
 
+        SyncedCron.start()
+    })
 }
+
+Meteor.startup(() => {
+    getEthereumPrice();
+});
 
 Meteor.methods({
     'store-salt': function (mnemonicHash, salt) {

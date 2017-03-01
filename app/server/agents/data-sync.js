@@ -98,29 +98,30 @@ if (Meteor.settings.listeners) {
         }, Meteor.settings.ethPricePollInterval);
     });
 
-    Meteor.methods({
-        'store-salt': function (mnemonicHash, salt) {
-            Profiles.update({owner: this.userId}, {$set: {mnemonicHash: mnemonicHash, salt: salt}});
-        },
-        'get-salt-from-mnemonic': function (mnemonicHash) {
-            let profile = Profiles.findOne({mnemonicHash: mnemonicHash});
-            return profile ? profile.salt : null;
-        },
-        'update-balance': function () {
-            let profile = Profiles.findOne({owner: this.userId});
-            updateProfileEthBalance(profile);
-            updateProfileOzcBalance(profile);
-            updateProfileAffiliateBalane(profile);
-        },
-        'update-user-details': function () {
-            let profile = Profiles.findOne({owner: this.userId});
-            updateUserDetails(profile);
-            updateProfileEthBalance(profile);
-            updateProfileOzcBalance(profile);
-            updateProfileAffiliateBalane(profile);
-        }
-    });
 }
+
+Meteor.methods({
+    'store-salt': function (mnemonicHash, salt) {
+        Profiles.update({owner: this.userId}, {$set: {mnemonicHash: mnemonicHash, salt: salt}});
+    },
+    'get-salt-from-mnemonic': function (mnemonicHash) {
+        let profile = Profiles.findOne({mnemonicHash: mnemonicHash});
+        return profile ? profile.salt : null;
+    },
+    'update-balance': function () {
+        let profile = Profiles.findOne({owner: this.userId});
+        updateProfileEthBalance(profile);
+        updateProfileOzcBalance(profile);
+        updateProfileAffiliateBalane(profile);
+    },
+    'update-user-details': function () {
+        let profile = Profiles.findOne({owner: this.userId});
+        updateUserDetails(profile);
+        updateProfileEthBalance(profile);
+        updateProfileOzcBalance(profile);
+        updateProfileAffiliateBalane(profile);
+    }
+});
 
 const setOzcPrices = function (address, sell, buy) {
     if (sell) {

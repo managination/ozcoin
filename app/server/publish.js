@@ -1,5 +1,4 @@
 import {Profiles, Roles} from "../imports/api/model/profiles";
-import {Contracts} from "../imports/api/model/contracts";
 import {Documents} from "../imports/api/model/documents";
 import {Globals} from "../imports/api/model/globals";
 import {add0x} from "../imports/api/ethereum-services";
@@ -16,10 +15,6 @@ Meteor.publish("user-profile", function (address) {
     if (profile.role == Roles.administrator)
         return Profiles.find({address: add0x(address)});
     return Profiles.find({address: "unauthorized"});
-});
-
-Meteor.publish("contracts", function () {
-    return Contracts.find({});
 });
 
 Meteor.publish("documents", function () {

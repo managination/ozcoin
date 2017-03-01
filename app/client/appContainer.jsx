@@ -101,7 +101,13 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                       onClick={this._copyMnemonic}/>
         );
         this.actions = [
-            <Button key="refresh" icon onClick={() => Meteor.call('update-balance')}>refresh</Button>,
+            <Button key="refresh" icon onClick={
+                () => {
+                    Session.set("showWait", true);
+                    Meteor.call('update-balance', () => {
+                        Session.set("showWait", false);
+                    });
+                }}>refresh</Button>,
             <MenuButton id="aliases" buttonChildren="more_vert" key="menu" icon>
                 {toolbarMenuItems}
             </MenuButton>

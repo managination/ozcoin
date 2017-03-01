@@ -64,27 +64,32 @@ export const listenToEvent = function (contractName, event, filter, callback) {
             event: contract[event](filter, {fromBlock: 'latest', toBlock: 'latest'})
         };
 
-        (function startWatching() {
-            listener.event.watch(function (error, result) {
-                if (error) {
-                    try {
-                        listener.event.stopWatching();
-                        if (listener.failures++ < 10) {
-                            startWatching();
-                            console.log("WARNING watcher restarted", contractName, event, error);
-                        } else {
-                            console.log("ERROR stopped watching", contractName, event, error);
+        startWatching = function () {
+            try {
+                listener.event.watch(function (error, result) {
+                    if (error) {
+                        try {
+                            listener.event.stopWatching();
+                            if (listener.failures++ < 10) {
+                                Meteor.setTimeout(startWatching, 1000);
+                                console.log("WARNING watcher restarted", contractName, event, error);
+                            } else {
+                                console.log("ERROR stopped watching", contractName, event, error);
+                            }
+                        } catch (exception) {
+                            console.log("ERROR exception in", contractName, event, error, exception);
                         }
-                    } catch (exception) {
-                        console.log("ERROR exception in", contractName, event, error, exception);
+                    } else {
+                        listener.failures = 0;
+                        if (typeof result == 'object' && result.args)
+                            listener.callback(result);
                     }
-                } else {
-                    listener.failures = 0;
-                    if (typeof result == 'object' && result.args)
-                        listener.callback(result);
-                }
-            })
-        })();
+                })
+            } catch (error) {
+                console.log("ERROR did not start watching", contractName, event, error);
+            }
+        };
+        startWatching();
     })
 };
 

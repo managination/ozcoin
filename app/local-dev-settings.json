@@ -1,7 +1,9 @@
 {
   "public": {
-    "ethNodeAddress": "http://eth.mngn.io:8545"
+    "ethNodeAddress": "http://localhost:8545"
+
   },
+  "listeners": false,
   "userPollInterval": 86400000,
   "userBalancePollInterval": 3600000,
   "ethPricePollInterval": 60000,

@@ -32,32 +32,39 @@ export default class Wallet extends TrackerReact(PureComponent) {
         this._submitTx.bind(this);
         this._transferEth.bind(this);
         this._transferOzc.bind(this);
+        this._redeemAffiliateBalance.bind(this);
         this._handleChange.bind(this);
         this._transactionConfirmed.bind(this);
+    }
+
+    _setProfile(profile) {
+        /*only create the coinowner if it does not exist yet and the ETH balance is positive*/
+        if (profile && !profile.isRegistered && profile.balance && profile.balance.comparedTo(0) === 1) {
+            Meteor.callPromise('register-user').then((response) => {
+                response.showUserRegistrationDialog = true;
+                response.profile = profile;
+                this.setState(response);
+            })
+        } else {
+            this.setState({profile: profile});
+        }
     }
 
     componentWillMount() {
         Meteor.subscribe('globals', (err) => {
         });
 
-        if (Meteor.user())
-            Meteor.subscribe('current-profile', (err) => {
-                let profile = Profiles.findOne({address: add0x(Meteor.user().username)});
-                /*only create the coinowner if it does not exist yet and the ETH balance is positive*/
-                if (profile && !profile.isRegistered && profile.balance && profile.balance.comparedTo(0) === 1) {
-                    Meteor.callPromise('register-user').then((response) => {
-                        response.showUserRegistrationDialog = true;
-                        response.profile = profile;
-                        this.setState(response);
-                    })
-                } else {
-                    this.setState({profile: profile});
-                }
-            });
+        if (Meteor.user()) {
+            Meteor.subscribe('current-profile');
+            Profiles.find({owner: Meteor.userId()}).observe({
+                added: this._setProfile,
+                changed: this._setProfile,
+            })
+        }
     };
 
     _transactionConfirmed = (password) => {
-        this.setState({getPasswordVisible: false});
+        this.setState({getPasswordVisible: false, showUserRegistrationDialog: false});
         Session.set("showWait", true);
         signAndSubmit(password, this.state.rawTx, true, this.state.profile.address, this.state.recipient)
             .then(() => {
@@ -71,7 +78,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
 
     _transactionCanceled = () => {
         Session.set("showWait", false);
-        this.setState({getPasswordVisible: false});
+        this.setState({getPasswordVisible: false, showUserRegistrationDialog: false});
     };
 
     _submitTx = () => {
@@ -104,6 +111,23 @@ export default class Wallet extends TrackerReact(PureComponent) {
             .catch((err) => {
                 console.log(err);
                 Session.set("showWait", false);
+            })
+    };
+
+    _redeemAffiliateBalance = () => {
+        const self = this;
+        Session.set("showWait", true);
+        Meteor.callPromise('redeem-affiliate-share')
+            .then((response) => {
+                response.getPasswordVisible = true;
+                Session.set("showWait", false);
+                self.setState(response);
+            })
+            .catch((err) => {
+                console.log(err);
+                Meteor.call('update-balance', function () {
+                    Session.set("showWait", false);
+                });
             })
     };
 
@@ -188,7 +212,6 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             </Button>
                         </CardActions>
                         <CardText>
-                            Lorem Ipsum
                         </CardText>
                     </Card>
                     <Card style={{maxWidth: 400}} className="md-cell md-cell--6">
@@ -198,9 +221,9 @@ export default class Wallet extends TrackerReact(PureComponent) {
                                 <CardTitle title={profile.formattedEthBalance + " ETH = " + ethBalanceUSD + " USD"}
                                            subtitle={"price for ETH in USD " + (new BigNumber(prices.eth.USD).toFormat(2))}>
                                     <Button className="md-cell--right"
-                                            style={profile.transferFees ? {color: "#8BC34A"} : {}}
-                                            disabled={!profile.transferFees}
-                                            onClick={() => alert("I was clicked")}
+                                            style={profile.affiliateBalance ? {color: "#8BC34A"} : {}}
+                                            disabled={!profile.affiliateBalance}
+                                            onClick={this._redeemAffiliateBalance}
                                             icon>
                                         monetization_on
                                     </Button>
@@ -238,7 +261,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             </Button>
                         </CardActions>
                         <CardText>
-                            {profile.transferFees ? "click on the green dollar sign ($) to redeem your transfer fees" : ""}
+                            {profile.affiliateBalance ? "click on the green dollar sign ($) to redeem your affiliate share" : ""}
                         </CardText>
                     </Card>
                 </div>

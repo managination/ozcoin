@@ -11,6 +11,7 @@ import Subheader from "react-md/lib/Subheaders";
 import {signAndSubmit} from "../../api/ethereum-services";
 import GetPassword from "./confirm-transaction";
 import {Documents} from "../../api/model/documents";
+import {Roles} from "../../api/model/profiles";
 
 const InfoIcon = () => <FontIcon>info</FontIcon>;
 
@@ -92,6 +93,51 @@ export default class FileUpload extends TrackerReact(PureComponent) {
     };
 
     render() {
+        let profile = Session.get("currentProfile");
+        let canUpload = (this.props.params.docType == 'audit-report' && profile.role == Roles.auditor) ||
+            (this.props.params.docType == 'certificate' && profile.role == Roles.certificatecreator) ||
+            profile.role == Roles.administrator;
+        let uploadForm = null;
+        if (canUpload)
+            uploadForm = <form className="md-grid" onSubmit={(e) => e.preventDefault()}>
+                < TextField
+                    id="fileName"
+                    ref="fileName"
+                    label="File Name"
+                    placeholder="File Name"
+                    className="md-cell md-cell--6"
+                    disabled={!this.state.file}
+                    value={this.state.fileName}
+                    onChange={this._handleChange}
+                />
+                < TextField
+                    id="documentId"
+                    ref="documentId"
+                    label="Document ID"
+                    placeholder="Document ID"
+                    className="md-cell md-cell--6"
+                    disabled={!this.state.file}
+                    value={this.state.documentId}
+                    onChange={this._handleChange}
+                />
+                <div className="file-block md-cell md-cell--12">
+                    <FileInput
+                        id="report"
+                        secondary
+                        label="Select"
+                        accept="application/pdf"
+                        onChange={this._selectFile}
+                    />
+                    <Button style={{marginLeft: 20}}
+                            id="upload"
+                            secondary raised
+                            label="Upload"
+                            disabled={!this.state.file}
+                            onClick={this._uploadFile}
+                    >cloud_upload</Button>
+                </div>
+            </form>;
+
         return (
             <div>
                 <GetPassword visible={this.state.getPasswordVisible}
@@ -101,45 +147,7 @@ export default class FileUpload extends TrackerReact(PureComponent) {
                              cancel={this._transactionCanceled}
                 />
                 <h2>{this.props.params.docType}</h2>
-
-                <form className="md-grid" onSubmit={(e) => e.preventDefault()}>
-                    < TextField
-                        id="fileName"
-                        ref="fileName"
-                        label="File Name"
-                        placeholder="File Name"
-                        className="md-cell md-cell--6"
-                        disabled={!this.state.file}
-                        value={this.state.fileName}
-                        onChange={this._handleChange}
-                    />
-                    < TextField
-                        id="documentId"
-                        ref="documentId"
-                        label="Document ID"
-                        placeholder="Document ID"
-                        className="md-cell md-cell--6"
-                        disabled={!this.state.file}
-                        value={this.state.documentId}
-                        onChange={this._handleChange}
-                    />
-                    <div className="file-block md-cell md-cell--12">
-                        <FileInput
-                            id="report"
-                            secondary
-                            label="Select"
-                            accept="application/pdf"
-                            onChange={this._selectFile}
-                        />
-                        <Button style={{marginLeft: 20}}
-                                id="upload"
-                                secondary raised
-                                label="Upload"
-                                disabled={!this.state.file}
-                                onClick={this._uploadFile}
-                        >cloud_upload</Button>
-                    </div>
-                </form>
+                {uploadForm}
                 <div className="md-grid">
                     <List className="md-cell md-cell--10 md-paper md-paper--1">
                         <Subheader primaryText="Existing Files"/>

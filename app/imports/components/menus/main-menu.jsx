@@ -1,8 +1,7 @@
-import React from 'react';
-import FontIcon from 'react-md/lib/FontIcons';
-import {browserHistory} from 'react-router';
-
-import {Roles} from '../../api/model/profiles';
+import React from "react";
+import FontIcon from "react-md/lib/FontIcons";
+import {browserHistory} from "react-router";
+import {Roles} from "../../api/model/profiles";
 
 export default entries = (user, path) => {
 
@@ -24,14 +23,16 @@ export default entries = (user, path) => {
         key: 'upoload-certificate',
         primaryText: 'Proof of Asset',
         leftIcon: <FontIcon>fingerprint</FontIcon>,
-        roles: [Roles.certificatecreator, Roles.administrator],
+        // roles: [Roles.certificatecreator, Roles.administrator],
+        roles: [Roles.all],
         active: path.indexOf('upload/certificate') > -1,
         onClick: () => browserHistory.push('/upload/certificate'),
     }, {
         key: 'upload-audit-report',
         primaryText: 'Audit Report',
         leftIcon: <FontIcon>send</FontIcon>,
-        roles: [Roles.auditor, Roles.administrator],
+        // roles: [Roles.auditor, Roles.administrator],
+        roles: [Roles.all],
         active: path.indexOf('upload/audit-report') > -1,
         onClick: () => browserHistory.push('/upload/audit-report'),
     }, /*{ key: 'divider', divider: true },*/].map((entry) => {

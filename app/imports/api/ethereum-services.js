@@ -103,6 +103,8 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
             // the corresponding private key is also encrypted
             ks.generateNewAddress(pwDerivedKey);
 
+            let mnemonic = ks.getSeed(pwDerivedKey);
+
             LocalStorage.setItem('encrypted-mnemonic', CryptoJS.AES.encrypt(mnemonic, password).toString());
             LocalStorage.setItem('salt', ks.salt);
             LocalStorage.setItem('alias', alias);

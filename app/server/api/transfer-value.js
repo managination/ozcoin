@@ -11,4 +11,8 @@ Meteor.methods({
         return createRawTx(this.userId, 'ExchangeToken', 'transfer', 0, recipient,
             new BigNumber(amount).times(ozcoin).toNumber());
     },
+
+    'redeem-affiliate-share': function () {
+        return createRawTx(this.userId, 'StandardToken', 'withdrawEther', 0)
+    }
 });

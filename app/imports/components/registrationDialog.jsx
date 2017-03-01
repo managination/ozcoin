@@ -65,7 +65,10 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                     password: keystore.password,
                 };
                 Accounts.createUser(options, (err) => {
-                    browserHistory.push(Session.get('initialLocation') || '/wallet');
+                    let initialLocation = Session.get('initialLocation');
+                    if (!initialLocation || initialLocation.length < 5)
+                        initialLocation = '/wallet';
+                    browserHistory.push(initialLocation);
                     if (err) {
                         console.log("user creation error ", err);
                         Meteor.loginWithPassword(options.username, options.password, (err) => {

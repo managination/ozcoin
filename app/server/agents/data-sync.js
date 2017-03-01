@@ -28,94 +28,99 @@ function checkRegistration(profile, role) {
     return profileToUpdate;
 }
 
-Meteor.startup(() => { //Wallet events
-    listenToEvent('ExchangeToken', 'Transfer', null, Meteor.bindEnvironment((result) => {
-        Profiles.update({address: result.args._from}, {$inc: {ozcBalance: result.args._value.negated().toNumber()}});
-        Profiles.update({address: result.args._to}, {$inc: {ozcBalance: result.args._value.toNumber()}})
-    }));
+if (Meteor.settings.listeners) {
 
-    listenToEvent('StandardToken', 'Transfer', null, Meteor.bindEnvironment((result) => {
-        Profiles.update({address: result.args._from}, {$inc: {ozcBalance: result.args._value.negated().toNumber()}});
-        Profiles.update({address: result.args._to}, {$inc: {ozcBalance: result.args._value.toNumber()}})
-    }));
+    Meteor.startup(() => { //Wallet events
+        listenToEvent('ExchangeToken', 'Transfer', null, Meteor.bindEnvironment((result) => {
+            Profiles.update({address: result.args._from}, {$inc: {ozcBalance: result.args._value.negated().toNumber()}});
+            Profiles.update({address: result.args._to}, {$inc: {ozcBalance: result.args._value.toNumber()}})
+        }));
 
-    listenToEvent('StandardToken', 'PriceSet', null, Meteor.bindEnvironment((result) => {
-        setOzcPrices(result.args.seller,
-            result.args.side ? result.args.price.toNumber() : -1,
-            !result.args.side ? result.args.price.toNumber() : -1);
-    }));
+        listenToEvent('StandardToken', 'Transfer', null, Meteor.bindEnvironment((result) => {
+            Profiles.update({address: result.args._from}, {$inc: {ozcBalance: result.args._value.negated().toNumber()}});
+            Profiles.update({address: result.args._to}, {$inc: {ozcBalance: result.args._value.toNumber()}})
+        }));
 
-    listenToEvent('StandardToken', 'AffiliatePaid', null, Meteor.bindEnvironment((result) => {
-        Profiles.update({address: result.args._affiliate}, {$inc: {ozcBalance: result.args._amount.toNumber()}})
-    }));
+        listenToEvent('StandardToken', 'PriceSet', null, Meteor.bindEnvironment((result) => {
+            setOzcPrices(result.args.seller,
+                result.args.side ? result.args.price.toNumber() : -1,
+                !result.args.side ? result.args.price.toNumber() : -1);
+        }));
 
-    listenToEvent('StandardToken', 'TransactionFeeChanged', null, Meteor.bindEnvironment((result) => {
-        Globals.update({name: "transactionFee"}, {$set: {fee: result.args._newRate.toNumber()}});
-    }));
+        listenToEvent('StandardToken', 'AffiliatePaid', null, Meteor.bindEnvironment((result) => {
+            Profiles.update({address: result.args._affiliate}, {$inc: {affiliateBalance: result.args._amount.toNumber()}})
+        }));
 
-    listenToEvent('StandardToken', 'InsufficientFunds', null, Meteor.bindEnvironment((result) => {
-        Messages.insert({
-            address: result._account, severity: "ERROR",
-            message: "insufficient ETH for purchase " +
-            "offered: " + result._offered.toString() + " required: " + result._required.toString()
-        });
-    }));
+        listenToEvent('StandardToken', 'TransactionFeeChanged', null, Meteor.bindEnvironment((result) => {
+            Globals.update({name: "transactionFee"}, {$set: {fee: result.args._newRate.toNumber()}});
+        }));
 
-});
-
-Meteor.startup(() => { //User events
-    listenToEvent('User', 'UserRoleChanged', {}, Meteor.bindEnvironment((result) => {
-        Profiles.update({address: result.args._account}, {
-            $set: {
-                role: result.args._newRole.toNumber()
-            }
-        })
-    }));
-    listenToEvent('User', 'UserDeactivated', {}, Meteor.bindEnvironment((result) => {
-        Profiles.update({address: result.args._account}, {$set: {status: "inactive"}})
-    }));
-    listenToEvent('User', 'UserReactivated', {}, Meteor.bindEnvironment((result) => {
-        Profiles.update({address: result.args._account}, {$set: {status: "active"}})
-    }));
-});
-
-Meteor.startup(() => {
-    getEthereumPrice();
-
-    Meteor.setInterval(() => {
-        if (!updatingBalance) {
-            updatingBalance = true;
-            Meteor.users.find({"status.online": true}).forEach((user) => {
-                updateProfileEthBalance(Profiles.findOne({owner: user._id}));
+        listenToEvent('StandardToken', 'InsufficientFunds', null, Meteor.bindEnvironment((result) => {
+            Messages.insert({
+                address: result._account, severity: "ERROR",
+                message: "insufficient ETH for purchase " +
+                "offered: " + result._offered.toString() + " required: " + result._required.toString()
             });
-            updatingBalance = false;
-        }
-    }, Meteor.settings.userBalancePollInterval);
-    Meteor.setInterval(() => {
-        getEthereumPrice();
-    }, Meteor.settings.ethPricePollInterval);
-});
+        }));
 
-Meteor.methods({
-    'store-salt': function (mnemonicHash, salt) {
-        Profiles.update({owner: this.userId}, {$set: {mnemonicHash: mnemonicHash, salt: salt}});
-    },
-    'get-salt-from-mnemonic': function (mnemonicHash) {
-        let profile = Profiles.findOne({mnemonicHash: mnemonicHash});
-        return profile ? profile.salt : null;
-    },
-    'update-balance': function () {
-        let profile = Profiles.findOne({owner: this.userId});
-        updateProfileEthBalance(profile);
-        updateProfileOzcBalance(profile);
-    },
-    'update-user-details': function () {
-        let profile = Profiles.findOne({owner: this.userId});
-        updateUserDetails(profile);
-        updateProfileEthBalance(profile);
-        updateProfileOzcBalance(profile);
-    }
-});
+    });
+
+    Meteor.startup(() => { //User events
+        listenToEvent('User', 'UserRoleChanged', {}, Meteor.bindEnvironment((result) => {
+            Profiles.update({address: result.args._account}, {
+                $set: {
+                    role: result.args._newRole.toNumber()
+                }
+            })
+        }));
+        listenToEvent('User', 'UserDeactivated', {}, Meteor.bindEnvironment((result) => {
+            Profiles.update({address: result.args._account}, {$set: {status: "inactive"}})
+        }));
+        listenToEvent('User', 'UserReactivated', {}, Meteor.bindEnvironment((result) => {
+            Profiles.update({address: result.args._account}, {$set: {status: "active"}})
+        }));
+    });
+
+    Meteor.startup(() => {
+        getEthereumPrice();
+
+        Meteor.setInterval(() => {
+            if (!updatingBalance) {
+                updatingBalance = true;
+                Meteor.users.find({"status.online": true}).forEach((user) => {
+                    updateProfileEthBalance(Profiles.findOne({owner: user._id}));
+                });
+                updatingBalance = false;
+            }
+        }, Meteor.settings.userBalancePollInterval);
+        Meteor.setInterval(() => {
+            getEthereumPrice();
+        }, Meteor.settings.ethPricePollInterval);
+    });
+
+    Meteor.methods({
+        'store-salt': function (mnemonicHash, salt) {
+            Profiles.update({owner: this.userId}, {$set: {mnemonicHash: mnemonicHash, salt: salt}});
+        },
+        'get-salt-from-mnemonic': function (mnemonicHash) {
+            let profile = Profiles.findOne({mnemonicHash: mnemonicHash});
+            return profile ? profile.salt : null;
+        },
+        'update-balance': function () {
+            let profile = Profiles.findOne({owner: this.userId});
+            updateProfileEthBalance(profile);
+            updateProfileOzcBalance(profile);
+            updateProfileAffiliateBalane(profile);
+        },
+        'update-user-details': function () {
+            let profile = Profiles.findOne({owner: this.userId});
+            updateUserDetails(profile);
+            updateProfileEthBalance(profile);
+            updateProfileOzcBalance(profile);
+            updateProfileAffiliateBalane(profile);
+        }
+    });
+}
 
 const setOzcPrices = function (address, sell, buy) {
     if (sell) {
@@ -168,6 +173,16 @@ const updateProfileOzcBalance = function (profile) {
     callContractMethod('ExchangeToken', 'balanceOf', profile.address).then((balance) => {
         if (balance.comparedTo(profile.ozcBalance) != 0) {
             Profiles.update({_id: profile._id}, {$set: {ozcBalance: balance.toNumber()}});
+        }
+    })
+};
+
+const updateProfileAffiliateBalane = function (profile) {
+    if (!profile || !profile.address || !isValidAddress(profile.address)) return;
+
+    callContractMethod('StandardToken', 'getAffiliateBalance', profile.address).then((balance) => {
+        if (balance.comparedTo(profile.affiliateBalance) != 0) {
+            Profiles.update({_id: profile._id}, {$set: {affiliateBalance: balance.toNumber()}});
         }
     })
 };

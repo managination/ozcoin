@@ -29,7 +29,6 @@ function checkRegistration(profile, role) {
 }
 
 if (Meteor.settings.listeners) {
-
     Meteor.startup(() => { //Wallet events
         listenToEvent('ExchangeToken', 'Transfer', null, Meteor.bindEnvironment((result) => {
             Profiles.update({address: result.args._from}, {$inc: {ozcBalance: result.args._value.negated().toNumber()}});
@@ -62,7 +61,6 @@ if (Meteor.settings.listeners) {
                 "offered: " + result._offered.toString() + " required: " + result._required.toString()
             });
         }));
-
     });
 
     Meteor.startup(() => { //User events
@@ -80,7 +78,9 @@ if (Meteor.settings.listeners) {
             Profiles.update({address: result.args._account}, {$set: {status: "active"}})
         }));
     });
+}
 
+if (Meteor.settings.polling) {
     Meteor.startup(() => {
         getEthereumPrice();
 

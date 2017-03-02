@@ -26,6 +26,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
             profile: {balance: new BigNumber(0)},
             ethAmount: '',
             ozcAmount: '',
+            ozcAmountReceived: '',
             recipient: '',
         };
 
@@ -52,10 +53,13 @@ export default class Wallet extends TrackerReact(PureComponent) {
         }
     }
 
+    txFee = 0.001;
     componentWillMount() {
         let self = this;
 
-        Meteor.subscribe('globals');
+        Meteor.subscribe('globals', () => {
+            self.txFee = Globals.findOne({name: "transaction-fee"}).value;
+        });
 
         if (Meteor.user()) {
             Meteor.subscribe('current-profile', () => {
@@ -148,6 +152,16 @@ export default class Wallet extends TrackerReact(PureComponent) {
 
     _handleChange = (value, event) => {
         let change = {};
+        if (event.target.id == 'ozcAmount') {
+            value = new BigNumber(value);
+            change.ozcAmountReceived = value.minus(value.times(this.txFee)).round(5).toNumber();
+            value = value.toNumber();
+        }
+        if (event.target.id == 'ozcAmountReceived') {
+            value = new BigNumber(value);
+            change.ozcAmount = value.dividedBy(1 - this.txFee).round(5).toNumber();
+            value = value.toNumber();
+        }
         change[event.target.id] = value;
         this.setState(change);
     };
@@ -208,11 +222,20 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             />
                             < TextField
                                 id="ozcAmount"
-                                label="amount in OZC"
+                                label="amount in OZC to transfer"
                                 placeholder="0.00"
                                 className="md-cell md-cell--12"
                                 disabled={!profile.ozcBalance.toNumber()}
                                 value={this.state.ozcAmount}
+                                onChange={this._handleChange}
+                            />
+                            < TextField
+                                id="ozcAmountReceived"
+                                label="amount in OZC the recipient will get"
+                                placeholder="0.00"
+                                className="md-cell md-cell--12"
+                                disabled={!profile.ozcBalance.toNumber()}
+                                value={this.state.ozcAmountReceived}
                                 onChange={this._handleChange}
                             />
                         </form>

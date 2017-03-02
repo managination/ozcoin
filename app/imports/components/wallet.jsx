@@ -61,10 +61,10 @@ export default class Wallet extends TrackerReact(PureComponent) {
             Meteor.subscribe('current-profile');
             Profiles.find({owner: Meteor.userId()}).observe({
                 added: function (profile) {
-                    self._setProfile.bind(profile);
+                    self._setProfile(profile);
                 },
                 changed: function (profile) {
-                    self._setProfile.bind(profile);
+                    self._setProfile(profile);
                 },
             })
         }

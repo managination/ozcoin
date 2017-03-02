@@ -37,7 +37,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
     }
 
     _setProfile() {
-        Meteor.call('update-user-details', (err) => {
+        Meteor.call('sync-user-details', (err) => {
             if (err)
                 console.log("ERROR", err);
             Meteor.subscribe("current-profile", () => {

@@ -4,6 +4,9 @@ import {Match} from "meteor/check";
 import {Promise} from "meteor/promise";
 import {getWeb3} from "../ethereum-services";
 import contractDefs from "../../contract.json";
+import {Mongo} from "meteor/mongo";
+
+export const Events = new Mongo.Collection('eth-events');
 
 let contracts = {};
 export const getContract = (name) => {
@@ -39,7 +42,7 @@ export const listenToEvent = function (contractName, event, filter, callback) {
 
         startWatching = function () {
             try {
-                listener.event.watch(function (error, result) {
+                listener.event.watch(Meteor.bindEnvironment(function (error, result) {
                     if (error) {
                         try {
                             listener.event.stopWatching();
@@ -54,10 +57,32 @@ export const listenToEvent = function (contractName, event, filter, callback) {
                         }
                     } else {
                         listener.failures = 0;
-                        if (typeof result == 'object' && result.args)
-                            listener.callback(result);
+                        if (typeof result == 'object' && result.args) {
+                            if (Events.find({hash: result.transactionHash, logIndex: result.logIndex}).count() == 0) {
+                                /**convert any numeric argument to number*/
+                                let args = {};
+                                Object.entries(result.args).forEach((item) => {
+                                    let key = item[0];
+                                    let value = item[1];
+
+                                    if (typeof value.toNumber == 'function')
+                                        args[key] = value.toNumber();
+                                    else
+                                        args[key] = value;
+                                });
+                                /**the event will be picked up by the observer setup in data-sync*/
+                                Events.insert({
+                                    hash: result.transactionHash,
+                                    logIndex: result.logIndex,
+                                    method: listener.callback,
+                                    timestamp: new Date().getTime(),
+                                    executed: false,
+                                    result: {args: args}
+                                });
+                            }
+                        }
                     }
-                })
+                }))
             } catch (error) {
                 console.log("ERROR did not start watching", contractName, event, error);
             }

@@ -4,6 +4,7 @@ import {browserHistory} from "react-router";
 import {Roles} from "../../api/model/profiles";
 
 export default entries = (user, path) => {
+    let profile = Session.get('currentProfile') || {address: ''};
 
     return [{
         key: 'edit-user',
@@ -11,7 +12,7 @@ export default entries = (user, path) => {
         leftIcon: <FontIcon>android</FontIcon>,
         roles: [Roles.all],
         active: path.indexOf('edit-user') > -1,
-        onClick: () => browserHistory.push('/edit-user'),
+        onClick: () => browserHistory.push('/edit-user/' + profile.address),
     }, {
         key: 'wallet',
         primaryText: 'Wallet',

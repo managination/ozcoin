@@ -1,17 +1,23 @@
 import React, {PureComponent} from "react";
 import {EJSON} from "meteor/ejson";
+import {Promise} from "meteor/promise";
+import {Roles, Profiles} from "../../api/model/profiles";
+import {add0x, signAndSubmit} from "../../api/ethereum-services";
+import BigNumber from "bignumber.js";
+import FocusContainer from "react-md/lib/Helpers/FocusContainer";
 import SelectField from "react-md/lib/SelectFields";
 import Button from "react-md/lib/Buttons";
 import TextField from "react-md/lib/TextFields";
 import Toolbar from "react-md/lib/Toolbars";
-import {Roles, Profiles} from "../../api/model/profiles";
+import GetPassword from "./confirm-transaction";
 
 export default class UserDetails extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            getPasswordVisible: false,
             _id: false,
-            role: Roles.administrator,
+            role: Roles.coinowner,
             address: '',
             email: '',
             companyName: '',
@@ -25,6 +31,10 @@ export default class UserDetails extends PureComponent {
         };
         this.user = {};
         this.userDetailsForms = [
+            {
+                name: 'Coin Owner',
+                formIdx: Roles.coinowner
+            },
             {
                 name: 'Adminitrator',
                 formIdx: Roles.administrator
@@ -44,10 +54,6 @@ export default class UserDetails extends PureComponent {
             {
                 name: 'Escrow-Agent',
                 formIdx: Roles.escrowagent
-            },
-            {
-                name: 'Resource Company',
-                formIdx: Roles.certificatecreator
             },
             {
                 name: 'Affiliate Company',
@@ -75,6 +81,7 @@ export default class UserDetails extends PureComponent {
     }
 
     _handleRoleChange = (value, index, event) => {
+        this.roleChanged = true;
         this.user.role = value;
         this.setState({role: value});
     };
@@ -106,12 +113,22 @@ export default class UserDetails extends PureComponent {
     };
 
     _save = () => {
+        let self = this;
+        this.password = undefined;
         let user = EJSON.clone(this.user);
-        delete user._id;
-        delete user.balance;
-        Profiles.update({_id: this.user._id}, {$set: user}, (err, docCount) => {
-            console.log(err, docCount);
-        });
+        user.balance = this.user.balance.toNumber();
+        user.ozcBalance = this.user.ozcBalance.toNumber();
+
+        Meteor.callPromise('update-user-details', user)
+            .then((response) => {
+                response.getPasswordVisible = true;
+                Session.set("showWait", false);
+                self.setState(response);
+            })
+            .catch((err) => {
+                console.log(err);
+                Session.set("showWait", false);
+            });
     };
 
     _reset = () => {
@@ -119,11 +136,48 @@ export default class UserDetails extends PureComponent {
         this._handleSearch('');
     };
 
+    _transactionConfirmed = (password) => {
+        let self = this;
+        this.setState({getPasswordVisible: false});
+        Session.set("showWait", true);
+        signAndSubmit(password, this.state.rawTx, false)
+            .then(() => {
+                /**it is necessary to set the role if the role has changed or if the initial role is not coinowner*/
+                if (self.roleChanged) {
+                    return Meteor.callPromise('change-user-role', self.state.address, self.state.role)
+                }
+                throw new Meteor.Error("nothing to do");
+            })
+            .then((result) => signAndSubmit(password, result.rawTx, true))
+            .then(() => Session.set("showWait", false))
+            .catch(() => Session.set("showWait", false));
+    };
+
+    _transactionCanceled = () => {
+        Session.set("showWait", false);
+        this.setState({getPasswordVisible: false});
+    };
+
     render() {
-        console.log("rendering user-details");
+        const profile = Profiles.findOne({address: add0x(Meteor.user().username)})
+            || {balance: new BigNumber(0), ozcBalance: new BigNumber(0)};
+
         return (
             <div>
-                <div className="toolbar-group md-toolbar-relative">
+                <GetPassword visible={this.state.getPasswordVisible}
+                             cost={this.state.transactionCost}
+                             balance={profile.balance.toNumber()}
+                             confirm={this._transactionConfirmed}
+                             cancel={this._transactionCanceled}
+                             title={"Enter our password to validate the transaction"}
+                />
+
+                <FocusContainer
+                    focusOnMount
+                    component="div"
+                    className="toolbar-group md-toolbar-relative"
+                    initialFocus="#address"
+                >
                     <Toolbar themed>
                         <SelectField
                             id="states"
@@ -135,6 +189,7 @@ export default class UserDetails extends PureComponent {
                             itemValue="formIdx"
                             className="md-cell md-cell--4"
                             onChange={this._handleRoleChange}
+                            disabled={profile.role != Roles.administrator}
                             helpText="Select a role for the user"
                         />,
                         <TextField
@@ -143,6 +198,7 @@ export default class UserDetails extends PureComponent {
                             label="address"
                             value={this.state.address}
                             className="md-cell md-cell--4"
+                            disabled={profile.role != Roles.administrator}
                             required
                             onChange={this._handleChange}
                             helpText="enter an ethereum address"
@@ -160,10 +216,10 @@ export default class UserDetails extends PureComponent {
                          <Button className="md-cell md-cell--4" flat primary label="Search"
                          onClick={this._requestAccess}>
                          Request Role
-                        </Button>
+                         </Button>
                          */}
                     </Toolbar>
-                </div>
+                </FocusContainer>
                 <div>
                     <form id="user-details" className="md-grid" onSubmit={(e) => e.preventDefault()}>
                         < TextField

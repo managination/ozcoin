@@ -12,11 +12,8 @@ export const ozcoin = new BigNumber("1000000");
 const getNonce = function (address) {
     let web3 = getWeb3();
     /*the nonce is the count of the next transaction*/
-    let nonce = web3.eth.getTransactionCount(address);
-    console.log("mined transactions", nonce);
-    /*if the user has a pending transaction it needs to be added too*/
-    if (web3.eth.pendingTransactions)
-        nonce += web3.eth.pendingTransactions.filter((tx) => tx.from == address).lenght;
+    let nonce = web3.eth.getTransactionCount(address, "pending");
+    console.log("transactions including pending", nonce);
     return nonce;
 };
 

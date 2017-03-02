@@ -27,7 +27,7 @@ export const initializeKeystore = (() => {
                             if (err)
                                 reject(err);
                             else {
-                                Meteor.call('update-user-details', (err) => {
+                                Meteor.call('sync-user-details', (err) => {
                                     if (err)
                                         console.log("ERROR", err);
                                     resolve(ks);

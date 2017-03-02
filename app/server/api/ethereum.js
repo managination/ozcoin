@@ -9,10 +9,12 @@ import {updateProfileEthBalance} from "../agents/data-sync";
 export const ether = new BigNumber("1000000000000000000");
 export const ozcoin = new BigNumber("1000000");
 
-const getNonce = function (address) {
+const getNonce = function (profile) {
     let web3 = getWeb3();
     /*the nonce is the count of the next transaction*/
-    let nonce = web3.eth.getTransactionCount(address, "pending");
+    let nonce = web3.eth.getTransactionCount(profile.address, "pending");
+    if (nonce <= profile.lastNonce) nonce = profile.lastNonce + 1;
+    Profiles.update({_id: profile._id}, {$set: {lastNonce: nonce}});
     console.log("transactions including pending", nonce);
     return nonce;
 };
@@ -28,7 +30,7 @@ export const createRawValueTx = function (userId, recipient, value) {
             value: web3.toHex(value),
         }));
 
-        let nonce = getNonce(profile.address);
+        let nonce = getNonce(profile);
         console.log("the nonce is", nonce);
 
         var rawTx = {
@@ -64,7 +66,7 @@ export const createRawTx = function (userId, contractName, funcName, value) {
                 data: payloadData
             }) * 5);
 
-        let nonce = getNonce(profile.address);
+        let nonce = getNonce(profile);
         console.log("the nonce is", nonce, "gas estimate", gasEstimate / 5);
 
         var rawTx = {

@@ -58,15 +58,23 @@ export default class Wallet extends TrackerReact(PureComponent) {
         Meteor.subscribe('globals');
 
         if (Meteor.user()) {
-            Meteor.subscribe('current-profile');
-            Profiles.find({owner: Meteor.userId()}).observe({
-                added: function (profile) {
+            Meteor.subscribe('current-profile', () => {
+                let profile = Profiles.findOne({owner: Meteor.userId()});
+                if (!profile) {
+                    let observer = Profiles.find({owner: Meteor.userId()}).observe({
+                        added: function (profile) {
+                            observer.stop();
+                            self._setProfile(profile);
+                        },
+                        changed: function (profile) {
+                            observer.stop();
+                            self._setProfile(profile);
+                        },
+                    })
+                } else {
                     self._setProfile(profile);
-                },
-                changed: function (profile) {
-                    self._setProfile(profile);
-                },
-            })
+                }
+            });
         }
     };
 

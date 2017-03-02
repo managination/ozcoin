@@ -68,7 +68,8 @@ if (Meteor.settings.listeners) {
         'set-user-role': function (result) {
             Profiles.update({address: result.args._account}, {
                 $set: {
-                    role: result.args._newRole
+                    isRegistered: true,
+                    role: result.args._newRole || result.args._role
                 }
             })
         },
@@ -80,6 +81,7 @@ if (Meteor.settings.listeners) {
         }
     });
     Meteor.startup(() => { //User events
+        listenToEvent('User', 'UserAdded', {}, 'set-user-role');
         listenToEvent('User', 'UserRoleChanged', {}, 'set-user-role');
         listenToEvent('User', 'UserDeactivated', {}, 'deactivate-user');
         listenToEvent('User', 'UserReactivated', {}, 'reactivate-user');
@@ -189,7 +191,7 @@ Meteor.methods({
                 profile.address, profile.affiliate, profile.affiliateCompany, profile.alias, EJSON.stringify(profile));
         } else {
             return createRawTx(this.userId, "User", "updateUserDetails", 0,
-                profile.address, profile.alias, EJSON.stringify(profile), profile.affiliate, profile.affiliateCompany);
+                profile.alias, EJSON.stringify(profile), profile.affiliate, profile.affiliateCompany);
         }
     },
     'change-user-role': function (address, role) {

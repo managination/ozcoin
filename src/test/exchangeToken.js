@@ -43,7 +43,7 @@ contract('ExchangeToken', function(accounts) {
 
 
 
-    it("should check ozcoin balance then buy coins ", function() {
+    it("should check ozcoin balance then transfer coins ", function() {
         ExchangeToken.deployed().then(function(instance) {
             return instance.balanceOf.call(ozCoinAccount).then(function(balanceDetails) {
                 assert.equal(balanceDetails.toNumber(), 100);
@@ -63,7 +63,7 @@ contract('ExchangeToken', function(accounts) {
 
 
 
-    it("should fail to buy coins because of insufficient balance", function() {
+    it("should fail to transfer coins because of insufficient balance", function() {
         ExchangeToken.deployed().then(function(instance) {
           return TokenData.new(100, instance.address,instance.address, ozCoinAccount).then(function(tdInstance) {
               return instance.resetTokenData.sendTransaction(tdInstance.address).then(function(Tx2) {

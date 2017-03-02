@@ -77,13 +77,28 @@ contract('User', function(accounts) {
                         assert.equal(results[0], false);
                         assert.equal(results[1].valueOf(), 0);
 
-                
+
                   });
                 });
             });
         });
     });
 
-
+    it("should fail to change role if user not an admin", function() {
+        var normalUser1 = accounts[7];
+        var normalUser2 = accounts[8];
+        var user = User.new().then(function(instance) {
+            instance.createCoinOwner.sendTransaction(normalUser1, affiliateAccount,affiliateCompany, "Norm1", "{blah}",{from: accounts[0] }).then(function(Tx1) {
+              instance.createCoinOwner.sendTransaction(normalUser2, affiliateAccount,affiliateCompany, "Norm2","{blah}",{from: accounts[0] }).then(function(Tx2) {
+                instance.changeRole.sendTransaction(normalUser2,3,{from: normalUser1}).then(function(Tx2) {
+                    instance.checkRegistration.call(normalUser2).then(function(results) {
+                        assert.equal(results[0], true);
+                        assert.equal(results[1].valueOf(), 0);
+                  });
+                });
+            });
+        });
+    });
+});
 
 });

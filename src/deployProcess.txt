@@ -1,0 +1,30 @@
+Deployment Steps
+
+From contract owner account
+
+deploy user contract
+deploy ExchangeToken contract
+deploy StandardToken contract
+
+StandardToken run resetUser function
+
+deploy TokenData initial amount =  50000000000000  ozCoinAccount = "0x2facaf9f7c2c8ef72a993d8dbcd02d8bbc3a9f43"
+TokenData run setContractAdminOnly
+TokenData run setArbitrationLimit = 500
+TokenData run setWalletController
+TokenData run setExchangeController
+TokenData run setArbitrationAccount
+TokenData run activateContract
+TokenData run setFeePercent
+
+TokenData run checkStatus - check that all accounts are set up correctly
+
+ExchangeToken run resetTokenData
+StandardToken run resetTokenData
+
+StandardToken run setAffiliatePercent
+
+From the ozCoinAccount
+
+StandardToken setPrice(false,1000000000000)
+StandardToken setPrice(true,1000000000000)

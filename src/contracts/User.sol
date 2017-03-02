@@ -149,14 +149,16 @@ contract User is BaseContract{
     }
 
     // only allowed to change their own account
-    function updateUserDetails(bytes32 _name,string newDetails,address _affiliateAccount,address _affiliateCompany) userHasRole(msg.sender,Role.CoinOwner,true) {
-        users[msg.sender].details = newDetails;
-        users[msg.sender].name = _name;
-        users[msg.sender].affiliateAccount = _affiliateAccount;
-        users[msg.sender].affiliateCompany = _affiliateCompany;
-        UserDetailsChanged(msg.sender);
-        AffiiateSet(msg.sender,_affiliateAccount);
-        AffiiateCompanySet(msg.sender,_affiliateCompany);
+    function updateUserDetails(address _account, bytes32 _name,string newDetails,address _affiliateAccount,address _affiliateCompany) userActiveStatus(_account, true) {
+       if(_account == msg.sender || users[msg.sender].role == Role.Administrator) {
+           users[msg.sender].details = newDetails;
+           users[msg.sender].name = _name;
+           users[msg.sender].affiliateAccount = _affiliateAccount;
+           users[msg.sender].affiliateCompany = _affiliateCompany;
+           UserDetailsChanged(msg.sender);
+           AffiiateSet(msg.sender,_affiliateAccount);
+           AffiiateCompanySet(msg.sender,_affiliateCompany);
+        }
 
     }
 

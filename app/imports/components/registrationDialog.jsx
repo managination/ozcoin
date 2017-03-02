@@ -15,10 +15,28 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
     constructor(props) {
         super(props);
 
-        this.state = {visible: true, pageX: 1, pageY: 1};
+        this.state = {visible: true, noAffiliate: true, affiliate: ''};
         this._openDialog = this._openDialog.bind(this);
         this._closeDialog = this._closeDialog.bind(this);
         this._createKeystore = this._createKeystore.bind(this);
+    }
+
+    componentWillReceiveProps() {
+        console.log("componentWillReceiveProps registrationDialog.jsx");
+        let self = this;
+        if (this.props.params.affiliate)
+            Meteor.callPromise('get-affiliate', this.props.params.affiliate)
+                .then((result) => {
+                    if (!result)
+                        self.setState({noAffiliate: true});
+                    else
+                        self.setState({affiliate: result, noAffiliate: false});
+                })
+                .catch((err) => {
+                    self.setState({noAffiliate: true});
+                });
+        else
+            self.setState({noAffiliate: true});
     }
 
     _openDialog(e) {
@@ -86,7 +104,8 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                             alias: alias,
                             role: Roles.coinowner,
                             address: '0x' + keystore.username,
-                            affiliate: self.props.params.affiliate,
+                            affiliate: self.state.affiliate.address,
+                            affiliateCompany: self.state.affiliate.affiliateCompany,
                             salt: keystore.salt,
                             mnemonicHash: keystore.mnemonicHash,
                             isRegistered: false,
@@ -106,80 +125,91 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
         const nav = <Button icon onClick={this._closeDialog}>close</Button>;
         const action = <Button raised label="Create keystore" onClick={this._createKeystore}/>;
         const dialogLabel = "Create new Keystore";
-        const toolbarTitle = "Create new keystore";
+        const toolbarTitle = "Create new keystore affiliated to";
         const {user} = this.props;
+        let dialogBody = null;
+        if (this.state.noAffiliate) {
+            dialogBody =
+                <div className="md-toolbar-relative--prominent md-text-center">
+                    <h1>you must choose an affiliate in order to create an account</h1>
+                    <h2>get a link from an affiliate or go to <a href="http://ozgld.com">ozgld.com</a></h2>
+                </div>;
+        } else {
+            dialogBody = <form className="md-toolbar-relative md-grid" onSubmit={(e) => e.preventDefault()}>
+                <TextField
+                    id="ksEMail"
+                    ref="email"
+                    label="e-mail"
+                    placeholder="e-mail"
+                    customSize="title"
+                    className="md-cell md-cell--12"
+                    required
+                    defaultValue=""
+                    pattern="^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$"
+                />
+                <TextField
+                    id="ksName"
+                    ref="alias"
+                    label="First and last names"
+                    placeholder="First and last names"
+                    defaultValue=""
+                    customSize="title"
+                    className="md-cell md-cell--12"
+                    required
+                />
+                <TextField
+                    id="keystorePassword"
+                    ref="keystorePassword"
+                    label="Keystore Password"
+                    placeholder="Keystore Password"
+                    type="password"
+                    customSize="title"
+                    className="md-cell md-cell--12"
+                    required
+                />
+                <Paper
+                    key={1}
+                    zDepth={1}
+                    raiseOnHover={true}
+                    className="md-cell md-cell--12"
+                >
+                    <h1 style={{"textAlign": "center"}}>if you have an existing mnemonic paste it below</h1>
+                    <TextField
+                        id="mnemonic"
+                        ref="mnemonic"
+                        label="mnemonic"
+                        placeholder="if you know your mnemonic paste it here"
+                        customSize="title"
+                        className="md-cell md-cell--12"
+                        helpText="if you do not provide a mnemonic a random one will be created for you"
+                    />
+                    <h1 style={{"textAlign": "center"}}>
+                        a random mnemonic will be generated if left empty
+                    </h1>
+                </Paper>
+            </form>
+
+        }
         //TODO add validation to the form in order to avoid invalid patterns
         return (
-            <div>
-                <Dialog
-                    id="keystoreCreation"
-                    {...this.state}
-                    onHide={this._closeDialog}
-                    fullPage
-                    aria-label={dialogLabel}
-                >
-                    <Toolbar
-                        colored
-                        nav={nav}
-                        actions={action}
-                        title={toolbarTitle + ' ' + (this.props.params.affiliate || '')}
-                        fixed
-                    />
-                    <form className="md-toolbar-relative md-grid" onSubmit={(e) => e.preventDefault()}>
-                        <TextField
-                            id="ksEMail"
-                            ref="email"
-                            label="e-mail"
-                            placeholder="e-mail"
-                            customSize="title"
-                            className="md-cell md-cell--12"
-                            required
-                            defaultValue=""
-                            pattern="^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$"
-                        />
-                        <TextField
-                            id="ksName"
-                            ref="alias"
-                            label="First and last names"
-                            placeholder="First and last names"
-                            defaultValue=""
-                            customSize="title"
-                            className="md-cell md-cell--12"
-                            required
-                        />
-                        <TextField
-                            id="keystorePassword"
-                            ref="keystorePassword"
-                            label="Keystore Password"
-                            placeholder="Keystore Password"
-                            type="password"
-                            customSize="title"
-                            className="md-cell md-cell--12"
-                            required
-                        />
-                        <Paper
-                            key={1}
-                            zDepth={1}
-                            raiseOnHover={true}
-                            className="md-cell md-cell--12"
-                        >
-                            <h1 style={{"textAlign": "center"}}>if you have an existing mnemonic paste it below</h1>
-                            <TextField
-                                id="mnemonic"
-                                ref="mnemonic"
-                                label="mnemonic"
-                                placeholder="if you know your mnemonic paste it here"
-                                customSize="title"
-                                className="md-cell md-cell--12"
-                                helpText="if you do not provide a mnemonic a random one will be created for you"
-                            />
-                            <h1 style={{"textAlign": "center"}}>
-                                a random mnemonic will be generated if left empty
-                            </h1>
-                        </Paper>
-                    </form>
-                </Dialog>
-            </div>
+            <Dialog
+                id="keystoreCreation"
+                visible={this.state.visible}
+                pageX={1}
+                pageY={1}
+                onHide={this._closeDialog}
+                fullPage
+                aria-label={dialogLabel}
+            >
+                <Toolbar
+                    colored
+                    nav={nav}
+                    actions={action}
+                    title={toolbarTitle + ' ' + (this.state.affiliate.alias || '')}
+                    fixed
+                />
+                {dialogBody}
+            </Dialog>
         );
     }
 }

@@ -9,6 +9,11 @@ const fs = require('fs');
 const ipfs = ipfsAPI(Meteor.settings.ipfsNode);
 
 Meteor.methods({
+    'get-affiliate': function (address) {
+        let affiliate = Profiles.findOne({address: address}, {fields: {alias: 1, address: 1, affiliateCompany: 1}});
+        return affiliate;
+    },
+
     'register-user': function () {
         let profile = Profiles.findOne({owner: this.userId});
         delete profile._id;

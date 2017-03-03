@@ -8,6 +8,13 @@ import {Mongo} from "meteor/mongo";
 
 export const Events = new Mongo.Collection('eth-events');
 
+if (Meteor.isServer) {
+    Meteor.startup(() => {
+        Events._ensureIndex({hash: 1, logIndex: 1}, {unique: true});
+        Events._ensureIndex({executed: 1}, {unique: false});
+    })
+}
+
 let contracts = {};
 export const getContract = (name) => {
     return new Promise((resolve, reject) => {

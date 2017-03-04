@@ -1,6 +1,6 @@
 {
   "public": {
-    "ethNodeAddress": "http://eth.mngn.io:8545"
+    "ethNodeAddress": "http://localhost:8545"
   },
   "kadira": {
     "appId": "K52Z9zawP2CBxSKYt",

@@ -51,7 +51,7 @@ if (Meteor.settings.listeners) {
             Messages.insert({
                 address: result._account, severity: "ERROR",
                 message: "insufficient ETH for purchase " +
-                "offered: " + result._offered.toString() + " required: " + result._required.toString()
+                "offered: " + result._offered + " required: " + result._required
             });
         }
     });
@@ -136,6 +136,7 @@ if (Meteor.settings.polling) {
             },
             job: function () {
                 Meteor.users.find({"status.online": true}).forEach((user) => {
+                    console.log("updating balances for", user.username);
                     updateProfileEthBalance(Profiles.findOne({owner: user._id}));
                 });
                 return true;

@@ -1,7 +1,7 @@
 import ipfsAPI from "ipfs-api";
 import {EJSON} from "meteor/ejson";
 import {Documents} from "../../imports/api/model/documents";
-import {createRawTx} from "./ethereum";
+import {ozcoin, ether, createRawTx} from "./ethereum";
 import {Profiles} from "../../imports/api/model/profiles";
 
 const fs = require('fs');
@@ -12,6 +12,15 @@ Meteor.methods({
     'get-affiliate': function (address) {
         let affiliate = Profiles.findOne({address: address}, {fields: {alias: 1, address: 1, affiliateCompany: 1}});
         return affiliate;
+    },
+
+    'get-ozc-affiliate-price': function (address) {
+        let userProfile = Profiles.findOne({owner: this.userId});
+        let profile = Profiles.findOne({address: userProfile.affiliateCompany}, {fields: {alias: 1, price: 1}});
+        if (profile && profile.prices && profile.price.sell) {
+            profile.price.sell = new BigNumber(profile.price.sell).dividedBy(ether).times(ozcoin).toNumber();
+        }
+        return profile;
     },
 
     'register-user': function () {

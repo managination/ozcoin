@@ -8,6 +8,7 @@ import CardActions from "react-md/lib/Cards/CardActions";
 import CardText from "react-md/lib/Cards/CardText";
 import Media, {MediaOverlay} from "react-md/lib/Media";
 import TextField from "react-md/lib/TextFields";
+import SelectField from "react-md/lib/SelectFields";
 import {add0x, signAndSubmit, isValidAddress} from "../api/ethereum-services";
 import GetPassword from "./forms/confirm-transaction";
 import {Profiles} from "../api/model/profiles";
@@ -18,6 +19,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
         super(props);
 
         this.state = {
+            ozcTransferMode: false,
             txData: "",
             getPasswordVisible: false,
             showUserRegistrationDialog: false,
@@ -26,17 +28,23 @@ export default class Wallet extends TrackerReact(PureComponent) {
             profile: {balance: new BigNumber(0)},
             ethAmount: '',
             ozcAmount: '',
+            ozcPurchase: '',
             ozcAmountReceived: '',
             recipient: '',
+            sourceAccount: '',
+            sourceAccounts: [{name: '', address: ''}]
         };
 
-        this._submitTx.bind(this);
-        this._transferEth.bind(this);
-        this._transferOzc.bind(this);
-        this._redeemAffiliateBalance.bind(this);
-        this._handleChange.bind(this);
-        this._transactionConfirmed.bind(this);
-        this._setProfile.bind(this);
+        this._toggleMode = this._toggleMode.bind(this);
+        this._transferEth = this._transferEth.bind(this);
+        this._transferOzc = this._transferOzc.bind(this);
+        this._buyOzc = this._buyOzc.bind(this);
+        this._redeemAffiliateBalance = this._redeemAffiliateBalance.bind(this);
+        this._handleChange = this._handleChange.bind(this);
+        this._handleSourceSelect = this._handleSourceSelect.bind(this);
+        this._transactionConfirmed = this._transactionConfirmed.bind(this);
+        this._setProfile = this._setProfile.bind(this);
+        this._getOzcForm = this._getOzcForm.bind(this);
     }
 
     _setProfile(profile) {
@@ -54,11 +62,33 @@ export default class Wallet extends TrackerReact(PureComponent) {
     }
 
     txFee = 0.001;
+
     componentWillMount() {
         let self = this;
 
         Meteor.subscribe('globals', () => {
             self.txFee = Globals.findOne({name: "transaction-fee"}).value;
+            Meteor.callPromise('get-ozc-affiliate-price').then((affiliateCompany) => {
+                let sourceAccounts = [
+                    {
+                        name: "OZ Coin Account",
+                        address: Globals.findOne({name: 'ozcoin-account'}).address,
+                        price: Globals.findOne({name: "ozcPrice"}).ETH
+                    },
+                ];
+                if (affiliateCompany && affiliateCompany.price && affiliateCompany.price.sell > 0)
+                    sourceAccounts.push({
+                        name: affiliateCompany.alias,
+                        address: affiliateCompany.address,
+                        price: affiliateCompany.price.sell
+                    });
+                self.setState(
+                    {
+                        sourceAccounts: sourceAccounts,
+                        sourceAccount: sourceAccounts[0].address,
+                        sellPrice: sourceAccounts[0].price
+                    });
+            })
         });
 
         if (Meteor.user()) {
@@ -82,7 +112,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
         }
     };
 
-    _transactionConfirmed = (password) => {
+    _transactionConfirmed(password) {
         this.setState({getPasswordVisible: false, showUserRegistrationDialog: false});
         Session.set("showWait", true);
         signAndSubmit(password, this.state.rawTx, true, this.state.profile.address, this.state.recipient)
@@ -95,15 +125,16 @@ export default class Wallet extends TrackerReact(PureComponent) {
             });
     };
 
-    _transactionCanceled = () => {
+    _transactionCanceled() {
         Session.set("showWait", false);
         this.setState({getPasswordVisible: false, showUserRegistrationDialog: false});
     };
 
-    _submitTx = () => {
+    _toggleMode() {
+        this.setState({ozcTransferMode: !this.state.ozcTransferMode})
     };
 
-    _transferEth = () => {
+    _transferEth() {
         const self = this;
         Session.set("showWait", true);
         Meteor.callPromise('transfer-eth', this.state.recipient, this.state.ethAmount)
@@ -118,7 +149,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
             })
     };
 
-    _transferOzc = () => {
+    _transferOzc() {
         const self = this;
         Session.set("showWait", true);
         Meteor.callPromise('transfer-ozc', this.state.recipient, this.state.ozcAmount)
@@ -133,7 +164,22 @@ export default class Wallet extends TrackerReact(PureComponent) {
             })
     };
 
-    _redeemAffiliateBalance = () => {
+    _buyOzc() {
+        const self = this;
+        Session.set("showWait", true);
+        Meteor.callPromise('buy-ozc', this.state.sourceAccount, this.state.ozcPurchase, this.state.sellPrice)
+            .then((response) => {
+                response.getPasswordVisible = true;
+                Session.set("showWait", false);
+                self.setState(response);
+            })
+            .catch((err) => {
+                console.log(err);
+                Session.set("showWait", false);
+            })
+    }
+
+    _redeemAffiliateBalance() {
         const self = this;
         Session.set("showWait", true);
         Meteor.callPromise('redeem-affiliate-share')
@@ -150,7 +196,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
             })
     };
 
-    _handleChange = (value, event) => {
+    _handleChange(value, event) {
         let change = {};
         if (event.target.id == 'ozcAmount') {
             value = new BigNumber(value);
@@ -166,8 +212,101 @@ export default class Wallet extends TrackerReact(PureComponent) {
         this.setState(change);
     };
 
+    _handleSourceSelect(value, index, event) {
+        this.setState({sourceAccount: value, sellPrice: this.sourceAccounts[index].price});
+    }
 
-    componentDidUpdate(prevProps, prevState) {
+    _getOzcForm(profile, prices) {
+        if (this.state.ozcTransferMode) {
+            return [
+                <form key="transferForm" onSubmit={(e) => e.preventDefault()} className="md-grid">
+                    < TextField
+                        id="recipient"
+                        label="Recipient address"
+                        placeholder="0x77454e832261aeed81422348efee52d5bd3a3684"
+                        className="md-cell md-cell--12"
+                        disabled={!profile.ozcBalance.toNumber()}
+                        value={this.state.recipient}
+                        onChange={this._handleChange}
+                    />
+                    < TextField
+                        id="ozcAmount"
+                        label="amount in OZC to transfer"
+                        type={"number"}
+                        placeholder="0.00"
+                        className="md-cell md-cell--12"
+                        disabled={!profile.ozcBalance.toNumber()}
+                        value={this.state.ozcAmount}
+                        onChange={this._handleChange}
+                    />
+                    < TextField
+                        id="ozcAmountReceived"
+                        label="amount in OZC the recipient will get"
+                        type={"number"}
+                        placeholder="0.00"
+                        className="md-cell md-cell--12"
+                        disabled={!profile.ozcBalance.toNumber()}
+                        value={this.state.ozcAmountReceived}
+                        onChange={this._handleChange}
+                    />
+                </form>,
+                <CardActions key="transferCardAction" expander>
+                    <Button primary={this.state.ozcAmount > 0}
+                            flat label="Transfer"
+                            onClick={this._transferOzc}
+                            disabled={!profile.balance.toNumber() || !(this.state.ozcAmount > 0)
+                            || this.state.ozcAmount > profile.ozcBalance.toNumber()
+                            || !isValidAddress(this.state.recipient)}>
+                        check
+                    </Button>
+                </CardActions>,
+                <CardText key="transferCardText">
+                    <p>The amount tranfered is different from the amount received because there is
+                        a {this.txFee * 100}% fee on OZC transfers</p>
+                </CardText>
+            ]
+        } else {
+            let maxOzc = profile.balance.dividedBy(prices.ozc.ETH);
+            return [
+                <form key="transferForm" onSubmit={(e) => e.preventDefault()} className="md-grid">
+                    <SelectField
+                        id="sourceAccount"
+                        label="Select the account to buy from"
+                        value={this.state.sourceAccount}
+                        menuItems={this.state.sourceAccounts}
+                        itemLabel="name"
+                        itemValue="address"
+                        className="md-cell md-cell--12"
+                        onChange={this._handleSourceSelect}
+                        helpText="Select which account you want to buy your OZC from"
+                    />,
+                    < TextField
+                        id="ozcPurchase"
+                        label="amount in OZC you wish to purchase"
+                        type={"number"}
+                        placeholder="0.00"
+                        className="md-cell md-cell--12"
+                        disabled={profile.balance.comparedTo(prices.ozc.ETH / 100) == -1}
+                        value={this.state.ozcPurchase}
+                        onChange={this._handleChange}
+                        helpText={"the minimum purchase amount is 0.01 OZC"}
+                    />
+                </form>,
+                <CardActions key="transferCardAction" expander>
+                    <Button primary={this.state.ozcAmount > 0}
+                            flat label="Buy OZC"
+                            onClick={this._buyOzc}
+                            disabled={!profile.balance.toNumber() || this.state.ozcPurchase < 0.01
+                            || maxOzc.comparedTo(this.state.ozcPurchase) == -1}>
+                        check
+                    </Button>
+                </CardActions>,
+                <CardText key="transferCardText">
+                    <p>For the {profile.formattedEthBalance} ETH in your account you can
+                        purchase {maxOzc.round(2).toFormat(2)} OZC</p>
+                </CardText>
+            ]
+        }
     }
 
     render() {
@@ -180,13 +319,22 @@ export default class Wallet extends TrackerReact(PureComponent) {
             ozc: Globals.findOne({name: "ozcPrice"}) || {ETH: 0, USD: 0, BTC: 0},
         };
 
-        const ozcBalanceUSD = new BigNumber(profile.ozcBalance).times(prices.ozc.USD).toFormat(2);
-        const ethBalanceUSD = new BigNumber(profile.balance).times(prices.eth.USD).toFormat(2);
+        profile.ozcBalanceUSD = new BigNumber(profile.ozcBalance).times(prices.ozc.USD).round(2).toFormat(2);
+        profile.ethBalanceUSD = new BigNumber(profile.balance).times(prices.eth.USD).round(2).toFormat(2);
         let dialogTitle;
         if (this.state.getPasswordVisible)
             dialogTitle = "Enter our password to validate the transaction";
         else
             dialogTitle = "Please confirm this transaction in order to register your account";
+
+        if (this.state.ozcTransferMode) {
+            this.modeButton = 'shopping_cart';
+            this.ozcCardImage = '/images/gold-ounces.jpg';
+        } else {
+            this.modeButton = 'send';
+            this.ozcCardImage = '/images/buy-gold.jpg';
+        }
+        let ozcForm = this._getOzcForm(profile, prices);
 
         return (
             <div style={{width: "100%"}}>
@@ -200,64 +348,26 @@ export default class Wallet extends TrackerReact(PureComponent) {
                 <div className="md-grid md-toolbar-relative">
                     <Card style={{maxWidth: 400}} className="md-cell md-cell--6">
                         <Media>
-                            <img src="/images/gold-ounces.jpg" role="presentation"/>
+                            <img src={this.ozcCardImage} role="presentation"/>
                             <MediaOverlay>
-                                <CardTitle title={profile.formattedOzcBalance + " OZC = " + ozcBalanceUSD + " USD"}
-                                           subtitle={"price for OZC in USD " + (new BigNumber(prices.ozc.USD).toFormat(2))}>
-                                    <Button className="md-cell--right" icon>
-                                        shopping_cart
+                                <CardTitle
+                                    title={profile.formattedOzcBalance + " OZC = " + profile.ozcBalanceUSD + " USD"}
+                                    subtitle={"price for OZC in USD " + (new BigNumber(prices.ozc.USD).toFormat(2))}>
+                                    <Button className="md-cell--right" icon onClick={this._toggleMode}>
+                                        {this.modeButton}
                                     </Button>
                                 </CardTitle>
                             </MediaOverlay>
                         </Media>
-                        <form onSubmit={(e) => e.preventDefault()} className="md-grid">
-                            < TextField
-                                id="recipient"
-                                label="Recipient address"
-                                placeholder="0x77454e832261aeed81422348efee52d5bd3a3684"
-                                className="md-cell md-cell--12"
-                                disabled={!profile.ozcBalance.toNumber()}
-                                value={this.state.recipient}
-                                onChange={this._handleChange}
-                            />
-                            < TextField
-                                id="ozcAmount"
-                                label="amount in OZC to transfer"
-                                placeholder="0.00"
-                                className="md-cell md-cell--12"
-                                disabled={!profile.ozcBalance.toNumber()}
-                                value={this.state.ozcAmount}
-                                onChange={this._handleChange}
-                            />
-                            < TextField
-                                id="ozcAmountReceived"
-                                label="amount in OZC the recipient will get"
-                                placeholder="0.00"
-                                className="md-cell md-cell--12"
-                                disabled={!profile.ozcBalance.toNumber()}
-                                value={this.state.ozcAmountReceived}
-                                onChange={this._handleChange}
-                            />
-                        </form>
-                        <CardActions expander>
-                            <Button primary={this.state.ozcAmount > 0}
-                                    flat label="Transfer"
-                                    onClick={this._transferOzc}
-                                    disabled={!profile.balance.toNumber() || !(this.state.ozcAmount > 0)
-                                    || this.state.ozcAmount > profile.ozcBalance.toNumber()
-                                    || !isValidAddress(this.state.recipient)}>
-                                check
-                            </Button>
-                        </CardActions>
-                        <CardText>
-                        </CardText>
+                        {ozcForm}
                     </Card>
                     <Card style={{maxWidth: 400}} className="md-cell md-cell--6">
                         <Media>
                             <img src="/images/ethereum-logo.jpg" role="presentation"/>
                             <MediaOverlay>
-                                <CardTitle title={profile.formattedEthBalance + " ETH = " + ethBalanceUSD + " USD"}
-                                           subtitle={"price for ETH in USD " + (new BigNumber(prices.eth.USD).toFormat(2))}>
+                                <CardTitle
+                                    title={profile.formattedEthBalance + " ETH = " + profile.ethBalanceUSD + " USD"}
+                                    subtitle={"price for ETH in USD " + (new BigNumber(prices.eth.USD).toFormat(2))}>
                                     <Button className="md-cell--right"
                                             style={profile.affiliateBalance ? {color: "#8BC34A"} : {}}
                                             disabled={!profile.affiliateBalance}
@@ -281,6 +391,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             < TextField
                                 id="ethAmount"
                                 label="amount in ETH"
+                                type={"number"}
                                 placeholder="0.00"
                                 className="md-cell md-cell--12"
                                 disabled={!profile.balance.toNumber()}

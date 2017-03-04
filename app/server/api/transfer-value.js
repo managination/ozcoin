@@ -13,10 +13,10 @@ Meteor.methods({
     },
 
     'buy-ozc': function (sourceAccount, amount, price) {
-        let priceInWei = new BigNumber(amount).times(price).times(ether).times(2).toNumber();
+        let priceInWei = new BigNumber(amount).times(price).times(ether).toNumber();
         let amountInUCoins = new BigNumber(amount).times(ozcoin).toNumber();
         console.log("buying OZC from", sourceAccount, amountInUCoins, "for", new BigNumber(priceInWei).dividedBy(ether).toNumber());
-        return createRawTx(this.userId, 'StandardToken', 'buyCoins', priceInWei, sourceAccount, amountInUCoins);
+        return createRawTx(this.userId, 'StandardToken', 'buyCoins', priceInWei, amountInUCoins, sourceAccount);
     },
 
     'redeem-affiliate-share': function () {

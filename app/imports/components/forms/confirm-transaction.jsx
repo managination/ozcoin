@@ -1,3 +1,5 @@
+import * as LocalStorage from "meteor/simply:reactive-local-storage";
+import CryptoJS from "crypto-js";
 import React, {PureComponent, PropTypes} from "react";
 import {createContainer} from "meteor/react-meteor-data";
 import Dialog from "react-md/lib/Dialogs";
@@ -8,15 +10,27 @@ import Button from "react-md/lib/Buttons";
 export default class TransactionConfirmationOverlay extends PureComponent {
     constructor(props) {
         super(props);
-
+        this.mnemonic = null;
         this.state = {pageX: 1, pageY: 1, ksPassword: ''};
-        this._handleChange.bind(this);
+        this._handleChange = this._handleChange.bind(this);
+        this._verifyPassword = this._verifyPassword.bind(this);
     }
 
     componentWillReceiveProps() {
         this._confirm = this.props.confirm;
         this._cancel = this.props.cancel;
     }
+
+    _verifyPassword = () => {
+        if (this.props.passwordOnly) return true;
+        if (this.state.ksPassword) {
+            if (!this.mnemonic) {
+                this.mnemonic = LocalStorage.getItem('encrypted-mnemonic');
+            }
+            return CryptoJS.AES.decrypt(this.mnemonic, this.state.ksPassword).toString(CryptoJS.enc.Utf8).length > 1;
+        }
+        return false;
+    };
 
     _handleChange = (value, event) => {
         let change = {};
@@ -57,6 +71,7 @@ export default class TransactionConfirmationOverlay extends PureComponent {
                     <Button id="confirm"
                             primary raised
                             label="Confirm"
+                            disabled={!this._verifyPassword()}
                             onClick={() => this.props.confirm(this.state.ksPassword)}
                     >done</Button>
                     <Button style={{marginLeft: 20}}

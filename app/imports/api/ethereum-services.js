@@ -111,6 +111,8 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
             LocalStorage.setItem('email', email);
             //TODO: remove password from localstorage
             LocalStorage.setItem('password', password);
+            LocalStorage.setItem('pk', ks.exportPrivateKey(ks.getAddresses()[0], pwDerivedKey));
+
             LocalStorage.setItem('username', ks.getAddresses()[0]);
 
             _resolve({

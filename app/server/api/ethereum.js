@@ -13,7 +13,6 @@ const getNonce = function (profile) {
     let web3 = getWeb3();
     /*the nonce is the count of the next transaction*/
     let nonce = web3.eth.getTransactionCount(profile.address, "pending");
-    if (nonce <= profile.lastNonce) nonce = profile.lastNonce + 1;
     Profiles.update({_id: profile._id}, {$set: {lastNonce: nonce}});
     console.log("transactions including pending", nonce);
     return nonce;
@@ -121,7 +120,9 @@ Meteor.methods({
                     try {
                         const web3 = getWeb3();
                         let tx = web3.eth.getTransaction(txHash);
-                        if (tx.blockNumber) {
+                        if (tx && tx.blockNumber) {
+                            console.log("transaction", tx);
+                            console.log("receipt", web3.eth.getTransactionReceipt(txHash));
                             Meteor.clearInterval(txloop);
                             if (sender)
                                 updateProfileEthBalance(Profiles.findOne({address: sender}));
@@ -130,6 +131,8 @@ Meteor.methods({
                             resolve(web3.eth.getTransactionReceipt(txHash));
                         }
                     } catch (err) {
+                        console.log("ERROR: wait for tx to mine", err);
+                        Meteor.clearInterval(txloop);
                         reject(new Meteor.Error("wait for TX to mine", err.message));
                     }
                 }), 1000);

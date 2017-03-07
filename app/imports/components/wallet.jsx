@@ -120,7 +120,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                 Session.set("showWait", false);
             })
             .catch((err) => {
-                console.log("submitting signed transaction", err);
+                console.log("ERROR submitting signed transaction", err);
                 Session.set("showWait", false)
             });
     };

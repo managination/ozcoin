@@ -53,6 +53,13 @@ if (Meteor.settings.listeners) {
                 message: "insufficient ETH for purchase " +
                 "offered: " + result._offered + " required: " + result._required
             });
+        },
+        'ether-withdrawn': function (result) {
+            let profile = Profiles.findOne({address: result._account});
+            if (profile) {
+                updateProfileEthBalance(profile);
+                updateProfileAffiliateBalane(profile);
+            }
         }
     });
     Meteor.startup(() => { //Wallet events
@@ -62,6 +69,7 @@ if (Meteor.settings.listeners) {
         listenToEvent('StandardToken', 'AffiliatePaid', null, 'affiliate-paid');
         listenToEvent('StandardToken', 'TransactionFeeChanged', null, 'set-transaction-fee');
         listenToEvent('StandardToken', 'InsufficientFunds', null, 'insufficient-funds');
+        listenToEvent('StandardToken', 'EtherWithdrawn', null, 'ether-withdrawn');
     });
 
     Meteor.methods({

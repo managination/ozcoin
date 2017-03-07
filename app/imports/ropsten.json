@@ -339,7 +339,7 @@
         }]
     },
     "StandardToken": {
-        "address": "0x695e2d871a8a178b8e6c18beda2a1cd3b98621da",
+        "address": "0x9cc994ed235358cc5f31682b6ce8ac771661714d",
         "abi": [{
             "constant": false,
             "inputs": [{
@@ -792,6 +792,19 @@
                 "type": "uint256"
             }],
             "name": "PriceSet",
+            "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": true,
+                "name": "_account",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "_amount",
+                "type": "uint256"
+            }],
+            "name": "EtherWithdrawn",
             "type": "event"
         }, {
             "anonymous": false,

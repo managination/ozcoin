@@ -13,8 +13,7 @@ export default class TransactionConfirmationOverlay extends PureComponent {
         this._handleChange.bind(this);
     }
 
-    componentWillMount() {
-        console.log("TransactionConfirmationOverlay will mount");
+    componentWillReceiveProps() {
         this._confirm = this.props.confirm;
         this._cancel = this.props.cancel;
     }
@@ -42,7 +41,7 @@ export default class TransactionConfirmationOverlay extends PureComponent {
                     fixed
                 />
                 <form className="md-toolbar-relative md-grid" onSubmit={(e) => e.preventDefault()}>
-                    <div className="md-cell--12">
+                    <div className={this.props.passwordOnly ? "hidden" : "md-cell--12"}>
                         <h1>Transaction costs {cost} ETH your balance is {balance} ETH</h1>
                     </div>
                     <TextField
@@ -58,13 +57,14 @@ export default class TransactionConfirmationOverlay extends PureComponent {
                     <Button id="confirm"
                             primary raised
                             label="Confirm"
-                            onClick={() => this._confirm(this.state.ksPassword)}
+                            onClick={() => this.props.confirm(this.state.ksPassword)}
                     >done</Button>
                     <Button style={{marginLeft: 20}}
+                            className={this.props.cancel ? '' : 'hidden'}
                             id="cancel"
                             secondary raised
                             label="Cancel"
-                            onClick={this._cancel}
+                            onClick={this.props.cancel}
                     >cancel</Button>
 
                 </form>
@@ -78,4 +78,6 @@ TransactionConfirmationOverlay.propTypes = {
     balance: PropTypes.number,
     confirm: PropTypes.func,
     cancel: PropTypes.func,
+    title: PropTypes.string,
+    passwordOnly: PropTypes.bool,
 };

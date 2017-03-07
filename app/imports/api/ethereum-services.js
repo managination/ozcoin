@@ -44,10 +44,20 @@ export const initializeKeystore = (() => {
 });
 
 let initialisedWeb3 = undefined;
-export const getWeb3 = () => {
-    let w3 = initialisedWeb3;
+let eventWeb3 = undefined;
+export const getWeb3 = (event) => {
+    let w3;
+    if (event)
+        w3 = eventWeb3;
+    else
+        w3 = initialisedWeb3;
+
     if (!w3) {
-        let provider = new W3.providers.HttpProvider(Meteor.settings.public.ethNodeAddress);
+        let provider;
+        if (event)
+            provider = new W3.providers.HttpProvider(Meteor.settings.public.ethNodeAddress);
+        else
+            provider = new W3.providers.HttpProvider(Meteor.settings.public.ethNodeAddress);
         // let provider = new W3.providers.HttpProvider('http://localhost:8545');
         //let provider = new W3.providers.HttpProvider('https://ropsten.infura.io/NgjvCOUF5UIhCgRKndzD');
         w3 = new W3(provider);

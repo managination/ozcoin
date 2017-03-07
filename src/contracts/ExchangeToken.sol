@@ -1,7 +1,7 @@
 pragma solidity ^0.4.0;
-import "TokenData.sol";
-import "ExchangeTokenInterface.sol";
-import "BaseContract.sol";
+import "./TokenData.sol";
+import "./ExchangeTokenInterface.sol";
+import "./BaseContract.sol";
 
 
 
@@ -22,7 +22,7 @@ function resetTokenData(TokenData _tokenData) onlyowner {
   ozCoinAccount = tokenData.getOzCoinAccount();
 }
 
-function getOzAccount() returns (address){
+function getOzAccount() constant returns (address){
   return ozCoinAccount;
 }
 

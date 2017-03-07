@@ -1,5 +1,4 @@
 pragma solidity ^0.4.0;
-import "TokenData.sol";
 
 contract ExchangeTokenInterface {
 

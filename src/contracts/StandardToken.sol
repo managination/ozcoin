@@ -1,8 +1,7 @@
 pragma solidity ^0.4.0;
-import "ExchangeToken.sol";
-import "TokenData.sol";
-
-import "User.sol";
+import "./ExchangeToken.sol";
+import "./TokenData.sol";
+import "./User.sol";
 
 // at startup display vesion and price from ozcoin account
 // include blocknumbers in events
@@ -45,25 +44,16 @@ event ArbitrationRequested(address indexed  _account,bytes32 ID);
 event PriceSet(address indexed seller,bool side,uint256 price);
 event EtherWithdrawn(address indexed _account, uint256 _amount);
 
-
-function StandardToken(){
-
-}
-
-function resetUser(User _userContract) onlyowner {
-  userContract = _userContract;
-}
-
-
 modifier accountFrozenStatus(address _account, bool _expected){
   if(accountFrozen[_account]==_expected){
     _;
   }
 }
 
-
-
-
+// reset address of User contract
+function resetUser(User _userContract) onlyowner contractIsAdminOnly {
+  userContract = _userContract;
+}
 
  function setAffiliatePercent(uint8 _percentage) onlyowner {
     if(_percentage>=0 && _percentage<100 ){
@@ -73,11 +63,7 @@ modifier accountFrozenStatus(address _account, bool _expected){
    }
   }
 
-
-  // modifiers needed
-  // check buyer has enough ether for coin plus fee
-  // need to check amount is greater than fee
-
+  // don't allow payments to contracts ir from or to frozen accounts
    function buyCoins (uint256 _amount,address _seller) payable accountFrozenStatus(_seller, false) accountFrozenStatus(msg.sender, false) {
      uint256 sellPrice = 1;
      (sellPrice,)  = getPrices(_seller);
@@ -85,13 +71,13 @@ modifier accountFrozenStatus(address _account, bool _expected){
      uint256 etherCost = sellPrice*_amount;
 
      if(validatePurchase(_amount,_seller,etherCost,msg.value)==false){
+       // credit sender with ether, they need to pull
+       etherBalances[msg.sender] += msg.value;
        return;
      }
       EtherShare memory shares = calculateAffiliateShares(msg.sender,msg.value);
-
-      bool sendEtherSuccess =  _seller.send(shares.ozcoinShare);
-      if(sendEtherSuccess){
-        if(_seller==ozCoinAccount){
+      etherBalances[_seller]+=shares.ozcoinShare;
+      if(_seller==ozCoinAccount){
           OzCoinPaid(msg.sender,shares.ozcoinShare);
         }
 
@@ -110,14 +96,13 @@ modifier accountFrozenStatus(address _account, bool _expected){
           Transfer(_seller,ozCoinAccount, _amount - sent);
         }
 
-        }
-        else{
-          FailedToSend(_seller,shares.ozcoinShare);
-        }
-
    }
 
 function validatePurchase(uint256 _amount, address _seller,uint256 _etherCost, uint256 _etherSupplied) internal returns (bool){
+
+  if(isContract(msg.sender)){
+    return false;
+  }
 
   if(_seller==msg.sender){
     return false;
@@ -134,6 +119,7 @@ function validatePurchase(uint256 _amount, address _seller,uint256 _etherCost, u
 
   return true;
 }
+
 
 // returns ozcoin share, affiliate address affiliate share , company address compnay share
 function  calculateAffiliateShares(address _buyer, uint256 _cost) internal returns (EtherShare){
@@ -173,7 +159,7 @@ function getAffiliateBalance(address _account) constant returns(uint256){
     return etherBalances[_account];
 }
 
-function withdrawEther () accountFrozenStatus(msg.sender, false) external returns (bool success){
+function withdrawEther() accountFrozenStatus(msg.sender, false) external returns (bool success){
         uint amount = etherBalances[msg.sender];
         etherBalances[msg.sender] = 0;
         if (msg.sender.send(amount)) {
@@ -185,7 +171,7 @@ function withdrawEther () accountFrozenStatus(msg.sender, false) external return
         }
 }
 
-function withdrawOzCoinEther () external returns (bool success){
+function withdrawAllEther () external returns (bool success){
         if(msg.sender!=ozCoinAccount){
           return false;
         }

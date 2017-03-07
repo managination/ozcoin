@@ -1,7 +1,7 @@
 pragma solidity ^0.4.0;
-import "BaseContract.sol";
+import "./BaseContract.sol";
 
-contract TokenData is Mortal {
+contract TokenData is BaseContract {
 
 struct PendingTransfer{
   uint256 value;
@@ -26,9 +26,6 @@ address arbiterAccount;
 uint256 totalSupply;
 
 
-
-// have total ether amount so can do checks of before and after
-
 mapping (address=>uint256) coins;
 mapping (bytes32=>Arbitration) arbitrations;
 
@@ -36,12 +33,13 @@ PendingTransfer[] pendingTransfers;
 
 event ControllerChanged(address controller);
 event OzCoinAccountChanged(address ozCoin);
+event CoinsMined(uint256 _amount);
 event ArbiterChanged(address arbiterAccount);
 event ArbitrationRequested(address indexed requester,bytes32 ID);
 event ArbitrationApproved(address indexed approver,bytes32 ID);
 event ArbitrationTransfer(address indexed source,address destination, address sender,uint256 amount);
 
-event PendingActivated(address sender,address recipient,uint256 value);
+//event PendingActivated(address sender,address recipient,uint256 value);
 
 event InsufficientOZCBalance(address _seller, address _buyer, uint256 requiredAmount);
 
@@ -66,12 +64,6 @@ modifier onlyArbiter(){
    }
 }
 
-modifier contractOnly(address _contract, bool expected){
-  if(isContract(_contract)==expected){
-    _;
-  }
-}
-
 modifier sufficientFunds(address _sender,uint256 _amount){
   if (_amount > 0 && coins[_sender] >= _amount){
     _;
@@ -79,9 +71,15 @@ modifier sufficientFunds(address _sender,uint256 _amount){
 }
 
 function TokenData(uint256 _totalSupply,address _ozCoinAccount){
-  totalSupply = _totalSupply;
   ozCoinAccount = _ozCoinAccount;
-  coins[ozCoinAccount] = _totalSupply;
+  mineCoins(_totalSupply);
+}
+
+
+function mineCoins(uint256 _amount) onlyowner{
+  totalSupply += _amount;
+  coins[ozCoinAccount] += _amount;
+  CoinsMined(_amount);
 }
 
 function setWalletController(address _walletController) onlyowner contractIsAdminOnly contractOnly(msg.sender, false) external{
@@ -180,7 +178,7 @@ function calculateFee(uint256 _amount) internal constant returns (uint256){
 }
 
 
-// returns the index of the transfer in the array
+/*// returns the index of the transfer in the array
 function getPendingTransfers() constant external onlyController contractIsActive contractOnly(msg.sender,true)  returns (uint256 []) {
 uint256 [] memory validTransfers = new uint256 [] (pendingTransfers.length);
 for (uint256 ii= 0;ii<pendingTransfers.length;ii++){
@@ -208,7 +206,7 @@ function deletePendingTransfer(uint256 index) internal{
     pendingTransfers[index] = pendingTransfers[pendingTransfers.length-1];
   }
   pendingTransfers.length--;
-}
+}*/
 
 
 function requestArbitration( address _requester) external onlyController contractIsActive contractOnly(msg.sender,true){

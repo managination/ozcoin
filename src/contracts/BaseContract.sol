@@ -9,9 +9,18 @@ contract Owned {
         }
     }
 
+    event OwnerChanged(address oldOwner,address newOwner);
+
     function Owned() {
         owner = msg.sender;
     }
+
+    function changeOwner(address _newOwner) onlyowner {
+      address oldOwner = owner;
+      owner = _newOwner;
+      OwnerChanged(oldOwner,_newOwner);
+    }
+
 
 }
 
@@ -45,11 +54,7 @@ contract Mortal is Owned {
     return size > 1;
   }
 
-  /*function isContract2(address addr) returns (uint256) {
-    uint size;
-    assembly { size := extcodesize(addr) }
-    return size;
-  }*/
+
 
   function kill() onlyowner {
         setContractAdminOnly();
@@ -63,7 +68,12 @@ contract Mortal is Owned {
 
 
 contract BaseContract is Mortal {
-
+  
+  modifier contractOnly(address _contract, bool expected){
+    if(isContract(_contract)==expected){
+      _;
+    }
+  }
 
 
 }

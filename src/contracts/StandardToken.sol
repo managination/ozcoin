@@ -43,7 +43,7 @@ event AccountFrozen(address indexed _account);
 event AccountUnFrozen(address indexed _account);
 event ArbitrationRequested(address indexed  _account,bytes32 ID);
 event PriceSet(address indexed seller,bool side,uint256 price);
-
+event EtherWithdrawn(address indexed _account, uint256 _amount);
 
 
 function StandardToken(){
@@ -177,6 +177,7 @@ function withdrawEther () accountFrozenStatus(msg.sender, false) external return
         uint amount = etherBalances[msg.sender];
         etherBalances[msg.sender] = 0;
         if (msg.sender.send(amount)) {
+            EtherWithdrawn(msg.sender, amount);
             return true;
         } else {
             etherBalances[msg.sender] = amount;

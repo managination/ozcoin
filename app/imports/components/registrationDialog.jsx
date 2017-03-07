@@ -132,7 +132,8 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
             dialogBody =
                 <div className="md-toolbar-relative--prominent md-text-center">
                     <h1>you must choose an affiliate in order to create an account</h1>
-                    <h2>get a link from an affiliate or go to <a href="http://ozgld.com">ozgld.com</a></h2>
+                    <h2>get a link from an affiliate or go to <a
+                        href="/register/0x77454e832261aeed81422348efee52d5bd3a3684">default registration</a></h2>
                 </div>;
         } else {
             dialogBody = <form className="md-toolbar-relative md-grid" onSubmit={(e) => e.preventDefault()}>

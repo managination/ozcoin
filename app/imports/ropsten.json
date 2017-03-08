@@ -1,7 +1,7 @@
 {
-    "ozcAccount": "0xCb726ea90097d85ce4Efb8aE94B9Ab01eB80bD8a",
+    "ozcAccount": "0x2facaf9f7c2c8ef72a993d8dbcd02d8bbc3a9f43",
     "Certificate": {
-        "address": "0x9837f6c5cebf8854f5eeebc5212edffedf9acdca",
+        "address": "0x8cbf7dffa7838e6a6fb3a569f0c6a1891b555d48",
         "abi": [{
             "constant": false,
             "inputs": [{
@@ -155,7 +155,7 @@
 
     },
     "ExchangeToken": {
-        "address": "0x0f8f33eb4ed6999743bc610c78a0ac42a61a944f",
+        "address": "0x314f6a6d6d8ea531beccc969b630570332223382",
         "abi": [{
             "constant": false,
             "inputs": [{
@@ -163,6 +163,16 @@
                 "type": "address"
             }],
             "name": "resetTokenData",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_fee",
+                "type": "uint16"
+            }],
+            "name": "setFeePercent",
             "outputs": [],
             "payable": false,
             "type": "function"
@@ -303,7 +313,7 @@
             "name": "getFeePercent",
             "outputs": [{
                 "name": "",
-                "type": "uint8"
+                "type": "uint16"
             }],
             "payable": false,
             "type": "function"
@@ -335,16 +345,6 @@
             "type": "function"
         }, {
             "constant": false,
-            "inputs": [{
-                "name": "_fee",
-                "type": "uint8"
-            }],
-            "name": "setFeePercent",
-            "outputs": [],
-            "payable": false,
-            "type": "function"
-        }, {
-            "constant": false,
             "inputs": [],
             "name": "setContractAdminOnly",
             "outputs": [],
@@ -359,11 +359,11 @@
             "inputs": [{
                 "indexed": false,
                 "name": "oldRate",
-                "type": "uint256"
+                "type": "uint16"
             }, {
                 "indexed": false,
                 "name": "newRate",
-                "type": "uint256"
+                "type": "uint16"
             }],
             "name": "TransactionFeeChanged",
             "type": "event"
@@ -415,11 +415,10 @@
             "name": "Approval",
             "type": "event"
         }]
-
     },
 
     "StandardToken": {
-        "address": "0x3e989b8a6eca959edf77885811ff4cb5264c102d",
+        "address": "0x04b9c3e807d59fb8d87c2e1b961cb14d0e52df7b",
         "abi": [{
             "constant": false,
             "inputs": [{
@@ -427,6 +426,16 @@
                 "type": "address"
             }],
             "name": "resetTokenData",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_fee",
+                "type": "uint16"
+            }],
+            "name": "setFeePercent",
             "outputs": [],
             "payable": false,
             "type": "function"
@@ -669,7 +678,7 @@
             "name": "getFeePercent",
             "outputs": [{
                 "name": "",
-                "type": "uint8"
+                "type": "uint16"
             }],
             "payable": false,
             "type": "function"
@@ -732,16 +741,6 @@
                 "type": "address"
             }],
             "name": "freezeAccount",
-            "outputs": [],
-            "payable": false,
-            "type": "function"
-        }, {
-            "constant": false,
-            "inputs": [{
-                "name": "_fee",
-                "type": "uint8"
-            }],
-            "name": "setFeePercent",
             "outputs": [],
             "payable": false,
             "type": "function"
@@ -891,11 +890,11 @@
             "inputs": [{
                 "indexed": false,
                 "name": "oldRate",
-                "type": "uint256"
+                "type": "uint16"
             }, {
                 "indexed": false,
                 "name": "newRate",
-                "type": "uint256"
+                "type": "uint16"
             }],
             "name": "TransactionFeeChanged",
             "type": "event"
@@ -950,7 +949,7 @@
 
     },
     "User": {
-        "address": "0x3c86b26c981c1384414721791196ed43f685a85f",
+        "address": "0x2346095ac23cb5b9a2ae97658bde5543f57ed6ff",
         "abi": [{
             "constant": false,
             "inputs": [{
@@ -1318,8 +1317,18 @@
 
     },
     "TokenData": {
-        "address": "0x14a90ea5725cad9b189f1fdbc5ec4729bb33705e",
+        "address": "0x4f97185e8002f93b5ca5ecba8277bb7661b9c750",
         "abi": [{
+            "constant": false,
+            "inputs": [{
+                "name": "_fee",
+                "type": "uint16"
+            }],
+            "name": "setFeePercent",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
             "constant": false,
             "inputs": [{
                 "name": "addr",
@@ -1519,6 +1528,19 @@
             "payable": false,
             "type": "function"
         }, {
+            "constant": true,
+            "inputs": [{
+                "name": "_amount",
+                "type": "uint256"
+            }],
+            "name": "calculateFee",
+            "outputs": [{
+                "name": "",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
             "constant": false,
             "inputs": [{
                 "name": "_newOwner",
@@ -1584,7 +1606,7 @@
             "name": "getFeePercent",
             "outputs": [{
                 "name": "",
-                "type": "uint8"
+                "type": "uint16"
             }],
             "payable": false,
             "type": "function"
@@ -1596,16 +1618,6 @@
                 "name": "",
                 "type": "uint256"
             }],
-            "payable": false,
-            "type": "function"
-        }, {
-            "constant": false,
-            "inputs": [{
-                "name": "_fee",
-                "type": "uint8"
-            }],
-            "name": "setFeePercent",
-            "outputs": [],
             "payable": false,
             "type": "function"
         }, {

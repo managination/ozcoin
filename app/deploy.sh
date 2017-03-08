@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-
-DEPLOY_HOSTNAME=galaxy.meteor.com meteor deploy ozcoin-test --settings ../galaxy-private.json --debug
+echo $1
+DEPLOY_HOSTNAME=galaxy.meteor.com meteor deploy ozcoin-$1 --settings ../galaxy-$1.json --debug

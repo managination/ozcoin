@@ -9,7 +9,8 @@ import Toolbar from "react-md/lib/Toolbars";
 import Paper from "react-md/lib/Papers";
 import {browserHistory} from "react-router";
 import {createKeystore, add0x} from "../../api/ethereum-services";
-import {Profiles, Roles} from "../../api/model/profiles.js";
+import {Profiles, Roles} from "../../api/model/profiles";
+import {Globals} from "../../api/model/globals";
 
 export default class RegistrationDialog extends TrackerReact(PureComponent) {
     constructor(props) {
@@ -62,6 +63,13 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                 let profile = Profiles.findOne({address: add0x(Meteor.user().username)});
                 Session.set('currentProfile', profile || {alias: "not logged in"});
                 Session.set('showWait', false);
+                let userNum = 1;
+                if (profile)
+                    userNum = profile.userNum;
+
+                if (userNum > Globals.findOne({name: 'user-count'}).max) {
+                    browserHistory.push('/delay-notification');
+                }
             });
         });
     }
@@ -122,7 +130,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
 
     render() {
         // Session.set("show-wait", false);
-        const nav = <Button icon onClick={this._closeDialog}>close</Button>;
+        const nav = null;//<Button icon onClick={this._closeDialog}>close</Button>;
         const action = <Button raised label="Create keystore" onClick={this._createKeystore}/>;
         const dialogLabel = "Create new Keystore";
         const toolbarTitle = "Create new keystore affiliated to";

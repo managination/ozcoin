@@ -33,8 +33,12 @@ Meteor.startup(() => {
         initializeKeystore(password).then((keystore) => {
             Session.set('initialized', true);
             Meteor.subscribe('current-profile', (err) => {
-                let userNum = Profiles.findOne({owner: Meteor.userId()}).userNum;
-                if(userNum > Globals.findOne({name: 'user-count'}).max)
+                let profile = Profiles.findOne({owner: Meteor.userId()});
+                let userNum = 0;
+                if (profile) {
+                    userNum = profile.userNum;
+                }
+                if (userNum > Globals.findOne({name: 'user-count'}).max)
                     render(
                         <DelayNotification/>, document.getElementById('render-target')
                     );

@@ -27,7 +27,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         };
         Session.set("showWait", false);
         Session.set("showCopyMnemonic", false);
-        Session.set('currentProfile', {alias: 'Please login'});
+        Session.set('currentProfile', Profiles.findOne({owner: Meteor.userId()}) || {alias: "not logged in"});
 
         this._showToast = this._showToast.bind(this);
         this._removeToast = this._removeToast.bind(this);
@@ -66,7 +66,6 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         const toasts = this.state.toasts.slice();
         toasts.push({text, action});
 
-        const words = text.split(' ').length;
         const autohideTimeout = Snackbar.defaultProps.autohideTimeout;
 
         this.setState({toasts, autohideTimeout});
@@ -99,6 +98,14 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         toolbarMenuItems.push(
             <ListItem key="copyMnemonic" primaryText="Copy mnemonic"
                       onClick={this._copyMnemonic}/>
+        );
+        let affiliateAddress = Session.get('currentProfile').affiliate;
+        toolbarMenuItems.push(
+            <CopyToClipboard key="copyAffiliateLink"
+                             text={location.protocol + "//" + location.hostname + ":" + location.port + "/register/" + affiliateAddress}
+                             onCopy={() => this._showToast("registration URL copied")}>
+                <ListItem key="copyAffiliateLink" primaryText="Copy Registration link"/>
+            </CopyToClipboard>
         );
         this.actions = [
             <Button key="refresh" icon onClick={

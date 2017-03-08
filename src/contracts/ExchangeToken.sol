@@ -10,7 +10,7 @@ contract ExchangeToken is ExchangeTokenInterface,BaseContract{
 TokenData tokenData;  // address of data contract
 address ozCoinAccount;
 
-event TransactionFeeChanged(uint256 oldRate,uint256 newRate);
+event TransactionFeeChanged(uint16 oldRate,uint16 newRate);
 
 function ExchangeToken(){
 
@@ -51,18 +51,18 @@ function transfer(address _to, uint256 _value) returns (bool success){
   }
 }
 
-function setFeePercent(uint8 _fee) external onlyowner {
-    uint256 old = tokenData.getFeePercent();
+function setFeePercent(uint16 _fee) external onlyowner {
+    uint16 old = tokenData.getFeePercent();
     tokenData.setFeePercent(_fee);
     TransactionFeeChanged(old,_fee);
 }
 
-function getFeePercent() constant external returns (uint8){
+function getFeePercent() constant external returns (uint16){
   return tokenData.getFeePercent();
 }
 
 function calculateFee(uint256 _amount) internal constant returns (uint256){
-  uint256 fee = tokenData.getFeePercent()*_amount/100;
+  uint256 fee = tokenData.calculateFee(_amount);
   return fee;
 }
 

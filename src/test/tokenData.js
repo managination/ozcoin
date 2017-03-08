@@ -45,7 +45,7 @@ contract('TokenData', function(accounts) {
         });
 
     it("should return status", function() {
-          TokenData.new(initialSupply, ozAccount).then(function(instance) {
+          TokenData.new(initialSupply, ozAccount,"0x0").then(function(instance) {
             return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
                 return instance.checkStatus.call({from : ownerAccount}).then(function(details) {
                     return assert.equal(details[1], ozAccount);
@@ -56,7 +56,7 @@ contract('TokenData', function(accounts) {
     });
 
     it("should have the correct balances", function() {
-        TokenData.new(initialSupply,ozAccount).then(function(instance) {
+        TokenData.new(initialSupply,ozAccount,"0x0").then(function(instance) {
             return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
                 return instance.balanceOf.call(ozAccount, {from : exchangeAccount.address}).then(function(balance) {
                     return assert.equal(balance.valueOf(), initialSupply);
@@ -68,7 +68,7 @@ contract('TokenData', function(accounts) {
 
 
     it("should fail functions if not called by controller", function() {
-        TokenData.new(initialSupply, ozAccount).then(function(instance) {
+        TokenData.new(initialSupply, ozAccount,"0x0").then(function(instance) {
           return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
               return instance.transfer.sendTransaction(ozAccount, userAccount, 10, 0,{from : userAccount}).then(function(Tx2) {
                   return instance.balanceOf.call(userAccount,{from : exchangeAccount.address}).then(function(balance) {
@@ -82,7 +82,7 @@ contract('TokenData', function(accounts) {
 
 
     it("should fail to set wallet controller if not owner", function() {
-        TokenData.new(initialSupply,ozAccount).then(function(instance) {
+        TokenData.new(initialSupply,ozAccount,"0x0").then(function(instance) {
           return instance.setContractAdminOnly.sendTransaction({from : ownerAccount}).then(function(Tx) {
             // this should succeed
             return instance.setWalletController.sendTransaction(walletAccount,{from : ownerAccount}).then(function(Tx2) {
@@ -99,7 +99,7 @@ contract('TokenData', function(accounts) {
           });
 
     it("should fail to set wallet controller if contract is active", function() {
-        TokenData.new(initialSupply,ozAccount).then(function(instance) {
+        TokenData.new(initialSupply,ozAccount,"0x0").then(function(instance) {
           return instance.setContractAdminOnly.sendTransaction({from : ownerAccount}).then(function(Tx) {
                 return instance.setWalletController.sendTransaction(walletAccount,{from : ownerAccount}).then(function(Tx2) {
                   return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
@@ -113,9 +113,10 @@ contract('TokenData', function(accounts) {
               });
             });
           });
+          });
 
           it("should set wallet controller if contract is not active", function() {
-              TokenData.new(initialSupply, exchangeAccount.address,walletAccount.address,ozAccount,arbiterAccount).then(function(instance) {
+              TokenData.new(initialSupply, ozAccount,"0x0").then(function(instance) {
                   return instance.setContractAdminOnly.sendTransaction({from : ownerAccount}).then(function(Tx2) {
                     return instance.setWalletController.sendTransaction(userAccount,{from : ownerAccount}).then(function(Tx3) {
                         return instance.checkStatus.call({from : ownerAccount}).then(function(details) {
@@ -127,7 +128,7 @@ contract('TokenData', function(accounts) {
                 });
 
                 it("should set exchange controller if contract is not active", function() {
-                    TokenData.new(initialSupply, exchangeAccount.address,walletAccount.address,ozAccount,arbiterAccount).then(function(instance) {
+                    TokenData.new(initialSupply, ozAccount,"0x0").then(function(instance) {
                         return instance.setContractAdminOnly.sendTransaction({from : ownerAccount}).then(function(Tx2) {
                           return instance.setExchangeController.sendTransaction(userAccount,{from : ownerAccount}).then(function(Tx3) {
                               return instance.checkStatus.call({from : ownerAccount}).then(function(details) {
@@ -140,7 +141,7 @@ contract('TokenData', function(accounts) {
 
 
               it("should set an arbitration limit then allow arbitration", function() {
-                  TokenData.new(initialSupply, exchangeAccount.address,walletAccount.address,ozAccount,arbiterAccount).then(function(instance) {
+                  TokenData.new(initialSupply,ozAccount,"0x0").then(function(instance) {
                   return instance.setContractAdminOnly.sendTransaction({from : ownerAccount}).then(function(Tx) {
                       return instance.setArbitrationLimit.sendTransaction(10,{from : ownerAccount}).then(function(Tx2) {
                         return instance.checkStatus.call({from : ownerAccount}).then(function(details) {

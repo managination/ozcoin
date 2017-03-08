@@ -17,7 +17,7 @@ struct Arbitration {
 }
 
 uint16 arbitrationLimit = 500;
-uint8 transactionFeePercent;
+uint16 transactionFeePercent;
 
 address exchangeController;
 address walletController;
@@ -160,18 +160,18 @@ function transfer(address _sender,address _recipient, uint256 _value,uint64 _tra
   return (transferAmount);
 }
 
-function setFeePercent(uint8 _fee) external onlyController contractIsActive {
-    if(_fee>=0 && _fee <100 ){
+function setFeePercent(uint16 _fee) external onlyController contractIsActive {
+    if(_fee>=0 && _fee <10000 ){
       transactionFeePercent = _fee;
     }
 }
 
-function getFeePercent()  constant external returns (uint8){
+function getFeePercent()  constant external returns (uint16){
     return transactionFeePercent;
 }
 
-function calculateFee(uint256 _amount) internal constant returns (uint256){
-  uint256 fee = transactionFeePercent*_amount/100;
+function calculateFee(uint256 _amount) constant returns (uint256){
+  uint256 fee = transactionFeePercent*_amount/10000;
   return fee;
 }
 

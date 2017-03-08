@@ -6,6 +6,7 @@ import BigNumber from "bignumber.js";
 import CryptoJS from "crypto-js";
 import * as LocalStorage from "meteor/simply:reactive-local-storage";
 import Wait from "../imports/components/wait";
+import DelayNotification from "../imports/components/delayNotification";
 import GetPassword from "../imports/components/forms/confirm-transaction";
 import {initializeKeystore} from "../imports/api/ethereum-services";
 import {Globals} from "../imports/api/model/globals";
@@ -35,7 +36,7 @@ Meteor.startup(() => {
                 let userNum = Profiles.findOne({owner: Meteor.userId()}).userNum;
                 if(userNum > Globals.findOne({name: 'user-count'}).max)
                     render(
-                        <DelayNotification visible={true}/>, document.getElementById('render-target')
+                        <DelayNotification/>, document.getElementById('render-target')
                     );
                 else
                     render(renderRoutes(),

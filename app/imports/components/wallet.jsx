@@ -67,7 +67,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
     componentWillMount() {
         let self = this;
 
-        this.txFee = Globals.findOne({name: "transaction-fee"}).value;
+        this.txFee = new BigNumber(Globals.findOne({name: "transaction-fee"}).value);
         Meteor.callPromise('get-ozc-affiliate-price').then((affiliateCompany) => {
             let sourceAccounts = [
                 {
@@ -88,7 +88,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                     sourceAccount: sourceAccounts[0].address,
                     sellPrice: sourceAccounts[0].price
                 });
-        })
+        });
 
         if (Meteor.user() && this.props.params.register) {
             let profile = Profiles.findOne({owner: Meteor.userId()});
@@ -191,7 +191,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
         }
         if (event.target.id == 'ozcAmountReceived') {
             value = new BigNumber(value);
-            change.ozcAmount = value.dividedBy(1 - this.txFee).round(5).toNumber();
+            change.ozcAmount = value.dividedBy(1 - this.txFee.toNumber()).round(5).toNumber();
             value = value.toNumber();
         }
         change[event.target.id] = value;
@@ -248,7 +248,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                 </CardActions>,
                 <CardText key="transferCardText">
                     <p>The amount tranfered is different from the amount received because there is
-                        a {this.txFee * 100}% fee on OZC transfers</p>
+                        a {this.txFee.times(100).toFormat(2)}% fee on OZC transfers</p>
                 </CardText>
             ]
         } else {

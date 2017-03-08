@@ -1,10 +1,11 @@
-import React, {PureComponent} from 'react';
-import {createContainer} from 'meteor/react-meteor-data';
-
-import Dialog from 'react-md/lib/Dialogs';
-import Toolbar from 'react-md/lib/Toolbars';
-import Card from 'react-md/lib/Cards';
-import Media, {MediaOverlay} from 'react-md/lib/Media';
+import React, {PureComponent} from "react";
+import {createContainer} from "meteor/react-meteor-data";
+import Dialog from "react-md/lib/Dialogs";
+import Toolbar from "react-md/lib/Toolbars";
+import Card from "react-md/lib/Cards";
+import CardTitle from "react-md/lib/Cards/CardTitle";
+import Media, {MediaOverlay} from "react-md/lib/Media";
+import CardText from "react-md/lib/Cards/CardText";
 
 export default class WaitOverlay extends PureComponent {
     constructor (props) {
@@ -19,7 +20,7 @@ export default class WaitOverlay extends PureComponent {
         return (
             <Dialog
                 id="delayNotificationOverlay"
-                {...this.state}
+                visible={true}
                 fullPage
                 aria-label="dialogLabel"
                 focusOnMount={false}
@@ -36,10 +37,14 @@ export default class WaitOverlay extends PureComponent {
                             <MediaOverlay>
                                 <CardTitle
                                     title="Thank you for your OZcoinGold Wallet registration"
-                                    subtitle="We are committed to providing exceptional customer service and will notify you as soon as you OzGLD Wallet is activated">
+                                    subtitle="">
                                 </CardTitle>
                             </MediaOverlay>
                         </Media>
+                        <CardText key="transferCardText">
+                            <p>We are committed to providing exceptional customer service and will notify you as soon as
+                                you OzGLD Wallet is activated</p>
+                        </CardText>
                     </Card>
                 </div>
             </Dialog>

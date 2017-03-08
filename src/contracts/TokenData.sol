@@ -24,13 +24,12 @@ address walletController;
 address ozCoinAccount;
 address arbiterAccount;
 address feeAccount;
+TokenData cloneParent;
 uint256 totalSupply;
 
 
-mapping (address=>uint256) coins;
+mapping (address=>uint256) public coins;
 mapping (bytes32=>Arbitration) arbitrations;
-
-PendingTransfer[] pendingTransfers;
 
 
 event CoinsMinted(uint256 _amount);
@@ -65,8 +64,9 @@ modifier sufficientFunds(address _sender,uint256 _amount){
   }
 }
 
-function TokenData(uint256 _totalSupply,address _ozCoinAccount){
+function TokenData(uint256 _totalSupply,address _ozCoinAccount, TokenData _cloneParent){
   ozCoinAccount = _ozCoinAccount;
+  cloneParent = _cloneParent;
   mintCoins(_totalSupply);
 }
 
@@ -112,6 +112,12 @@ function setFeeAccount(address _account) onlyowner contractIsAdminOnly {
 function setArbitrationLimit(uint16 _limit) onlyowner contractIsAdminOnly {
   if(_limit > 0){
     arbitrationLimit = _limit;
+  }
+}
+
+function fillFromParent(address _account) onlyowner contractIsAdminOnly external{
+  if (_account!=0x0){
+    coins[_account] = cloneParent.balanceOf(_account);
   }
 }
 

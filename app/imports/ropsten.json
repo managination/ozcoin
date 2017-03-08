@@ -1,7 +1,7 @@
 {
-    "ozcAccount": "0x2facaf9f7c2c8ef72a993d8dbcd02d8bbc3a9f43",
+    "ozcAccount": "0xCb726ea90097d85ce4Efb8aE94B9Ab01eB80bD8a",
     "Certificate": {
-        "address": "0xf14dceddfe9d51706e86b7e381df463d7aee49fd",
+        "address": "0x9837f6c5cebf8854f5eeebc5212edffedf9acdca",
         "abi": [{
             "constant": false,
             "inputs": [{
@@ -12,6 +12,63 @@
                 "type": "string"
             }],
             "name": "registerAuditReport",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "addr",
+                "type": "address"
+            }],
+            "name": "isContract",
+            "outputs": [{
+                "name": "",
+                "type": "bool"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "kill",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "contractState",
+            "outputs": [{
+                "name": "",
+                "type": "uint8"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [],
+            "name": "activateContract",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_newOwner",
+                "type": "address"
+            }],
+            "name": "changeOwner",
             "outputs": [],
             "payable": false,
             "type": "function"
@@ -58,6 +115,13 @@
             "payable": false,
             "type": "function"
         }, {
+            "constant": false,
+            "inputs": [],
+            "name": "setContractAdminOnly",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
             "anonymous": false,
             "inputs": [{
                 "indexed": false,
@@ -74,10 +138,24 @@
             }],
             "name": "CertificateAdded",
             "type": "event"
+        }, {
+            "anonymous": false,
+            "inputs": [{
+                "indexed": false,
+                "name": "oldOwner",
+                "type": "address"
+            }, {
+                "indexed": false,
+                "name": "newOwner",
+                "type": "address"
+            }],
+            "name": "OwnerChanged",
+            "type": "event"
         }]
+
     },
     "ExchangeToken": {
-        "address": "0xbaf804b8672594d175e9c35e3a9af0c5dc8f7635",
+        "address": "0x0f8f33eb4ed6999743bc610c78a0ac42a61a944f",
         "abi": [{
             "constant": false,
             "inputs": [{
@@ -337,9 +415,11 @@
             "name": "Approval",
             "type": "event"
         }]
+
     },
+
     "StandardToken": {
-        "address": "0x9cc994ed235358cc5f31682b6ce8ac771661714d",
+        "address": "0x3e989b8a6eca959edf77885811ff4cb5264c102d",
         "abi": [{
             "constant": false,
             "inputs": [{
@@ -867,9 +947,10 @@
             "name": "Approval",
             "type": "event"
         }]
+
     },
     "User": {
-        "address": "0x81e07879f6dde617783a8fb32c99b64eef83c256",
+        "address": "0x3c86b26c981c1384414721791196ed43f685a85f",
         "abi": [{
             "constant": false,
             "inputs": [{
@@ -883,6 +964,28 @@
                 "type": "string"
             }],
             "name": "createAdministrator",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }, {
+                "name": "_name",
+                "type": "bytes32"
+            }, {
+                "name": "newDetails",
+                "type": "string"
+            }, {
+                "name": "_affiliateAccount",
+                "type": "address"
+            }, {
+                "name": "_affiliateCompany",
+                "type": "address"
+            }],
+            "name": "updateUserDetails",
             "outputs": [],
             "payable": false,
             "type": "function"
@@ -910,25 +1013,6 @@
                 "name": "",
                 "type": "address"
             }],
-            "payable": false,
-            "type": "function"
-        }, {
-            "constant": false,
-            "inputs": [{
-                "name": "_name",
-                "type": "bytes32"
-            }, {
-                "name": "newDetails",
-                "type": "string"
-            }, {
-                "name": "_affiliateAccount",
-                "type": "address"
-            }, {
-                "name": "_affiliateCompany",
-                "type": "address"
-            }],
-            "name": "updateUserDetails",
-            "outputs": [],
             "payable": false,
             "type": "function"
         }, {
@@ -1231,9 +1315,10 @@
             "name": "OwnerChanged",
             "type": "event"
         }]
+
     },
     "TokenData": {
-        "address": "0xc347f6b2613e02f5d676f0cdc3215035cca4ecb1",
+        "address": "0x14a90ea5725cad9b189f1fdbc5ec4729bb33705e",
         "abi": [{
             "constant": false,
             "inputs": [{
@@ -1321,10 +1406,10 @@
         }, {
             "constant": false,
             "inputs": [{
-                "name": "_amount",
-                "type": "uint256"
+                "name": "_account",
+                "type": "address"
             }],
-            "name": "mineCoins",
+            "name": "setFeeAccount",
             "outputs": [],
             "payable": false,
             "type": "function"
@@ -1362,6 +1447,19 @@
             "payable": false,
             "type": "function"
         }, {
+            "constant": true,
+            "inputs": [{
+                "name": "",
+                "type": "address"
+            }],
+            "name": "coins",
+            "outputs": [{
+                "name": "",
+                "type": "uint256"
+            }],
+            "payable": false,
+            "type": "function"
+        }, {
             "constant": false,
             "inputs": [{
                 "name": "_exchangeController",
@@ -1378,16 +1476,6 @@
             "outputs": [{
                 "name": "",
                 "type": "uint8"
-            }],
-            "payable": false,
-            "type": "function"
-        }, {
-            "constant": false,
-            "inputs": [],
-            "name": "getOwner",
-            "outputs": [{
-                "name": "",
-                "type": "address"
             }],
             "payable": false,
             "type": "function"
@@ -1443,6 +1531,16 @@
         }, {
             "constant": false,
             "inputs": [{
+                "name": "_amount",
+                "type": "uint256"
+            }],
+            "name": "mintCoins",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
                 "name": "_limit",
                 "type": "uint16"
             }],
@@ -1457,6 +1555,16 @@
                 "type": "address"
             }],
             "name": "setWalletController",
+            "outputs": [],
+            "payable": false,
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [{
+                "name": "_account",
+                "type": "address"
+            }],
+            "name": "fillFromParent",
             "outputs": [],
             "payable": false,
             "type": "function"
@@ -1514,6 +1622,9 @@
             }, {
                 "name": "_ozCoinAccount",
                 "type": "address"
+            }, {
+                "name": "_cloneParent",
+                "type": "address"
             }],
             "payable": false,
             "type": "constructor"
@@ -1521,37 +1632,23 @@
             "anonymous": false,
             "inputs": [{
                 "indexed": false,
-                "name": "controller",
-                "type": "address"
-            }],
-            "name": "ControllerChanged",
-            "type": "event"
-        }, {
-            "anonymous": false,
-            "inputs": [{
-                "indexed": false,
-                "name": "ozCoin",
-                "type": "address"
-            }],
-            "name": "OzCoinAccountChanged",
-            "type": "event"
-        }, {
-            "anonymous": false,
-            "inputs": [{
-                "indexed": false,
                 "name": "_amount",
                 "type": "uint256"
             }],
-            "name": "CoinsMined",
+            "name": "CoinsMinted",
             "type": "event"
         }, {
             "anonymous": false,
             "inputs": [{
+                "indexed": true,
+                "name": "name",
+                "type": "string"
+            }, {
                 "indexed": false,
-                "name": "arbiterAccount",
+                "name": "newAddress",
                 "type": "address"
             }],
-            "name": "ArbiterChanged",
+            "name": "AccountChanged",
             "type": "event"
         }, {
             "anonymous": false,
@@ -1621,15 +1718,6 @@
             "anonymous": false,
             "inputs": [{
                 "indexed": false,
-                "name": "sender",
-                "type": "address"
-            }],
-            "name": "Sender",
-            "type": "event"
-        }, {
-            "anonymous": false,
-            "inputs": [{
-                "indexed": false,
                 "name": "oldOwner",
                 "type": "address"
             }, {
@@ -1640,6 +1728,7 @@
             "name": "OwnerChanged",
             "type": "event"
         }]
+
     }
 
 }

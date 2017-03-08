@@ -8,11 +8,14 @@ deploy Certificate contract
 deploy ExchangeToken contract
 deploy StandardToken contract
 
+
+deploy TokenData initial amount =  50000000000000  ozCoinAccount = "0x2facaf9f7c2c8ef72a993d8dbcd02d8bbc3a9f43" parent  = "0x0"
+
+
 ExchangeToken run setContractAdminOnly
 StandardToken run setContractAdminOnly
 StandardToken run resetUser function
 
-deploy TokenData initial amount =  50000000000000  ozCoinAccount = "0x2facaf9f7c2c8ef72a993d8dbcd02d8bbc3a9f43" parent  = "0x0"
 TokenData run setContractAdminOnly
 TokenData run setArbitrationLimit = 500
 TokenData run setWalletController

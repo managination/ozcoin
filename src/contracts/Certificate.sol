@@ -1,6 +1,6 @@
 pragma solidity ^0.4.0;
-
-contract Certificate {
+import "./BaseContract.sol";
+contract Certificate is BaseContract {
 
   enum CertificateType{
     PoA,Audit

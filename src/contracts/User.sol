@@ -1,5 +1,5 @@
 pragma solidity ^0.4.0;
-import "BaseContract.sol";
+import "./BaseContract.sol";
 
 contract User is BaseContract{
 

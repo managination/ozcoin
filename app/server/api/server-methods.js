@@ -16,9 +16,12 @@ Meteor.methods({
 
     'get-ozc-affiliate-price': function (address) {
         let userProfile = Profiles.findOne({owner: this.userId});
-        let profile = Profiles.findOne({address: userProfile.affiliateCompany}, {fields: {alias: 1, price: 1}});
-        if (profile && profile.prices && profile.price.sell) {
-            profile.price.sell = new BigNumber(profile.price.sell).dividedBy(ether).times(ozcoin).toNumber();
+        let profile = {};
+        if (userProfile) {
+            profile = Profiles.findOne({address: userProfile.affiliateCompany}, {fields: {alias: 1, price: 1}});
+            if (profile && profile.prices && profile.price.sell) {
+                profile.price.sell = new BigNumber(profile.price.sell).dividedBy(ether).times(ozcoin).toNumber();
+            }
         }
         return profile;
     },

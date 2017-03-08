@@ -43,6 +43,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
         this._handleChange = this._handleChange.bind(this);
         this._handleSourceSelect = this._handleSourceSelect.bind(this);
         this._transactionConfirmed = this._transactionConfirmed.bind(this);
+        this._transactionCanceled = this._transactionCanceled.bind(this);
         this._setProfile = this._setProfile.bind(this);
         this._getOzcForm = this._getOzcForm.bind(this);
     }
@@ -91,24 +92,11 @@ export default class Wallet extends TrackerReact(PureComponent) {
             })
         });
 
-        if (Meteor.user()) {
-            Meteor.subscribe('current-profile', () => {
-                let profile = Profiles.findOne({owner: Meteor.userId()});
-                if (!profile) {
-                    let observer = Profiles.find({owner: Meteor.userId()}).observe({
-                        added: function (profile) {
-                            observer.stop();
-                            self._setProfile(profile);
-                        },
-                        changed: function (profile) {
-                            observer.stop();
-                            self._setProfile(profile);
-                        },
-                    })
-                } else {
-                    self._setProfile(profile);
-                }
-            });
+        if (Meteor.user() && this.props.params.register) {
+            let profile = Profiles.findOne({owner: Meteor.userId()});
+            if (profile) {
+                self._setProfile(profile);
+            }
         }
     };
 

@@ -8,8 +8,8 @@ import TextField from "react-md/lib/TextFields";
 import Toolbar from "react-md/lib/Toolbars";
 import Paper from "react-md/lib/Papers";
 import {browserHistory} from "react-router";
-import {createKeystore, add0x} from "../api/ethereum-services";
-import {Profiles, Roles} from "../api/model/profiles.js";
+import {createKeystore, add0x} from "../../api/ethereum-services";
+import {Profiles, Roles} from "../../api/model/profiles.js";
 
 export default class RegistrationDialog extends TrackerReact(PureComponent) {
     constructor(props) {

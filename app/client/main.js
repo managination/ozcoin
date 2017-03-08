@@ -26,14 +26,26 @@ Meteor.startup(() => {
             <Wait visible={true}/>, document.getElementById('render-target')
         );
     };
+    const createKeystore = function (password) {
+        waitMessage();
+        initializeKeystore(password).then((keystore) => {
+            Session.set('initialized', true);
+            render(renderRoutes(),
+                document.getElementById('render-target'));
+        })
+
+    };
+
     const confirm = function (password) {
-        if (password && CryptoJS.AES.decrypt(mnemonic, password).toString(CryptoJS.enc.Utf8).length > 1) {
-            waitMessage();
-            initializeKeystore(password).then((keystore) => {
-                Session.set('initialized', true);
-                render(renderRoutes(),
-                    document.getElementById('render-target'));
-            })
+        let correctPassword = false;
+        try {
+            correctPassword = password && CryptoJS.AES.decrypt(mnemonic, password).toString(CryptoJS.enc.Utf8).length > 1;
+        } catch (err) {
+            correctPassword = false;
+        }
+
+        if (correctPassword) {
+            createKeystore(password);
         } else {
             let title;
             title = "Enter the password to unlock your keystore";
@@ -48,9 +60,9 @@ Meteor.startup(() => {
     };
 
     if (mnemonic) {
-        confirm();
+        confirm(Meteor.settings.public.password);
     } else {
-        waitMessage();
+        createKeystore();
     }
 
 });

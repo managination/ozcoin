@@ -23,13 +23,18 @@ export default class TransactionConfirmationOverlay extends PureComponent {
 
     _verifyPassword = () => {
         if (this.props.passwordOnly) return true;
-        if (this.state.ksPassword) {
-            if (!this.mnemonic) {
-                this.mnemonic = LocalStorage.getItem('encrypted-mnemonic');
-            }
-            return CryptoJS.AES.decrypt(this.mnemonic, this.state.ksPassword).toString(CryptoJS.enc.Utf8).length > 1;
+
+        if (!this.mnemonic) {
+            this.mnemonic = LocalStorage.getItem('encrypted-mnemonic');
         }
-        return false;
+        let correctPassword = false;
+        try {
+            correctPassword = CryptoJS.AES.decrypt(this.mnemonic, this.state.ksPassword).toString(CryptoJS.enc.Utf8).length > 1;
+        } catch (err) {
+            correctPassword = false;
+        }
+
+        return correctPassword;
     };
 
     _handleChange = (value, event) => {

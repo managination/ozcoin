@@ -45,7 +45,7 @@ if (Meteor.settings.listeners) {
             Profiles.update({address: result.args._affiliate}, {$inc: {affiliateBalance: result.args._amount}})
         },
         'set-transaction-fee': function (result) {
-            Globals.update({name: "transactionFee"}, {$set: {fee: result.args._newRate}});
+            Globals.update({name: "transactionFee"}, {$set: {fee: result.args._newRate / 100}});
         },
         'insufficient-funds': function (result) {
             Messages.insert({

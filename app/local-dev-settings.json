@@ -1,6 +1,7 @@
 {
   "public": {
-    "chain": "development"
+    "chain": "development",
+    "password": "ppp"
   },
   "ethNodeAddress": "http://eth.mngn.io:8545",
   "contractEvents": "http://eth.mngn.io:8545",

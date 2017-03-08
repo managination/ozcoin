@@ -45,10 +45,10 @@ contract('TokenData', function(accounts) {
         });
 
     it("should return status", function() {
-          TokenData.new(initialSupply, exchangeAccount.address,walletAccount.address, ozAccount,arbiterAccount).then(function(instance) {
+          TokenData.new(initialSupply, ozAccount).then(function(instance) {
             return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
                 return instance.checkStatus.call({from : ownerAccount}).then(function(details) {
-                    return assert.equal(details[2], exchangeAccount.address);
+                    return assert.equal(details[1], ozAccount);
                 });
             });
         });
@@ -56,7 +56,7 @@ contract('TokenData', function(accounts) {
     });
 
     it("should have the correct balances", function() {
-        TokenData.new(initialSupply,exchangeAccount.address,walletAccount.address,ozAccount,arbiterAccount).then(function(instance) {
+        TokenData.new(initialSupply,ozAccount).then(function(instance) {
             return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
                 return instance.balanceOf.call(ozAccount, {from : exchangeAccount.address}).then(function(balance) {
                     return assert.equal(balance.valueOf(), initialSupply);
@@ -68,7 +68,7 @@ contract('TokenData', function(accounts) {
 
 
     it("should fail functions if not called by controller", function() {
-        TokenData.new(initialSupply, exchangeAccount.address,walletAccount.address, ozAccount,arbiterAccount).then(function(instance) {
+        TokenData.new(initialSupply, ozAccount).then(function(instance) {
           return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
               return instance.transfer.sendTransaction(ozAccount, userAccount, 10, 0,{from : userAccount}).then(function(Tx2) {
                   return instance.balanceOf.call(userAccount,{from : exchangeAccount.address}).then(function(balance) {
@@ -80,104 +80,12 @@ contract('TokenData', function(accounts) {
     });
 
 
-    // these tests moved to Standard Token
-    // it("should transfer balances - security from exchange account", function() {
-    //     TokenData.new(initialSupply, exchangeAccount.address,walletAccount.address, ozAccount,arbiterAccount).then(function(instance) {
-    //         return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
-    //             return instance.transfer.sendTransaction(ozAccount, userAccount, 10, 0,{from : exchangeAccount.address}).then(function(Tx2) {
-    //                 return instance.balanceOf.call(userAccount,{from : exchangeAccount.address}).then(function(balance) {
-    //                     assert.equal(balance.valueOf(), 10)
-    //                     return instance.balanceOf.call(ozAccount,{from : exchangeAccount.address}).then(function(balance2) {
-    //                         return assert.equal(balance2.valueOf(), initialSupply - 10);
-    //                     });
-    //                 });
-    //             });
-    //         });
-    //     });
-    // });
 
-    // it("should transfer balances - security from wallet account", function() {
-    //     TokenData.new(initialSupply, exchangeAccount,walletAccount, ozAccount,arbiterAccount).then(function(instance) {
-    //         return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
-    //             return instance.transfer.sendTransaction(ozAccount, userAccount, 10, 0,{from : walletAccount}).then(function(Tx2) {
-    //                 return instance.balanceOf.call(userAccount,{from : walletAccount}).then(function(balance) {
-    //                     assert.equal(balance.valueOf(), 10)
-    //                     return instance.balanceOf.call(ozAccount,{from : walletAccount}).then(function(balance2) {
-    //                         return assert.equal(balance2.valueOf(), initialSupply - 10);
-    //                     });
-    //                 });
-    //             });
-    //         });
-    //     });
-    // });
-    //
-    // it("should transfer balances - security from wallet account", function() {
-    //     TokenData.new(initialSupply, exchangeAccount,walletAccount, ozAccount,arbiterAccount).then(function(instance) {
-    //         return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
-    //             return instance.transfer.sendTransaction(ozAccount, userAccount, 10, 0,{from : walletAccount}).then(function(Tx2) {
-    //                 return instance.balanceOf.call(userAccount,{from : walletAccount}).then(function(balance) {
-    //                     assert.equal(balance.valueOf(), 10)
-    //                     return instance.balanceOf.call(ozAccount,{from : walletAccount}).then(function(balance2) {
-    //                         return assert.equal(balance2.valueOf(), initialSupply - 10);
-    //                     });
-    //                 });
-    //             });
-    //         });
-    //     });
-    // });
-    //
-    //
-    // it("should fail to transfer balances if insufficient funds", function() {
-    //     TokenData.new(initialSupply,exchangeAccount,walletAccount, ozAccount,arbiterAccount).then(function(instance) {
-    //         return instance.activateContract.sendTransaction().then(function(Tx) {
-    //             return instance.transfer.sendTransaction(ozAccount, exchangeAccount, (initialSupply + 1), 0,{from : walletAccount}).then(function(Tx2) {
-    //                 return instance.balanceOf.call(exchangeAccount,{from : walletAccount}).then(function(balance) {
-    //                     assert.equal(balance.valueOf(), 0)
-    //                     return instance.balanceOf.call(ozAccount,{from : walletAccount}).then(function(balance2) {
-    //                         return assert.equal(balance2.valueOf(), initialSupply);
-    //                     });
-    //                 });
-    //             });
-    //         });
-    //     });
-    // });
-    //
-    // it("should produce a pending transfer", function() {
-    //     TokenData.new(initialSupply,exchangeAccount,walletAccount, ozAccount,arbiterAccount).then(function(instance) {
-    //         return instance.activateContract.sendTransaction().then(function(Tx) {
-    //             return instance.transfer.sendTransaction(ozAccount, exchangeAccount, (initialSupply - 20), 10,{from : walletAccount}).then(function(Tx2) {
-    //                 return instance.balanceOf.call(exchangeAccount,{from : walletAccount}).then(function(balance) {
-    //                     assert.equal(balance.valueOf(), 0);
-    //                     return instance.balanceOf.call(ozAccount,{from : walletAccount}).then(function(balance2) {
-    //                         return assert.equal(balance2.valueOf(), 20);
-    //                     });
-    //                 });
-    //             });
-    //         });
-    //     });
-    // });
-    //
-    // it("should produce a pending transfer and activate it", function() {
-    //     TokenData.new(initialSupply,exchangeAccount,walletAccount, ozAccount,arbiterAccount).then(function(instance) {
-    //         return instance.activateContract.sendTransaction().then(function(Tx) {
-    //             return instance.transfer.sendTransaction(ozAccount, exchangeAccount, (initialSupply - 20), 10,{from : walletAccount}).then(function(Tx2) {
-    //                 return instance.getPendingTransfers.call({from : walletAccount}).then(function(pends) {
-    //                     assert.equal(pends.length, 1);
-    //                     return instance.activatePendingTransfer.sendTransaction(0).then(function(Tx3) {
-    //                         return instance.balanceOf.call(exchangeAccount,{from : walletAccount}).then(function(balance) {
-    //                           return assert.equal(balance, (initialSupply - 20));
-    //                         });
-    //                     });
-    //                 });
-    //             });
-    //         });
-    //
-    //     });
-    // });
-    //
     it("should fail to set wallet controller if not owner", function() {
-        TokenData.new(initialSupply, exchangeAccount.address,walletAccount.address,ozAccount,arbiterAccount).then(function(instance) {
+        TokenData.new(initialSupply,ozAccount).then(function(instance) {
           return instance.setContractAdminOnly.sendTransaction({from : ownerAccount}).then(function(Tx) {
+            // this should succeed
+            return instance.setWalletController.sendTransaction(walletAccount,{from : ownerAccount}).then(function(Tx2) {
               // this should fail
               return instance.setWalletController.sendTransaction(userAccount,{from : userAccount}).then(function(Tx2) {
                   // user can all check status
@@ -185,19 +93,23 @@ contract('TokenData', function(accounts) {
                     return assert.equal(details[3],walletAccount.address);
                   });
                 });
+                });
               });
             });
           });
 
     it("should fail to set wallet controller if contract is active", function() {
-        TokenData.new(initialSupply, exchangeAccount.address,walletAccount.address,ozAccount,arbiterAccount).then(function(instance) {
-          return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
+        TokenData.new(initialSupply,ozAccount).then(function(instance) {
+          return instance.setContractAdminOnly.sendTransaction({from : ownerAccount}).then(function(Tx) {
+                return instance.setWalletController.sendTransaction(walletAccount,{from : ownerAccount}).then(function(Tx2) {
+                  return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
               // this should fail
               return instance.setWalletController.sendTransaction(userAccount,{from : ownerAccount}).then(function(Tx2) {
                   return instance.checkStatus.call({from : ownerAccount}).then(function(details) {
                     return assert.equal(details[3],walletAccount.address);
                   });
                 });
+                    });
               });
             });
           });
@@ -239,32 +151,6 @@ contract('TokenData', function(accounts) {
                         });
                       });
                     });
-
-                  // it("should watch an event", function() {
-                  //   console.log("creating instance");
-                  //   TokenData.new(initialSupply, exchangeAccount.address,walletAccount.address,ozAccount,arbiterAccount).then(function(instance) {
-                  //       console.log("about to activate");
-                  //     return instance.activateContract.sendTransaction({from : ownerAccount}).then(function(Tx) {
-                  //       // var filteredEvents =  instance.ArbitrationRequested({requester:ownerAccount},{fromBlock: 0, toBlock: 'latest'});
-                  //       // filteredEvents.get(function(err,logs){console.log(logs);});
-                  //       //
-                  //      //
-                  //     //   var transfers = meta.Transfer({fromBlock: "latest"});
-                  //     //   transfers.watch(function(error, result) {
-                  //     //     // This will catch all Transfer events, regardless of how they originated.
-                  //     //     if (error == null) {
-                  //     //       console.log(result.args);
-                  //     //     }
-                  //     //
-                  //     //   var filter = web3.eth.filter([instance.ArbitrationRequested]);
-                  //     //  filter.watch(function(err,logs){console.log(logs);});
-                  //
-                  //      instance.requestArbitration.sendTransaction(userAccount,{from : userAccount}).then(function(result) {
-                  //
-                  //
-                  //     });
-                  //     });
-                  //   });
 
 
 });

@@ -17,7 +17,7 @@ function ExchangeToken(){
 }
 
 
-function resetTokenData(TokenData _tokenData) onlyowner {
+function resetTokenData(TokenData _tokenData) onlyowner contractIsAdminOnly {
   tokenData = _tokenData;
   ozCoinAccount = tokenData.getOzCoinAccount();
 }
@@ -53,8 +53,8 @@ function transfer(address _to, uint256 _value) returns (bool success){
 
 function setFeePercent(uint8 _fee) external onlyowner {
     uint256 old = tokenData.getFeePercent();
-      tokenData.setFeePercent(_fee);
-      TransactionFeeChanged(old,_fee);
+    tokenData.setFeePercent(_fee);
+    TransactionFeeChanged(old,_fee);
 }
 
 function getFeePercent() constant external returns (uint8){

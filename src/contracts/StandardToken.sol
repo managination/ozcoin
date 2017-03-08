@@ -64,7 +64,7 @@ function resetUser(User _userContract) onlyowner contractIsAdminOnly {
   }
 
   // don't allow payments to contracts ir from or to frozen accounts
-   function buyCoins (uint256 _amount,address _seller) payable accountFrozenStatus(_seller, false) accountFrozenStatus(msg.sender, false) {
+   function buyCoins (uint256 _amount,address _seller) payable contractIsActive accountFrozenStatus(_seller, false) accountFrozenStatus(msg.sender, false) {
      uint256 sellPrice = 1;
      (sellPrice,)  = getPrices(_seller);
 
@@ -159,7 +159,7 @@ function getAffiliateBalance(address _account) constant returns(uint256){
     return etherBalances[_account];
 }
 
-function withdrawEther() accountFrozenStatus(msg.sender, false) external returns (bool success){
+function withdrawEther() contractIsActive accountFrozenStatus(msg.sender, false) external returns (bool success){
         uint amount = etherBalances[msg.sender];
         etherBalances[msg.sender] = 0;
         if (msg.sender.send(amount)) {
@@ -171,7 +171,7 @@ function withdrawEther() accountFrozenStatus(msg.sender, false) external returns
         }
 }
 
-function withdrawAllEther () external returns (bool success){
+function withdrawAllEther () contractIsActive external returns (bool success){
         if(msg.sender!=ozCoinAccount){
           return false;
         }
@@ -188,7 +188,7 @@ function getPrices(address _seller) constant returns (uint256,uint256) {
 }
 
 // anyone can change their own price
-function setPrice(bool _isBuy,uint256 _price) accountFrozenStatus(msg.sender, false) external {
+function setPrice(bool _isBuy,uint256 _price) contractIsActive accountFrozenStatus(msg.sender, false) external {
     if(_isBuy){
       prices[msg.sender].buy = _price;
     }
@@ -200,10 +200,10 @@ function setPrice(bool _isBuy,uint256 _price) accountFrozenStatus(msg.sender, fa
 }
 
 //Admin functions
-function freezeAccount(address _account) external {
+function freezeAccount(address _account) onlyowner external {
   accountFrozen[_account]=true;
 }
-function unFreezeAccount(address _account) external {
+function unFreezeAccount(address _account) onlyowner external {
   accountFrozen[_account]=false;
 }
 

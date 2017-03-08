@@ -275,7 +275,7 @@ it("should test ozcoin setup for the Exchange contract", function() {
 
 
 it("should transfer coins from Exchange Token", function() {
-    return Exchange.deployed().then(function(instance) {
+    return ExchangeToken.deployed().then(function(instance) {
         return setUpTokenData(instance.address, instance.address).then(function(tokenData) {
             return instance.resetTokenData.sendTransaction(tokenData.address, {
                 from: controller

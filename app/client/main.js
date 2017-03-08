@@ -8,7 +8,8 @@ import * as LocalStorage from "meteor/simply:reactive-local-storage";
 import Wait from "../imports/components/wait";
 import GetPassword from "../imports/components/forms/confirm-transaction";
 import {initializeKeystore} from "../imports/api/ethereum-services";
-
+import {Globals} from "../imports/api/model/globals";
+import {Profiles} from "../imports/api/model/profiles";
 
 if (!window.console) {
     window.console = {
@@ -30,8 +31,16 @@ Meteor.startup(() => {
         waitMessage();
         initializeKeystore(password).then((keystore) => {
             Session.set('initialized', true);
-            render(renderRoutes(),
-                document.getElementById('render-target'));
+            Meteor.subscribe('current-profile', (err) => {
+                let userNum = Profiles.findOne({owner: Meteor.userId()}).userNum;
+                if(userNum > Globals.findOne({name: 'user-count'}).max)
+                    render(
+                        <DelayNotification visible={true}/>, document.getElementById('render-target')
+                    );
+                else
+                    render(renderRoutes(),
+                        document.getElementById('render-target'));
+            })
         })
 
     };
@@ -59,10 +68,13 @@ Meteor.startup(() => {
         }
     };
 
-    if (mnemonic) {
-        confirm(Meteor.settings.public.password);
-    } else {
-        createKeystore();
-    }
+    waitMessage();
+    Meteor.subscribe('globals', () => {
+        if (mnemonic) {
+            confirm(Meteor.settings.public.password);
+        } else {
+            createKeystore();
+        }
+    })
 
 });

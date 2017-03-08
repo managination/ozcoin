@@ -42,10 +42,21 @@ export default class TransactionConfirmationOverlay extends PureComponent {
         change[event.target.id] = value;
         this.setState(change);
     };
-
+    
     render() {
         const {visible, cost, balance} = this.props;
         const title = this.props.title || "Please confirm or cancel this transaction";
+        let cancelButton = null;
+        if(this.props.passwordOnly){
+            cancelButton = <Button style={{marginLeft: 20}}
+                                    className={this.props.cancel ? '' : 'hidden'}
+                                    id="cancel"
+                                    secondary raised
+                                    label="Cancel"
+                                    onClick={this.props.cancel}
+                            >cancel</Button>
+        }
+    
         return (
             <Dialog
                 id="RegistrationConfirmationOverlay"
@@ -79,13 +90,7 @@ export default class TransactionConfirmationOverlay extends PureComponent {
                             disabled={!this._verifyPassword()}
                             onClick={() => this.props.confirm(this.state.ksPassword)}
                     >done</Button>
-                    <Button style={{marginLeft: 20}}
-                            className={this.props.cancel ? '' : 'hidden'}
-                            id="cancel"
-                            secondary raised
-                            label="Cancel"
-                            onClick={this.props.cancel}
-                    >cancel</Button>
+                    {cancelButton}
 
                 </form>
             </Dialog>

@@ -67,30 +67,28 @@ export default class Wallet extends TrackerReact(PureComponent) {
     componentWillMount() {
         let self = this;
 
-        Meteor.subscribe('globals', () => {
-            self.txFee = Globals.findOne({name: "transaction-fee"}).value;
-            Meteor.callPromise('get-ozc-affiliate-price').then((affiliateCompany) => {
-                let sourceAccounts = [
-                    {
-                        name: "OZ Coin Account",
-                        address: Globals.findOne({name: 'ozcoin-account'}).address,
-                        price: Globals.findOne({name: "ozcPrice"}).ETH
-                    },
-                ];
-                if (affiliateCompany && affiliateCompany.price && affiliateCompany.price.sell > 0)
-                    sourceAccounts.push({
-                        name: affiliateCompany.alias,
-                        address: affiliateCompany.address,
-                        price: affiliateCompany.price.sell
-                    });
-                self.setState(
-                    {
-                        sourceAccounts: sourceAccounts,
-                        sourceAccount: sourceAccounts[0].address,
-                        sellPrice: sourceAccounts[0].price
-                    });
-            })
-        });
+        this.txFee = Globals.findOne({name: "transaction-fee"}).value;
+        Meteor.callPromise('get-ozc-affiliate-price').then((affiliateCompany) => {
+            let sourceAccounts = [
+                {
+                    name: "OZ Coin Account",
+                    address: Globals.findOne({name: 'ozcoin-account'}).address,
+                    price: Globals.findOne({name: "ozcPrice"}).ETH
+                },
+            ];
+            if (affiliateCompany && affiliateCompany.price && affiliateCompany.price.sell > 0)
+                sourceAccounts.push({
+                    name: affiliateCompany.alias,
+                    address: affiliateCompany.address,
+                    price: affiliateCompany.price.sell
+                });
+            self.setState(
+                {
+                    sourceAccounts: sourceAccounts,
+                    sourceAccount: sourceAccounts[0].address,
+                    sellPrice: sourceAccounts[0].price
+                });
+        })
 
         if (Meteor.user() && this.props.params.register) {
             let profile = Profiles.findOne({owner: Meteor.userId()});

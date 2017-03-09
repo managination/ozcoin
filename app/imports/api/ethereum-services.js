@@ -9,15 +9,13 @@ import BigNumber from "bignumber.js";
 export const ether = new BigNumber("1000000000000000000");
 export const ozcoin = new BigNumber("1000000");
 
-export const initializeKeystore = (() => {
+export const initializeKeystore = ((password) => {
     return new Promise((resolve, reject) => {
         let mnemonic = LocalStorage.getItem('encrypted-mnemonic');
         if (mnemonic) {
             let salt = LocalStorage.getItem('salt');
             let alias = LocalStorage.getItem('alias');
             let email = LocalStorage.getItem('email');
-            //TODO: remove password from localstorage and ask the user to enter it
-            let password = LocalStorage.getItem('password');
             mnemonic = CryptoJS.AES.decrypt(mnemonic, password).toString(CryptoJS.enc.Utf8);
 
             createKeystore(alias, email, password, salt, mnemonic)
@@ -55,13 +53,16 @@ export const getWeb3 = (event) => {
     if (!w3) {
         let provider;
         if (event)
-            provider = new W3.providers.HttpProvider(Meteor.settings.public.ethNodeAddress);
+            provider = new W3.providers.HttpProvider(Meteor.settings.ethNodeAddress);
         else
-            provider = new W3.providers.HttpProvider(Meteor.settings.public.ethNodeAddress);
-        // let provider = new W3.providers.HttpProvider('http://localhost:8545');
-        //let provider = new W3.providers.HttpProvider('https://ropsten.infura.io/NgjvCOUF5UIhCgRKndzD');
+            provider = new W3.providers.HttpProvider(Meteor.settings.contractEvents);
+
         w3 = new W3(provider);
-        initialisedWeb3 = w3;
+
+        if (event)
+            eventWeb3 = w3;
+        else
+            initialisedWeb3 = w3;
     }
     return w3;
 };
@@ -119,8 +120,6 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
             LocalStorage.setItem('salt', ks.salt);
             LocalStorage.setItem('alias', alias);
             LocalStorage.setItem('email', email);
-            //TODO: remove password from localstorage
-            LocalStorage.setItem('password', password);
             LocalStorage.setItem('pk', ks.exportPrivateKey(ks.getAddresses()[0], pwDerivedKey));
 
             LocalStorage.setItem('username', ks.getAddresses()[0]);

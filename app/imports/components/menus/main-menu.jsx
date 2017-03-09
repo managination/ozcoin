@@ -21,6 +21,13 @@ export default entries = (user, path) => {
         active: path.indexOf('wallet') > -1,
         onClick: () => browserHistory.push('/wallet'),
     }, {
+        key: 'register',
+        primaryText: 'Register',
+        leftIcon: <FontIcon>account_balance_wallet</FontIcon>,
+        roles: [Roles.all],
+        active: path.indexOf('registration') > -1,
+        onClick: () => browserHistory.push('/registration/true'),
+    }, {
         key: 'upoload-certificate',
         primaryText: 'Proof of Asset',
         leftIcon: <FontIcon>fingerprint</FontIcon>,
@@ -41,6 +48,7 @@ export default entries = (user, path) => {
 
         try {
             if (entry.roles.indexOf(Roles.all) > -1 || entry.roles.indexOf(user.role) > -1) {
+                if (entry.key == 'register' && user.isRegistered) return;
                 delete entry.roles;
                 let click = entry.onClick;
                 entry.onClick = (event) => {

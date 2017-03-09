@@ -45,7 +45,7 @@ if (Meteor.settings.listeners) {
             Profiles.update({address: result.args._affiliate}, {$inc: {affiliateBalance: result.args._amount}})
         },
         'set-transaction-fee': function (result) {
-            Globals.update({name: "transactionFee"}, {$set: {fee: result.args._newRate}});
+            Globals.update({name: "transaction-fee"}, {$set: {value: result.args._newRate / 10000}});
         },
         'insufficient-funds': function (result) {
             Messages.insert({
@@ -186,6 +186,11 @@ Meteor.methods({
     },
     'sync-user-details': function () {
         let profile = Profiles.findOne({owner: this.userId});
+        if(!profile.userNum){
+            let userNum = Globals.findOne({name: "user-count"}).value + 1;
+            Profiles.update({_id: profile._id}, {$set: {userNum: userNum}});
+            Globals.update({name: "user-count"}, {$inc: {value: 1}});
+        }
         updateUserDetails(profile);
         updateProfileEthBalance(profile);
         updateProfileOzcBalance(profile);

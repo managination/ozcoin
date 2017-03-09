@@ -1,22 +1,22 @@
 {
   "public": {
-    "chain": "development"
+    "chain": "development",
+    "password": "ppp"
   },
   "ethNodeAddress": "http://eth.mngn.io:8545",
-  "contractEvents": "https://eth.mngn.io/yaZzcWfEAeNLBZCVFXrRlg0t6WXyHZ4mrmXIRi92/",
+  "contractEvents": "http://eth.mngn.io:8545",
   "kadira": {
     "appId": "K52Z9zawP2CBxSKYt",
     "appSecret": "6ea66336-9041-4ec2-83d7-8bd5127cf79f"
   },
   "listeners": true,
   "polling": false,
-  "userPollInterval": 86400000,
-  "userBalancePollInterval": 3600000,
-  "ethPricePollInterval": 60000,
-  "contractPollInterval": 60000,
   "ipfsNode": {
     "host": "ipfs.infura.io",
     "port": "5001",
     "protocol": "https"
   }
 }
+
+
+    

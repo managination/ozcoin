@@ -2,7 +2,7 @@ import React from "react";
 import {Router, Route, browserHistory} from "react-router";
 // route components
 import AppContainer from "./appContainer";
-import RegistrationDialog from "../imports/components/registrationDialog";
+import RegistrationDialog from "../imports/components/forms/registrationDialog";
 import UserDetails from "../imports/components/forms/user-details";
 import FileUpload from "../imports/components/forms/file-upload";
 import TransactionConfirmationOverlay from "../imports/components/forms/confirm-transaction";
@@ -13,6 +13,7 @@ export const renderRoutes = () => (
     <Router history={browserHistory}>
         <Route path="/confirm" component={TransactionConfirmationOverlay}/>
         <Route path="/" component={AppContainer}>
+            <Route path="registration/:register" component={Wallet}/>
             <Route path="wallet" component={Wallet}/>
             <Route path="register/:affiliate" component={RegistrationDialog}/>
             <Route path="register" component={RegistrationDialog}/>

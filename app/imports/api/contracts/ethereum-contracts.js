@@ -3,8 +3,17 @@ import {EJSON} from "meteor/ejson";
 import {Match} from "meteor/check";
 import {Promise} from "meteor/promise";
 import {getWeb3} from "../ethereum-services";
-import contractDefs from "../../contract.json";
+import developmentContracts from "../../development.json";
+// import ropstenContracts from "../../ropsten.json";
+// import mainnetContracts from "../../mainnet.json";
 import {Mongo} from "meteor/mongo";
+
+let allContractDefs = {
+    development: developmentContracts,
+    // ropsten: ropstenContracts,
+};
+
+let contractDefs = allContractDefs[Meteor.settings.public.chain];
 
 export const Events = new Mongo.Collection('eth-events');
 
@@ -16,13 +25,13 @@ if (Meteor.isServer) {
 }
 
 let contracts = {};
-export const getContract = (name) => {
+export const getContract = (name, event) => {
     return new Promise((resolve, reject) => {
         if (!contracts[name]) try {
             if (Match.test(contractDefs[name].abi, String)) {
                 contractDefs[name].abi = EJSON.parse(contractDefs[name].abi.replace(/'/g, '"'));
             }
-            contracts[name] = getWeb3().eth.contract(contractDefs[name].abi).at(contractDefs[name].address);
+            contracts[name] = getWeb3(event).eth.contract(contractDefs[name].abi).at(contractDefs[name].address);
         } catch (err) {
             reject(err);
             return;
@@ -40,7 +49,7 @@ export const callContractMethod = function (contract, funcName) {
 
 /*start listening for events of this type*/
 export const listenToEvent = function (contractName, event, filter, callback) {
-    return getContract(contractName).then((contract) => {
+    return getContract(contractName, true).then((contract) => {
         let listener = {
             callback: callback,
             failures: 0,

@@ -53,9 +53,9 @@ export const getWeb3 = (event) => {
     if (!w3) {
         let provider;
         if (event)
-            provider = new W3.providers.HttpProvider(Meteor.settings.ethNodeAddress);
-        else
             provider = new W3.providers.HttpProvider(Meteor.settings.contractEvents);
+        else
+            provider = new W3.providers.HttpProvider(Meteor.settings.ethNodeAddress);
 
         w3 = new W3(provider);
 

@@ -4,13 +4,14 @@ import {Match} from "meteor/check";
 import {Promise} from "meteor/promise";
 import {getWeb3} from "../ethereum-services";
 import developmentContracts from "../../development.json";
-// import ropstenContracts from "../../ropsten.json";
+import ropstenContracts from "../../ropsten.json";
 // import mainnetContracts from "../../mainnet.json";
 import {Mongo} from "meteor/mongo";
 
 let allContractDefs = {
     development: developmentContracts,
-    // ropsten: ropstenContracts,
+    ropsten: ropstenContracts,
+    // mainnet: mainnetContracts,
 };
 
 let contractDefs = allContractDefs[Meteor.settings.public.chain];
@@ -67,6 +68,7 @@ export const listenToEvent = function (contractName, event, filter, callback) {
                                 console.log("WARNING watcher restarted", contractName, event, error);
                             } else {
                                 console.log("ERROR stopped watching", contractName, event, error);
+                                Kadira.error()
                             }
                         } catch (exception) {
                             console.log("ERROR exception in", contractName, event, error, exception);

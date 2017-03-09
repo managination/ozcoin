@@ -217,7 +217,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                     />
                     < TextField
                         id="ozcAmount"
-                        label="amount in OZC to transfer"
+                        label="amount in OzGLD to transfer"
                         type={"number"}
                         placeholder="0.00"
                         className="md-cell md-cell--12"
@@ -227,7 +227,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                     />
                     < TextField
                         id="ozcAmountReceived"
-                        label="amount in OZC the recipient will get"
+                        label="amount in OzGLD the recipient will get"
                         type={"number"}
                         placeholder="0.00"
                         className="md-cell md-cell--12"
@@ -248,7 +248,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                 </CardActions>,
                 <CardText key="transferCardText">
                     <p>The amount tranfered is different from the amount received because there is
-                        a {this.txFee.times(100).toFormat(2)}% fee on OZC transfers</p>
+                        a {this.txFee.times(100).toFormat(2)}% fee on OzGLD transfers</p>
                 </CardText>
             ]
         } else {
@@ -264,23 +264,23 @@ export default class Wallet extends TrackerReact(PureComponent) {
                         itemValue="address"
                         className="md-cell md-cell--12"
                         onChange={this._handleSourceSelect}
-                        helpText="Select which account you want to buy your OZC from"
+                        helpText="Select which account you want to buy your OzGLD from"
                     />,
                     < TextField
                         id="ozcPurchase"
-                        label="amount in OZC you wish to purchase"
+                        label="amount in OzGLD you wish to purchase"
                         type={"number"}
                         placeholder="0.00"
                         className="md-cell md-cell--12"
                         disabled={profile.balance.comparedTo(prices.ozc.ETH / 100) == -1}
                         value={this.state.ozcPurchase}
                         onChange={this._handleChange}
-                        helpText={"the minimum purchase amount is 0.01 OZC"}
+                        helpText={"the minimum purchase amount is 0.01 OzGLD"}
                     />
                 </form>,
                 <CardActions key="transferCardAction" expander>
                     <Button primary={this.state.ozcAmount > 0}
-                            flat label="Buy OZC"
+                            flat label="Buy OzGLD"
                             onClick={this._buyOzc}
                             disabled={!profile.balance.toNumber() || this.state.ozcPurchase < 0.01
                             || maxOzc.comparedTo(this.state.ozcPurchase) == -1}>
@@ -289,7 +289,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                 </CardActions>,
                 <CardText key="transferCardText">
                     <p>For the {profile.formattedEthBalance} ETH in your account you can
-                        purchase {maxOzc.round(2).toFormat(2)} OZC</p>
+                        purchase {maxOzc.round(2).toFormat(2)} OzGLD</p>
                 </CardText>
             ]
         }
@@ -337,8 +337,8 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             <img src={this.ozcCardImage} role="presentation"/>
                             <MediaOverlay>
                                 <CardTitle
-                                    title={profile.formattedOzcBalance + " OZC = " + profile.ozcBalanceUSD + " USD"}
-                                    subtitle={"price for OZC in USD " + (new BigNumber(prices.ozc.USD).toFormat(2))}>
+                                    title={profile.formattedOzcBalance + " OzGLD = " + profile.ozcBalanceUSD + " USD"}
+                                    subtitle={"price for OzGLD in USD " + (new BigNumber(prices.ozc.USD).toFormat(2))}>
                                     <Button className="md-cell--right" icon onClick={this._toggleMode}>
                                         {this.modeButton}
                                     </Button>

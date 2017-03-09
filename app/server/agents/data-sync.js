@@ -45,7 +45,7 @@ if (Meteor.settings.listeners) {
             Profiles.update({address: result.args._affiliate}, {$inc: {affiliateBalance: result.args._amount}})
         },
         'set-transaction-fee': function (result) {
-            Globals.update({name: "transaction-fee"}, {$set: {value: result.args._newRate / 10000}});
+            Globals.upsert({name: "transaction-fee"}, {$set: {value: result.args._newRate / 10000}});
         },
         'insufficient-funds': function (result) {
             Messages.insert({
@@ -157,6 +157,7 @@ if (Meteor.settings.polling) {
                 return parser.text('every 1 min');
             },
             job: function () {
+                console.log("sync prices in batch job");
                 getEthereumPrice();
                 return true;
             }
@@ -167,7 +168,11 @@ if (Meteor.settings.polling) {
 }
 
 Meteor.startup(() => {
+    console.log("sync prices in startup");
     getEthereumPrice();
+    callContractMethod('StandardToken', 'getFeePercent').then((fee) => {
+        Meteor.call('set-transaction-fee', {args: {_newRate: fee.toNumber()}})
+    })
 });
 
 Meteor.methods({
@@ -216,9 +221,6 @@ Meteor.methods({
 const setOzcPrices = function (address, sell, buy) {
     if (sell) {
         Profiles.update({address: address}, {$set: {"price.sell": sell}});
-        if (address == Globals.findOne({name: 'ozcoin-account'}).address) {
-            getEthereumPrice();
-        }
     }
     if (buy)
         Profiles.update({address: address}, {$set: {"price.buy": buy}})
@@ -232,19 +234,22 @@ const getEthereumPrice = function () {
         let prices = EJSON.parse(response.content);
         Globals.upsert({name: "ethPrice"}, {$set: prices});
 
-        /**now we have to reset the OZC value because the ETH value has changed*/
-        let ozcAddress = Globals.findOne({name: 'ozcoin-account'}).address;
-        callContractMethod('StandardToken', 'getPrices', ozcAddress)
-            .then((ozcPrices) => {
-                setOzcPrices(ozcAddress, ozcPrices[0].toNumber(), ozcPrices[1].toNumber());
-                prices.ETH = new BigNumber(ozcPrices[0]).dividedBy(ether).times(ozcoin).toNumber();
+        /**now we have to reset the OzGLD value because the ETH value has changed*/
+        callContractMethod('StandardToken', 'getOzAccount').then((ozcAddress) => {
+            callContractMethod('StandardToken', 'getPrices', ozcAddress)
+                .then((ozcPrices) => {
+                    Globals.upsert({name: 'ozcoin-account'}, {$set: {address: ozcAddress}});
+                    setOzcPrices(ozcAddress, ozcPrices[0].toNumber(), ozcPrices[1].toNumber());
+                    prices.ETH = new BigNumber(ozcPrices[0]).dividedBy(ether).times(ozcoin).toNumber();
 
-                /**converting OZC to ETH and adapting the price*/
-                prices.USD = prices.USD * prices.ETH;
-                prices.EUR = prices.EUR * prices.ETH;
-                prices.BTC = prices.BTC * prices.ETH;
-                Globals.upsert({name: "ozcPrice"}, {$set: prices});
-            });
+                    /**converting OzGLD to ETH and adapting the price*/
+                    prices.USD = prices.USD * prices.ETH;
+                    prices.EUR = prices.EUR * prices.ETH;
+                    prices.BTC = prices.BTC * prices.ETH;
+                    Globals.upsert({name: "ozcPrice"}, {$set: prices});
+                    console.log("set price and ozGLD address");
+                });
+        })
     });
 };
 

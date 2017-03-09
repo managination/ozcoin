@@ -1,9 +1,8 @@
 import React, {PureComponent} from "react";
 import {EJSON} from "meteor/ejson";
 import {Promise} from "meteor/promise";
-import {Roles, Profiles} from "../../api/model/profiles";
-import {add0x, signAndSubmit} from "../../api/ethereum-services";
-import BigNumber from "bignumber.js";
+import {Roles, Profiles, currentProfile} from "../../api/model/profiles";
+import {signAndSubmit} from "../../api/ethereum-services";
 import FocusContainer from "react-md/lib/Helpers/FocusContainer";
 import SelectField from "react-md/lib/SelectFields";
 import Button from "react-md/lib/Buttons";
@@ -159,8 +158,7 @@ export default class UserDetails extends PureComponent {
     };
 
     render() {
-        const profile = Profiles.findOne({address: add0x(Meteor.user().username)})
-            || {balance: new BigNumber(0), ozcBalance: new BigNumber(0)};
+        const profile = currentProfile();
 
         return (
             <div>

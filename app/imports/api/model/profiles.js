@@ -62,3 +62,11 @@ export const Roles = {
     affiliate: 7,
     affiliatecompany: 8,
 };
+
+export const currentProfile = function () {
+    return Profiles.findOne({owner: Meteor.userId()}) || {
+            alias: "not logged in",
+            balance: new BigNumber(0),
+            ozcBalance: new BigNumber(0)
+        };
+};

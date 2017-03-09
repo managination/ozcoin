@@ -48,7 +48,7 @@ export default entries = (user, path) => {
 
         try {
             if (entry.roles.indexOf(Roles.all) > -1 || entry.roles.indexOf(user.role) > -1) {
-                if (entry.key == 'register' && user.isRegistered) return;
+                if (entry.key == 'register' && (user.isRegistered || user.balance.comparedTo(0) < 1)) return;
                 delete entry.roles;
                 let click = entry.onClick;
                 entry.onClick = (event) => {

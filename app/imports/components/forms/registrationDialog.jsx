@@ -8,8 +8,8 @@ import TextField from "react-md/lib/TextFields";
 import Toolbar from "react-md/lib/Toolbars";
 import Paper from "react-md/lib/Papers";
 import {browserHistory} from "react-router";
-import {createKeystore, add0x} from "../../api/ethereum-services";
-import {Profiles, Roles} from "../../api/model/profiles";
+import {createKeystore} from "../../api/ethereum-services";
+import {Profiles, Roles, currentProfile} from "../../api/model/profiles";
 import {Globals} from "../../api/model/globals";
 
 export default class RegistrationDialog extends TrackerReact(PureComponent) {
@@ -60,7 +60,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
             if (err)
                 console.log("ERROR", err);
             Meteor.subscribe("current-profile", () => {
-                let profile = Profiles.findOne({address: add0x(Meteor.user().username)});
+                let profile = currentProfile();
                 Session.set('currentProfile', profile || {alias: "not logged in"});
                 Session.set('showWait', false);
                 let userNum = 1;
@@ -81,6 +81,8 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
         let mnemonic = this.refs.mnemonic.getField().value;
 
         let keystorePassword = this.refs.keystorePassword.getField().value;
+        if (keystorePassword.length < 1) return;
+
         Session.set('showWait', true);
         createKeystore(alias, email, keystorePassword, null, mnemonic)
             .then((keystore) => {
@@ -184,6 +186,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                 >
                     <h1 style={{"textAlign": "center"}}>if you have an existing mnemonic paste it below</h1>
                     <TextField
+                        autocomplete="off"
                         id="mnemonic"
                         ref="mnemonic"
                         label="mnemonic"

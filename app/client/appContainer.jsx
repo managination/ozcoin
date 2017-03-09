@@ -12,9 +12,8 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import Snackbar from "react-md/lib/Snackbars";
 import Wait from "../imports/components/wait";
 import CopyMnemonic from "../imports/components/forms/copy-mnemonic";
-import {Profiles} from "../imports/api/model/profiles";
+import {Profiles, currentProfile} from "../imports/api/model/profiles";
 import menuEntries from "../imports/components/menus/main-menu";
-import {add0x} from "../imports/api/ethereum-services";
 
 export default class AppContainer extends TrackerReact(PureComponent) {
     constructor(props) {
@@ -27,7 +26,6 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         };
         Session.set("showWait", false);
         Session.set("showCopyMnemonic", false);
-        Session.set('currentProfile', Profiles.findOne({owner: Meteor.userId()}) || {alias: "not logged in"});
 
         this._showToast = this._showToast.bind(this);
         this._removeToast = this._removeToast.bind(this);
@@ -39,16 +37,11 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         console.log("componentWillMount app.jsx");
         const user = Meteor.user();
         if (user) {
-            Meteor.subscribe("current-profile", () => {
-                let profile = Profiles.findOne({address: add0x(user.username)});
-                Session.set('currentProfile', profile || {alias: "not logged in"});
-
-                if (this.props.location.pathname.indexOf('register') >= 0) {
-                    browserHistory.push('/edit-user/' + profile.address);
-                } else if (this.props.location.pathname == '/') {
-                    browserHistory.push('/wallet');
-                }
-            });
+            if (this.props.location.pathname.indexOf('register') >= 0) {
+                browserHistory.push('/edit-user/' + profile.address);
+            } else if (this.props.location.pathname == '/') {
+                browserHistory.push('/wallet');
+            }
         } else {
             if (this.props.location.pathname.indexOf('register') == -1) {
                 Session.set('initialLocation', this.props.location.pathname);
@@ -90,7 +83,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
             return (
                 <ListItem key={profile._id} primaryText={profile.alias}
                           onClick={() => {
-                              Session.set('currentProfile', profile)
+                              Session.set('currentProfile', profile._id)
                           }}/>
 
             );
@@ -99,7 +92,8 @@ export default class AppContainer extends TrackerReact(PureComponent) {
             <ListItem key="copyMnemonic" primaryText="Copy mnemonic"
                       onClick={this._copyMnemonic}/>
         );
-        let affiliateAddress = Session.get('currentProfile').affiliate;
+        let profile = currentProfile();
+        let affiliateAddress = profile.affiliate;
         toolbarMenuItems.push(
             <CopyToClipboard key="copyAffiliateLink"
                              text={location.protocol + "//" + location.hostname + ":" + location.port + "/register/" + affiliateAddress}
@@ -122,14 +116,14 @@ export default class AppContainer extends TrackerReact(PureComponent) {
 
         this.state.initialized = Session.get('initialized');
 
-        const menuItems = menuEntries(Session.get('currentProfile'), this.props.location.pathname);
+        const menuItems = menuEntries(profile, this.props.location.pathname);
         const toolbarTitle = (<div>
-                <span>{Session.get('currentProfile').alias}</span>
+                <span>{profile.alias}</span>
                 <span> - </span>
-                <CopyToClipboard text={Session.get('currentProfile').address || ''}
+                <CopyToClipboard text={profile.address || ''}
                                  onCopy={this._showAddressCopiedToast}>
                     <Button flat iconBefore={false}
-                            label={Session.get('currentProfile').address}
+                            label={profile.address}
                             tooltipLabel="click here to copy the address">content_copy</Button>
                 </CopyToClipboard>
             </div>

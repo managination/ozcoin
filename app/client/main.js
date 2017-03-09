@@ -10,7 +10,7 @@ import DelayNotification from "../imports/components/delayNotification";
 import GetPassword from "../imports/components/forms/confirm-transaction";
 import {initializeKeystore} from "../imports/api/ethereum-services";
 import {Globals} from "../imports/api/model/globals";
-import {Profiles} from "../imports/api/model/profiles";
+import {currentProfile} from "../imports/api/model/profiles";
 
 if (!window.console) {
     window.console = {
@@ -33,7 +33,7 @@ Meteor.startup(() => {
         initializeKeystore(password).then((keystore) => {
             Session.set('initialized', true);
             Meteor.subscribe('current-profile', (err) => {
-                let profile = Profiles.findOne({owner: Meteor.userId()});
+                let profile = currentProfile();
                 let userNum = 0;
                 if (profile) {
                     userNum = profile.userNum;

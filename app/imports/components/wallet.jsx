@@ -9,9 +9,9 @@ import CardText from "react-md/lib/Cards/CardText";
 import Media, {MediaOverlay} from "react-md/lib/Media";
 import TextField from "react-md/lib/TextFields";
 import SelectField from "react-md/lib/SelectFields";
-import {add0x, signAndSubmit, isValidAddress} from "../api/ethereum-services";
+import {signAndSubmit, isValidAddress} from "../api/ethereum-services";
 import GetPassword from "./forms/confirm-transaction";
-import {Profiles} from "../api/model/profiles";
+import {currentProfile} from "../api/model/profiles";
 import {Globals} from "../api/model/globals";
 
 export default class Wallet extends TrackerReact(PureComponent) {
@@ -55,7 +55,9 @@ export default class Wallet extends TrackerReact(PureComponent) {
             Meteor.callPromise('register-user').then((response) => {
                 response.showUserRegistrationDialog = true;
                 response.profile = profile;
+                response.registrationStarted = true;
                 self.setState(response);
+                Session.set("showWait", false);
             })
         } else {
             this.setState({profile: profile});
@@ -90,12 +92,6 @@ export default class Wallet extends TrackerReact(PureComponent) {
                 });
         });
 
-        if (Meteor.user() && this.props.params.register) {
-            let profile = Profiles.findOne({owner: Meteor.userId()});
-            if (profile) {
-                self._setProfile(profile);
-            }
-        }
     };
 
     _transactionConfirmed(password) {
@@ -298,8 +294,15 @@ export default class Wallet extends TrackerReact(PureComponent) {
     render() {
         if (!Meteor.user()) return null;
 
-        const profile = Profiles.findOne({address: add0x(Meteor.user().username)})
-            || {balance: new BigNumber(0), ozcBalance: new BigNumber(0)};
+        if (Meteor.user() && this.props.params.register && !this.state.registrationStarted) {
+            let profile = currentProfile();
+            if (profile && !profile.isRegistered) {
+                Session.set("showWait", true);
+                this._setProfile(profile);
+            }
+        }
+
+        const profile = currentProfile();
         const prices = {
             eth: Globals.findOne({name: "ethPrice"}) || {BTC: 0, USD: 0, EUR: 0},
             ozc: Globals.findOne({name: "ozcPrice"}) || {ETH: 0, USD: 0, BTC: 0},

@@ -23,6 +23,7 @@ export default class TransactionConfirmationOverlay extends PureComponent {
 
     _verifyPassword = () => {
         if (this.props.passwordOnly) return true;
+        if (this.state.ksPassword.length < 1) return false;
 
         if (!this.mnemonic) {
             this.mnemonic = LocalStorage.getItem('encrypted-mnemonic');
@@ -42,21 +43,21 @@ export default class TransactionConfirmationOverlay extends PureComponent {
         change[event.target.id] = value;
         this.setState(change);
     };
-    
+
     render() {
         const {visible, cost, balance} = this.props;
         const title = this.props.title || "Please confirm or cancel this transaction";
         let cancelButton = null;
-        if(this.props.passwordOnly){
+        if (this.props.passwordOnly) {
             cancelButton = <Button style={{marginLeft: 20}}
-                                    className={this.props.cancel ? '' : 'hidden'}
-                                    id="cancel"
-                                    secondary raised
-                                    label="Cancel"
-                                    onClick={this.props.cancel}
-                            >cancel</Button>
+                                   className={this.props.cancel ? '' : 'hidden'}
+                                   id="cancel"
+                                   secondary raised
+                                   label="Cancel"
+                                   onClick={this.props.cancel}
+            >cancel</Button>
         }
-    
+
         return (
             <Dialog
                 id="RegistrationConfirmationOverlay"

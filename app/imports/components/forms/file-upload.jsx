@@ -11,7 +11,7 @@ import Subheader from "react-md/lib/Subheaders";
 import {signAndSubmit} from "../../api/ethereum-services";
 import GetPassword from "./confirm-transaction";
 import {Documents} from "../../api/model/documents";
-import {Roles} from "../../api/model/profiles";
+import {Roles, currentProfile} from "../../api/model/profiles";
 
 const InfoIcon = () => <FontIcon>info</FontIcon>;
 
@@ -93,7 +93,7 @@ export default class FileUpload extends TrackerReact(PureComponent) {
     };
 
     render() {
-        let profile = Session.get("currentProfile");
+        let profile = currentProfile();
         let canUpload = (this.props.params.docType == 'audit-report' && profile.role == Roles.auditor) ||
             (this.props.params.docType == 'certificate' && profile.role == Roles.certificatecreator) ||
             profile.role == Roles.administrator;

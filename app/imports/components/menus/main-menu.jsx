@@ -1,10 +1,10 @@
 import React from "react";
 import FontIcon from "react-md/lib/FontIcons";
 import {browserHistory} from "react-router";
-import {Roles} from "../../api/model/profiles";
+import {Roles, currentProfile} from "../../api/model/profiles";
 
 export default entries = (user, path) => {
-    let profile = Session.get('currentProfile') || {address: ''};
+    let profile = currentProfile() || {address: ''};
 
     return [{
         key: 'edit-user',

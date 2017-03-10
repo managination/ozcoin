@@ -185,6 +185,7 @@ Meteor.methods({
     },
     'update-balance': function () {
         let profile = Profiles.findOne({owner: this.userId});
+        console.log("manual balance update for", profile.address);
         updateProfileEthBalance(profile);
         updateProfileOzcBalance(profile);
         updateProfileAffiliateBalane(profile);

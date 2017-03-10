@@ -19,7 +19,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
         super(props);
 
         this.state = {
-            ozcTransferMode: false,
+            ozcTransferMode: true,
             txData: "",
             getPasswordVisible: false,
             showUserRegistrationDialog: false,
@@ -95,11 +95,18 @@ export default class Wallet extends TrackerReact(PureComponent) {
     };
 
     _transactionConfirmed(password) {
+        let self = this;
         this.setState({getPasswordVisible: false, showUserRegistrationDialog: false});
         Session.set("showWait", true);
         signAndSubmit(password, this.state.rawTx, true, this.state.profile.address, this.state.recipient)
             .then(() => {
-                Session.set("showWait", false);
+                if (self.state.transferETH) {
+                    Meteor.call('update-balance', () => {
+                        Session.set("showWait", false);
+                    });
+                } else {
+                    Session.set("showWait", false);
+                }
             })
             .catch((err) => {
                 console.log("ERROR submitting signed transaction", err);
@@ -119,9 +126,10 @@ export default class Wallet extends TrackerReact(PureComponent) {
     _transferEth() {
         const self = this;
         Session.set("showWait", true);
-        Meteor.callPromise('transfer-eth', this.state.recipient, this.state.ethAmount)
+        Meteor.callPromise('transfer-eth', this.state.recipient, new BigNumber(this.state.ethAmount).round(4).toNumber())
             .then((response) => {
                 response.getPasswordVisible = true;
+                response.transferETH = true;
                 Session.set("showWait", false);
                 self.setState(response);
             })
@@ -134,7 +142,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
     _transferOzc() {
         const self = this;
         Session.set("showWait", true);
-        Meteor.callPromise('transfer-ozc', this.state.recipient, this.state.ozcAmount)
+        Meteor.callPromise('transfer-ozc', this.state.recipient, new BigNumber(this.state.ozcAmount).round(4).toNumber())
             .then((response) => {
                 response.getPasswordVisible = true;
                 Session.set("showWait", false);
@@ -237,7 +245,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             flat label="Transfer"
                             onClick={this._transferOzc}
                             disabled={!profile.balance.toNumber() || !(this.state.ozcAmount > 0)
-                            || this.state.ozcAmount > profile.ozcBalance.toNumber()
+                            || profile.ozcBalance.comparedTo(this.state.ozcAmount) == -1
                             || !isValidAddress(this.state.recipient)}>
                         check
                     </Button>

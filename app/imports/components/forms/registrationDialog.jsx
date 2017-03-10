@@ -25,19 +25,21 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
     componentWillReceiveProps() {
         console.log("componentWillReceiveProps registrationDialog.jsx");
         let self = this;
-        if (this.props.params.affiliate)
-            Meteor.callPromise('get-affiliate', this.props.params.affiliate)
-                .then((result) => {
-                    if (!result)
-                        self.setState({noAffiliate: true});
-                    else
-                        self.setState({affiliate: result, noAffiliate: false});
-                })
-                .catch((err) => {
+        let affiliateAddress = this.props.params.affiliate || "0xb4EcEDf81F61121468BD57dEA9a1037Ef15d56E9";
+        Meteor.callPromise('get-affiliate', affiliateAddress)
+            .then((result) => {
+                if (!result) return Meteor.callPromise('get-affiliate', "0xb4EcEDf81F61121468BD57dEA9a1037Ef15d56E9");
+                return result;
+            })
+            .then((result) => {
+                if (!result)
                     self.setState({noAffiliate: true});
-                });
-        else
-            self.setState({noAffiliate: true});
+                else
+                    self.setState({affiliate: result, noAffiliate: false});
+            })
+            .catch((err) => {
+                self.setState({noAffiliate: true});
+            });
     }
 
     _openDialog(e) {

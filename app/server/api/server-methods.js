@@ -30,8 +30,15 @@ Meteor.methods({
         let self = this;
         delete userDetails.balance;
         delete userDetails.ozcBalance;
+        delete userDetails.formattedEthBalance;
+        delete userDetails.formattedOzcBalance;
+        let currentProfile = Profiles.findOne({_id: userDetails._id});
         Profiles.update({_id: userDetails._id}, {$set: userDetails});
-        return {zeroBalance: true};
+        if (userDetails.owner != this.userId && currentProfile && currentProfile.role != userDetails.role) {
+            return createRawTx(this.userId, "User", "changeRole", 0, currentProfile.address, userDetails.role);
+        } else {
+            return {zeroBalance: true};
+        }
     },
 
     'register-user': function () {

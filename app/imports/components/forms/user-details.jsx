@@ -66,7 +66,6 @@ export default class UserDetails extends PureComponent {
         this._handleRoleChange.bind(this);
         this._handleChange.bind(this);
         this._handleSearch.bind(this);
-        this._handleSearchButton.bind(this);
         this._save.bind(this);
         this._reset.bind(this);
     }
@@ -96,6 +95,18 @@ export default class UserDetails extends PureComponent {
     };
 
     _handleSearch = (address) => {
+        this.setState({
+            address: '',
+            email: '',
+            companyName: '',
+            website: '',
+            address1: '',
+            address2: '',
+            city: '',
+            zip: '',
+            state: '',
+            country: ''
+        });
         let self = this;
         if (this.profileSub) this.profileSub.stop();
         this.profileSub = Meteor.subscribe("user-profile", address, () => {
@@ -105,10 +116,6 @@ export default class UserDetails extends PureComponent {
                 };
             self.setState(this.user);
         })
-    };
-
-    _handleSearchButton = () => {
-        this._handleSearch(this.state.email);
     };
 
     _save = () => {
@@ -133,8 +140,12 @@ export default class UserDetails extends PureComponent {
     };
 
     _reset = () => {
-        this.email = '';
-        this._handleSearch('');
+        const profile = currentProfile();
+
+        if (profile.role != Roles.administrator)
+            this._handleSearch(profile.address);
+        else
+            this._handleSearch('');
     };
 
     _transactionConfirmed = (password) => {

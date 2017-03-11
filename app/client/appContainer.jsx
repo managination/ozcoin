@@ -93,7 +93,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                       onClick={this._copyMnemonic}/>
         );
         let profile = currentProfile();
-        let affiliateAddress = profile.affiliate;
+        let affiliateAddress = profile.address;
         toolbarMenuItems.push(
             <CopyToClipboard key="copyAffiliateLink"
                              text={location.protocol + "//" + location.hostname + ":" + location.port + "/register/" + affiliateAddress}
@@ -126,6 +126,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                             label={profile.address}
                             tooltipLabel="click here to copy the address">content_copy</Button>
                 </CopyToClipboard>
+                <span>Acc Ref: #{profile.userNum + 1000}</span>
             </div>
         );
 
@@ -135,7 +136,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
             return (
                 <NavigationDrawer
                     navItems={menuItems}
-                    drawerTitle={"Oz-Coins"}
+                    drawerTitle={"OzGLD"}
                     desktopDrawerType={NavigationDrawer.DrawerTypes.FULL_HEIGHT}
                     contentClassName="md-grid"
                     autoclose={true}

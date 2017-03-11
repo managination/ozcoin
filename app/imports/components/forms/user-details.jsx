@@ -118,18 +118,18 @@ export default class UserDetails extends PureComponent {
         user.balance = this.user.balance.toNumber();
         user.ozcBalance = this.user.ozcBalance.toNumber();
 
-        if (user.balance > 0) {
-            Meteor.callPromise('update-user-details', user)
-                .then((response) => {
+        Meteor.callPromise('update-user-details', user)
+            .then((response) => {
+                if (!response.zeroBalance) {
                     response.getPasswordVisible = true;
                     Session.set("showWait", false);
                     self.setState(response);
-                })
-                .catch((err) => {
-                    console.log(err);
-                    Session.set("showWait", false);
-                });
-        }
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                Session.set("showWait", false);
+            });
     };
 
     _reset = () => {

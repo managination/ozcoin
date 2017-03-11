@@ -43,6 +43,13 @@ export default entries = (user, path) => {
         roles: [Roles.all],
         active: path.indexOf('upload/audit-report') > -1,
         onClick: () => browserHistory.push('/upload/audit-report'),
+    }, {
+        key: 'info',
+        primaryText: 'Information',
+        leftIcon: <FontIcon>info</FontIcon>,
+        roles: [Roles.all],
+        active: path.indexOf('info-page') > -1,
+        onClick: () => browserHistory.push('/info-page'),
     }, /*{ key: 'divider', divider: true },*/].map((entry) => {
         if (entry.key === 'divider') return entry;
 

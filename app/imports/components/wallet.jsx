@@ -208,6 +208,15 @@ export default class Wallet extends TrackerReact(PureComponent) {
 
     _getOzcForm(profile, prices) {
         if (this.state.ozcTransferMode) {
+            let purchaseCardText = null;
+            if (profile.isRegistered) {
+                purchaseCardText = <p>The amount tranfered is different from the amount received because there is
+                    a {this.txFee.times(100).toFormat(2)}% fee on OzGLD transfers</p>
+            } else {
+                purchaseCardText =
+                    <p>You must register your account with the smart-contract before you can purchase through the
+                        wallet</p>
+            }
             return [
                 <form key="transferForm" onSubmit={(e) => e.preventDefault()} className="md-grid">
                     < TextField
@@ -244,15 +253,14 @@ export default class Wallet extends TrackerReact(PureComponent) {
                     <Button primary={this.state.ozcAmount > 0}
                             flat label="Transfer"
                             onClick={this._transferOzc}
-                            disabled={!profile.balance.toNumber() || !(this.state.ozcAmount > 0)
+                            disabled={!profile.isRegistered || !profile.balance.toNumber() || !(this.state.ozcAmount > 0)
                             || profile.ozcBalance.comparedTo(this.state.ozcAmount) == -1
                             || !isValidAddress(this.state.recipient)}>
                         check
                     </Button>
                 </CardActions>,
-                <CardText key="transferCardText">
-                    <p>The amount tranfered is different from the amount received because there is
-                        a {this.txFee.times(100).toFormat(2)}% fee on OzGLD transfers</p>
+                <CardText key="purchaseCardText">
+                    {purchaseCardText}
                 </CardText>
             ]
         } else {

@@ -202,18 +202,6 @@ Meteor.methods({
         updateProfileOzcBalance(profile);
         updateProfileAffiliateBalane(profile);
     },
-    'update-user-details': function (userDetails) {
-        let self = this;
-        Profiles.update({_id: userDetails._id}, {$set: userDetails});
-        let profile = Profiles.findOne({_id: userDetails._id});
-        if (!profile.isRegistered) {
-            return createRawTx(this.userId, "User", "createCoinOwner", 0,
-                profile.address, profile.affiliate, profile.affiliateCompany, profile.alias, EJSON.stringify(profile));
-        } else {
-            return createRawTx(this.userId, "User", "updateUserDetails", 0,
-                profile.alias, EJSON.stringify(profile), profile.affiliate, profile.affiliateCompany);
-        }
-    },
     'change-user-role': function (address, role) {
         return createRawTx(this.userId, "User", "changeRole", 0, address, role)
     }

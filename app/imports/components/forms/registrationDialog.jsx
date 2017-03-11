@@ -63,7 +63,6 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                 console.log("ERROR", err);
             Meteor.subscribe("current-profile", () => {
                 let profile = currentProfile();
-                Session.set('currentProfile', profile || {alias: "not logged in"});
                 Session.set('showWait', false);
                 let userNum = 1;
                 if (profile)
@@ -95,11 +94,8 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                     password: keystore.password,
                 };
                 Accounts.createUser(options, (err) => {
-                    let initialLocation = Session.get('initialLocation');
-                    if (!initialLocation || initialLocation.length < 5)
-                        initialLocation = '/wallet';
-                    browserHistory.push(initialLocation);
                     if (err) {
+                        browserHistory.push('/wallet');
                         console.log("user creation error ", err);
                         Meteor.loginWithPassword(options.username, options.password, (err) => {
                             if (err) {
@@ -110,6 +106,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                             }
                         });
                     } else {
+                        browserHistory.push('/info-page/yes');
                         Profiles.insert({
                             owner: Meteor.userId(),
                             email: email,
@@ -174,7 +171,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                     id="keystorePassword"
                     ref="keystorePassword"
                     label="Keystore Password"
-                    placeholder="Keystore Password"
+                    placeholder="Wallet Password"
                     type="password"
                     customSize="title"
                     className="md-cell md-cell--12"
@@ -186,9 +183,8 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                     raiseOnHover={true}
                     className="md-cell md-cell--12"
                 >
-                    <h1 style={{"textAlign": "center"}}>if you have an existing mnemonic paste it below</h1>
                     <TextField
-                        autocomplete="off"
+                        autoComplete="off"
                         id="mnemonic"
                         ref="mnemonic"
                         label="mnemonic"
@@ -198,7 +194,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                         helpText="if you do not provide a mnemonic a random one will be created for you"
                     />
                     <h1 style={{"textAlign": "center"}}>
-                        a random mnemonic will be generated if left empty
+                        Enter your existing mnemonic here to regenerate you OzGLD wallet
                     </h1>
                 </Paper>
             </form>

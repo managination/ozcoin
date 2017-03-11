@@ -26,16 +26,19 @@ Meteor.methods({
         return profile;
     },
 
+    'update-user-details': function (userDetails) {
+        let self = this;
+        delete userDetails.balance;
+        delete userDetails.ozcBalance;
+        Profiles.update({_id: userDetails._id}, {$set: userDetails});
+        return {zeroBalance: true};
+    },
+
     'register-user': function () {
         let profile = Profiles.findOne({owner: this.userId});
-        delete profile._id;
-        delete profile.owner;
         let alias = profile.alias;
-        delete profile.alias;
         let address = profile.address;
-        delete profile.address;
-        delete profile.balance;
-        let details = EJSON.stringify(profile);
+        let details = EJSON.stringify({email: profile.email, alias: profile.alias});
         return createRawTx(this.userId, 'User', 'createCoinOwner', 0, address, profile.affiliate, profile.affiliateCompany, alias, details);
     },
 

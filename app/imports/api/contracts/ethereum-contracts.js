@@ -5,13 +5,13 @@ import {Promise} from "meteor/promise";
 import {getWeb3} from "../ethereum-services";
 import developmentContracts from "../../development.json";
 import ropstenContracts from "../../ropsten.json";
-// import mainnetContracts from "../../mainnet.json";
+import mainnetContracts from "../../main.json";
 import {Mongo} from "meteor/mongo";
 
 let allContractDefs = {
     development: developmentContracts,
     ropsten: ropstenContracts,
-    // mainnet: mainnetContracts,
+    main: mainnetContracts,
 };
 
 let contractDefs = allContractDefs[Meteor.settings.public.chain];

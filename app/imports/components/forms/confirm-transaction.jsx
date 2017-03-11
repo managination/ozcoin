@@ -89,7 +89,10 @@ export default class TransactionConfirmationOverlay extends PureComponent {
                             primary raised
                             label="Confirm"
                             disabled={!this._verifyPassword()}
-                            onClick={() => this.props.confirm(this.state.ksPassword)}
+                            onClick={() => {
+                                this.props.confirm(this.state.ksPassword);
+                                this.state.ksPassword = '';
+                            }}
                     >done</Button>
                     {cancelButton}
 

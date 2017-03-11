@@ -9,6 +9,7 @@ import TransactionConfirmationOverlay from "../imports/components/forms/confirm-
 import Wallet from "../imports/components/wallet";
 import NotFound from "../imports/components/not-found";
 import DelayNotification from "../imports/components/delayNotification";
+import InformationPage from "../imports/components/information-page";
 
 export const renderRoutes = () => (
     <Router history={browserHistory}>
@@ -22,6 +23,8 @@ export const renderRoutes = () => (
             <Route path="upload/:docType" component={FileUpload}/>
             <Route path="register/:affiliate" component={RegistrationDialog}/>
             <Route path="register" component={RegistrationDialog}/>
+            <Route path="info-page" component={InformationPage}/>
+            <Route path="info-page/:firstTime" component={InformationPage}/>
             <Route path="*" component={NotFound}/>
         </Route>
 

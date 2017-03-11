@@ -96,16 +96,19 @@ export default class Wallet extends TrackerReact(PureComponent) {
 
     _transactionConfirmed(password) {
         let self = this;
+        let wasRegistration = this.state.showUserRegistrationDialog;
         this.setState({getPasswordVisible: false, showUserRegistrationDialog: false});
         Session.set("showWait", true);
         signAndSubmit(password, this.state.rawTx, true, this.state.profile.address, this.state.recipient)
             .then(() => {
-                if (self.state.transferETH) {
-                    Meteor.call('update-balance', () => {
+                if (wasRegistration) {
+                    Meteor.call('sync-user-details', (err) => {
                         Session.set("showWait", false);
                     });
                 } else {
-                    Session.set("showWait", false);
+                    Meteor.call('update-balance', () => {
+                        Session.set("showWait", false);
+                    });
                 }
             })
             .catch((err) => {
@@ -126,7 +129,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
     _transferEth() {
         const self = this;
         Session.set("showWait", true);
-        Meteor.callPromise('transfer-eth', this.state.recipient, new BigNumber(this.state.ethAmount).round(4).toNumber())
+        Meteor.callPromise('transfer-eth', this.state.recipient, new BigNumber(this.state.ethAmount).round(5, 1).toNumber())
             .then((response) => {
                 response.getPasswordVisible = true;
                 response.transferETH = true;
@@ -142,7 +145,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
     _transferOzc() {
         const self = this;
         Session.set("showWait", true);
-        Meteor.callPromise('transfer-ozc', this.state.recipient, new BigNumber(this.state.ozcAmount).round(4).toNumber())
+        Meteor.callPromise('transfer-ozc', this.state.recipient, new BigNumber(this.state.ozcAmount).round(5, 1).toNumber())
             .then((response) => {
                 response.getPasswordVisible = true;
                 Session.set("showWait", false);
@@ -190,12 +193,12 @@ export default class Wallet extends TrackerReact(PureComponent) {
         let change = {};
         if (event.target.id == 'ozcAmount') {
             value = new BigNumber(value);
-            change.ozcAmountReceived = value.minus(value.times(this.txFee)).round(5).toNumber();
+            change.ozcAmountReceived = value.minus(value.times(this.txFee)).round(5, 1).toNumber();
             value = value.toNumber();
         }
         if (event.target.id == 'ozcAmountReceived') {
             value = new BigNumber(value);
-            change.ozcAmount = value.dividedBy(1 - this.txFee.toNumber()).round(5).toNumber();
+            change.ozcAmount = value.dividedBy(1 - this.txFee.toNumber()).round(5, 1).toNumber();
             value = value.toNumber();
         }
         change[event.target.id] = value;
@@ -207,16 +210,15 @@ export default class Wallet extends TrackerReact(PureComponent) {
     }
 
     _getOzcForm(profile, prices) {
+        let purchaseCardText = [];
         if (this.state.ozcTransferMode) {
-            let purchaseCardText = null;
-            if (profile.isRegistered) {
-                purchaseCardText = <p>The amount tranfered is different from the amount received because there is
-                    a {this.txFee.times(100).toFormat(2)}% fee on OzGLD transfers</p>
-            } else {
-                purchaseCardText =
-                    <p>You must register your account with the smart-contract before you can purchase through the
-                        wallet</p>
+            if (profile.balance.comparedTo(0.003) == -1) {
+                purchaseCardText.push(<p key="purchaseCardText2">You will not be able to transfer any OzGLD out of
+                    your wallet. You need at least 0.003 ETH to pay for the transaction.</p>)
             }
+            purchaseCardText.push(<p key="purchaseCardText1">The amount tranfered is different from the amount
+                received because there is
+                a {this.txFee.times(100).toFormat(2)}% fee on OzGLD transfers</p>);
             return [
                 <form key="transferForm" onSubmit={(e) => e.preventDefault()} className="md-grid">
                     < TextField
@@ -253,8 +255,16 @@ export default class Wallet extends TrackerReact(PureComponent) {
                     <Button primary={this.state.ozcAmount > 0}
                             flat label="Transfer"
                             onClick={this._transferOzc}
-                            disabled={!profile.isRegistered || !profile.balance.toNumber() || !(this.state.ozcAmount > 0)
+                            disabled={profile.balance.comparedTo(0.003) == -1 || !profile.isRegistered
+                            || !(this.state.ozcAmount > 0)
                             || profile.ozcBalance.comparedTo(this.state.ozcAmount) == -1
+                            || !isValidAddress(this.state.recipient)}>
+                        check
+                    </Button>
+                    <Button secondary
+                            flat label="Transfer All"
+                            onClick={() => this._handleChange(profile.ozcBalance.toNumber(), {target: {id: "ozcAmount"}})}
+                            disabled={profile.balance.comparedTo(0.003) == -1 || !profile.ozcBalance.toNumber()
                             || !isValidAddress(this.state.recipient)}>
                         check
                     </Button>
@@ -264,7 +274,19 @@ export default class Wallet extends TrackerReact(PureComponent) {
                 </CardText>
             ]
         } else {
-            let maxOzc = profile.balance.dividedBy(prices.ozc.ETH);
+            let maxOzc = profile.balance.minus(0.09).dividedBy(prices.ozc.ETH).round(5, 1);
+            if (!profile.isRegistered)
+                purchaseCardText.push(<p key="purchaseCardText3">You must register your account with the smart-contract
+                    before you can purchase through the wallet</p>);
+
+            if (profile.balance.comparedTo(0.02) == -1)
+                purchaseCardText.push(<p key="purchaseCardText5">In order to register you need at least 0.02 ETH in your
+                    account</p>);
+            else
+                purchaseCardText.push(<p key="purchaseCardText4">For the {profile.formattedEthBalance} ETH in your
+                    account you can
+                    purchase {maxOzc.round(2).toFormat(2)} OzGLD</p>);
+
             return [
                 <form key="transferForm" onSubmit={(e) => e.preventDefault()} className="md-grid">
                     <SelectField
@@ -294,14 +316,20 @@ export default class Wallet extends TrackerReact(PureComponent) {
                     <Button primary={this.state.ozcAmount > 0}
                             flat label="Buy OzGLD"
                             onClick={this._buyOzc}
-                            disabled={!profile.balance.toNumber() || this.state.ozcPurchase < 0.01
+                            disabled={!profile.balance.toNumber() || !profile.isRegistered
+                            || this.state.ozcPurchase < 0.01
                             || maxOzc.comparedTo(this.state.ozcPurchase) == -1}>
+                        check
+                    </Button>
+                    <Button secondary
+                            flat label="Spend all ETH"
+                            onClick={() => this.setState({ozcPurchase: maxOzc.toNumber()})}
+                            disabled={profile.balance.comparedTo(0.1) == -1 }>
                         check
                     </Button>
                 </CardActions>,
                 <CardText key="transferCardText">
-                    <p>For the {profile.formattedEthBalance} ETH in your account you can
-                        purchase {maxOzc.round(2).toFormat(2)} OzGLD</p>
+                    {purchaseCardText}
                 </CardText>
             ]
         }
@@ -408,8 +436,15 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             <Button primary={this.state.ethAmount > 0}
                                     flat label="Transfer"
                                     onClick={this._transferEth}
-                                    disabled={!profile.balance.toNumber() || !(this.state.ethAmount > 0)
-                                    || this.state.ethAmount > profile.balance.toNumber()
+                                    disabled={profile.balance.comparedTo(0.00042) == -1 || !(this.state.ethAmount > 0)
+                                    || this.state.ethAmount > profile.balance.minus(0.00042).toNumber()
+                                    || !isValidAddress(this.state.recipient)}>
+                                check
+                            </Button>
+                            <Button secondary
+                                    flat label="Transfer All"
+                                    onClick={() => this.setState({ethAmount: profile.balance.minus(0.00042).round(5, 1).toNumber()})}
+                                    disabled={profile.balance.comparedTo(0.00042) == -1
                                     || !isValidAddress(this.state.recipient)}>
                                 check
                             </Button>

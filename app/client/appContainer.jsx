@@ -93,10 +93,14 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                       onClick={this._copyMnemonic}/>
         );
         let profile = currentProfile();
-        let affiliateAddress = profile.address;
+        let affiliateLink = location.protocol + "//" + location.hostname;
+        if (location.port.length > 0)
+            affiliateLink += ":" + location.port;
+        affiliateLink += "/register/" + profile.address;
+
         toolbarMenuItems.push(
             <CopyToClipboard key="copyAffiliateLink"
-                             text={location.protocol + "//" + location.hostname + ":" + location.port + "/register/" + affiliateAddress}
+                             text={affiliateLink}
                              onCopy={() => this._showToast("registration URL copied")}>
                 <ListItem key="copyAffiliateLink" primaryText="Copy Registration link"/>
             </CopyToClipboard>

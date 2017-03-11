@@ -14,10 +14,9 @@ export default class NotFound extends PureComponent {
             <div className="">
                 {headerText}
                 <h3>Security and Sign-In</h3>
-                <p>
-                    <span style={{fontWeight: "bold"}}>
-                        The most important thing is to first copy your mnemonic and store it in a safe place.</span>
-                </p>
+                <h2>
+                    The most important thing is to first copy your mnemonic and store it in a safe place.
+                </h2>
 
                 <p>
                     This is the ONLY way you can recreate your wallet or access it from a different device.
@@ -31,14 +30,16 @@ export default class NotFound extends PureComponent {
                     if you have deleted your cookies or browsing history.
                 </p>
 
-                <p>
-                    If you do not close your OzGLD Wallet it will automatically close after some time and require that
-                    you sign in with your OzGLD Wallet password again.
-                </p>
-                <p>
-                    To sign out of your wallet, simply close the browser tab or click the Sign Out icon in the top right
-                    of your window.
-                </p>
+                {/*
+                 <p>
+                 If you do not close your OzGLD Wallet it will automatically close after some time and require that
+                 you sign in with your OzGLD Wallet password again.
+                 </p>
+                 <p>
+                 To sign out of your wallet, simply close the browser tab or click the Sign Out icon in the top right
+                 of your window.
+                 </p>
+                 */}
                 <p>
                     To access your wallet again, simply go to <a href="https://app.ozgldwallet.com/wallet">https://app.ozgldwallet.com/wallet</a>
                     from the same browser on the same computer and enter your OzGLD Wallet password.

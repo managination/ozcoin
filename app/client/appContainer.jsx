@@ -31,6 +31,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         this._removeToast = this._removeToast.bind(this);
         this._copyMnemonic = this._copyMnemonic.bind(this);
         this._showAddressCopiedToast = this._showAddressCopiedToast.bind(this);
+        this._showAccRefCopiedToast = this._showAccRefCopiedToast.bind(this);
     }
 
     componentWillMount() {
@@ -68,6 +69,10 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         this._showToast("address copied");
     }
 
+    _showAccRefCopiedToast() {
+        this._showToast("address copied");
+    }
+
     _removeToast() {
         const [, ...toasts] = this.state.toasts;
         this.setState({toasts});
@@ -79,6 +84,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
 
     render() {
         console.log("rendering app.jsx");
+        let self = this;
         let toolbarMenuItems = Profiles.find().fetch().map((profile) => {
             return (
                 <ListItem key={profile._id} primaryText={profile.alias}
@@ -130,13 +136,26 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                             label={profile.address}
                             tooltipLabel="click here to copy the address">content_copy</Button>
                 </CopyToClipboard>
-                <span>Acc Ref: #{profile.userNum + 1000}</span>
+                <CopyToClipboard text={"#" + (profile.userNum + 1000) || ''}
+                                 onCopy={this._showAccRefCopiedToast}>
+                    <Button flat iconBefore={false}
+                            label={"Acc Ref: #" + (profile.userNum + 1000)}
+                            tooltipLabel="click here to copy the account reference">content_copy</Button>
+                </CopyToClipboard>
             </div>
         );
 
         // const { children } = this.props;
         if (this.state.initialized) {
             Session.set("show-wait", false);
+            let children = null;
+            if (this.props.children)
+                children = React.Children.toArray(this.props.children).map(function (item, i) {
+                    return React.cloneElement(
+                        item,
+                        {_showToast: self._showToast}
+                    );
+                }, this);
             return (
                 <NavigationDrawer
                     navItems={menuItems}
@@ -148,7 +167,7 @@ export default class AppContainer extends TrackerReact(PureComponent) {
                     toolbarActions={this.actions}
                 >
                     <div style={{width: "100%"}}>
-                        {this.props.children}
+                        {children}
                         <Wait visible={Session.get("showWait")}/>
                         <CopyMnemonic visible={Session.get("showCopyMnemonic")}
                                       showToast={this._showToast}/>

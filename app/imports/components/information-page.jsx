@@ -41,8 +41,10 @@ export default class NotFound extends PureComponent {
                  </p>
                  */}
                 <p>
-                    To access your wallet again, simply go to <a href="https://app.ozgldwallet.com/wallet">https://app.ozgldwallet.com/wallet</a>
-                    from the same browser on the same computer and enter your OzGLD Wallet password.
+                    To access your wallet again, simply go to
+                    <a target="_blank" href="https://app.ozgldwallet.com/wallet">https://app.ozgldwallet.com/wallet</a>
+                    from
+                    the same browser on the same computer and enter your OzGLD Wallet password.
                 </p>
 
                 <h3>Your Wallet Address & Account Reference</h3>
@@ -51,13 +53,15 @@ export default class NotFound extends PureComponent {
                     its right.</p>
                 <h3>Buy OzGLD</h3>
                 <p>You can get OzGLD in one of three ways.
-                    See <a href="http://ozgld.com/get-ozcoingold/">http://ozgld.com/get-ozcoingold/</a>
+                    See <a target="_blank" href="http://ozgld.com/get-ozcoingold/">http://ozgld.com/get-ozcoingold/</a>
                 </p>
 
                 <ol>
                     <li>
-                        Deposit the money into the OZcoinGold Escrow bank account. See http://ozgld.com/get-ozcoingold/
-                        referencing your Acc Ref. N.B. Without the Acc Ref OZcoinGold does not know which account to
+                        Deposit the money into the OZcoinGold Escrow bank account.
+                        See <a target="_blank"
+                               href="http://ozgld.com/get-ozcoingold/">http://ozgld.com/get-ozcoingold/</a> referencing
+                        your Acc Ref. N.B. Without the Acc Ref OZcoinGold does not know which account to
                         deposit the OzGLD’s to. Your OzGLD will be transferred to your OzGLD wallet within 48 hours from
                         confirming fund clearance.
                     </li>
@@ -108,7 +112,8 @@ export default class NotFound extends PureComponent {
                     blockchain and for your OzGLD to display in your wallet.
                 </li>
                 <p>
-                    For any questions, please feel free to contact us on <a href="http://ozgld.com/contact-us/">http://ozgld.com/contact-us/</a>
+                    For any questions, please feel free to contact us on
+                    <a target="_blank" href="http://ozgld.com/contact-us/">http://ozgld.com/contact-us/</a>
                 </p>
             </div>
         );

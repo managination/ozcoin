@@ -132,6 +132,7 @@ export default class UserDetails extends PureComponent {
                     Session.set("showWait", false);
                     self.setState(response);
                 }
+                self.props._showToast("user information saved");
             })
             .catch((err) => {
                 console.log(err);

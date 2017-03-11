@@ -48,7 +48,7 @@ export default class TransactionConfirmationOverlay extends PureComponent {
         const {visible, cost, balance} = this.props;
         const title = this.props.title || "Please confirm or cancel this transaction";
         let cancelButton = null;
-        if (this.props.passwordOnly) {
+        if (!this.props.passwordOnly) {
             cancelButton = <Button style={{marginLeft: 20}}
                                    className={this.props.cancel ? '' : 'hidden'}
                                    id="cancel"

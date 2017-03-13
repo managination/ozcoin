@@ -160,7 +160,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
     _buyOzc() {
         const self = this;
         Session.set("showWait", true);
-        Meteor.callPromise('buy-ozc', this.state.sourceAccount, this.state.ozcPurchase, this.state.sellPrice)
+        Meteor.callPromise('buy-ozc', this.state.sourceAccount, this.state.ozcPurchase.toString(), this.state.sellPrice.toString())
             .then((response) => {
                 response.getPasswordVisible = true;
                 Session.set("showWait", false);
@@ -299,7 +299,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                         className="md-cell md-cell--12"
                         onChange={this._handleSourceSelect}
                         helpText="Select which account you want to buy your OzGLD from"
-                    />,
+                    />
                     < TextField
                         id="ozcPurchase"
                         label="amount in OzGLD you wish to purchase"

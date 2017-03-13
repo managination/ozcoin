@@ -15,8 +15,8 @@ Meteor.methods({
     },
 
     'buy-ozc': function (sourceAccount, amount, price) {
-        let priceInWei = new BigNumber(amount).times(price).times(ether).toNumber();
-        let amountInUCoins = new BigNumber(amount).times(ozcoin).toNumber();
+        let priceInWei = new BigNumber(amount).times(price).times(ether).toString();
+        let amountInUCoins = new BigNumber(amount).times(ozcoin).toString();
         console.log("buying OZC from", sourceAccount, amountInUCoins, "for", new BigNumber(priceInWei).dividedBy(ether).toNumber());
         return createRawTx(this.userId, 'StandardToken', 'buyCoins', priceInWei, amountInUCoins, sourceAccount);
     },

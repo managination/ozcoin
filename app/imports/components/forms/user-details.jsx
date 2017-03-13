@@ -203,7 +203,7 @@ export default class UserDetails extends PureComponent {
                             onChange={this._handleRoleChange}
                             disabled={profile.role != Roles.administrator}
                             helpText="Select a role for the user"
-                        />,
+                        />
                         <TextField
                             id="address"
                             ref="address"
@@ -214,7 +214,7 @@ export default class UserDetails extends PureComponent {
                             required
                             onChange={this._handleChange}
                             helpText="enter an ethereum address"
-                        />,
+                        />
                         <TextField
                             id="email"
                             ref="email"
@@ -223,7 +223,7 @@ export default class UserDetails extends PureComponent {
                             className="md-cell md-cell--4"
                             onChange={this._handleChange}
                             disabled={true}
-                        />,
+                        />
                         {/*
                          <Button className="md-cell md-cell--4" flat primary label="Search"
                          onClick={this._requestAccess}>

@@ -194,7 +194,9 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                         helpText="if you do not provide a mnemonic a random one will be created for you"
                     />
                     <h1 style={{"textAlign": "center"}}>
-                        Enter your existing mnemonic here to regenerate you OzGLD wallet
+                        If you have lost your password or cannot access your wallet, re-enter your existing information
+                        in the relevant fields and enter your existing wallet's mnemonic here to regenerate your
+                        original OzGLD wallet.
                     </h1>
                 </Paper>
             </form>

@@ -30,6 +30,33 @@ export default class NotFound extends PureComponent {
                     if you have deleted your cookies or browsing history.
                 </p>
 
+                <h3>Device Security</h3>
+
+                <p>
+                    For added security, your OzGLD wallet registration is device and browser specific. This means that
+                    once you’ve opened a wallet its password sign-in window will only display if you go
+                    to <a href="https://app.ozgldwallet.com">https://app.ozgldwallet.com</a> or
+                    your browser bookmark from the same device and browser you’ve
+                    registered it from in the first place.
+                </p>
+                <p>
+                    If you try and access your wallet via any other device or browser, your wallet’s password sign-in
+                    window will not display. The system will prompt you to create a new wallet again and you will not be
+                    able to access your original OzGLD wallet this way.
+                </p>
+                <p>
+                    To access the same OzGLD wallet from another device or browser, you need to have that wallet’s
+                    password AND mnemonic. To open an existing OzGLD wallet from another device or browser;
+                </p>
+                <ol>
+                    <li>Go to <a href="https://app.ozgldwallet.com">https://app.ozgldwallet.com</a>. The OzGLD wallet
+                        registration window displays.
+                    </li>
+                    <li>Enter the password for the wallet you want to open in the Wallet Password field and</li>
+                    <li>Enter that wallet’s mnemonic in the mnemonic field.</li>
+                    <li>Click Create Keystore. Your existing wallet will open.</li>
+                </ol>
+
                 {/*
                  <p>
                  If you do not close your OzGLD Wallet it will automatically close after some time and require that
@@ -41,9 +68,9 @@ export default class NotFound extends PureComponent {
                  </p>
                  */}
                 <p>
-                    To access your wallet again, simply go to
-                    <a target="_blank" href="https://app.ozgldwallet.com/wallet">https://app.ozgldwallet.com/wallet</a>
-                    from
+                    To access your wallet again, simply go
+                    to <a target="_blank"
+                          href="https://app.ozgldwallet.com/wallet">https://app.ozgldwallet.com/wallet</a> from
                     the same browser on the same computer and enter your OzGLD Wallet password.
                 </p>
 

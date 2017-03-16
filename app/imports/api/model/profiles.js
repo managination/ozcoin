@@ -6,12 +6,12 @@ export const Profiles = new Mongo.Collection('profiles',
     {
         transform: (profile) => {
             if (profile.balance && typeof profile.balance == 'string')
-                profile.balance = new BigNumber(profile.balance, 16).dividedBy(ether);
+                profile.balance = new BigNumber(profile.balance.toString(), 16).dividedBy(ether);
             else
                 profile.balance = new BigNumber(0);
 
             if (profile.ozcBalance)
-                profile.ozcBalance = new BigNumber(profile.ozcBalance).dividedBy(ozcoin);
+                profile.ozcBalance = new BigNumber(profile.ozcBalance.toString()).dividedBy(ozcoin);
             else
                 profile.ozcBalance = new BigNumber(0);
 

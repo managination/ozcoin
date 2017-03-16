@@ -69,7 +69,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
     componentWillMount() {
         let self = this;
 
-        this.txFee = new BigNumber(Globals.findOne({name: "transaction-fee"}).value);
+        this.txFee = new BigNumber(Globals.findOne({name: "transaction-fee"}).value.toString());
         Meteor.callPromise('get-ozc-affiliate-price').then((affiliateCompany) => {
             let sourceAccounts = [
                 {
@@ -129,7 +129,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
     _transferEth() {
         const self = this;
         Session.set("showWait", true);
-        Meteor.callPromise('transfer-eth', this.state.recipient, new BigNumber(this.state.ethAmount).round(5, 1).toNumber())
+        Meteor.callPromise('transfer-eth', this.state.recipient, new BigNumber(this.state.ethAmount.toString()).round(5, 1).toNumber())
             .then((response) => {
                 response.getPasswordVisible = true;
                 response.transferETH = true;
@@ -145,7 +145,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
     _transferOzc() {
         const self = this;
         Session.set("showWait", true);
-        Meteor.callPromise('transfer-ozc', this.state.recipient, new BigNumber(this.state.ozcAmount).round(5, 1).toNumber())
+        Meteor.callPromise('transfer-ozc', this.state.recipient, new BigNumber(this.state.ozcAmount.toString()).round(5, 1).toNumber())
             .then((response) => {
                 response.getPasswordVisible = true;
                 Session.set("showWait", false);
@@ -192,12 +192,12 @@ export default class Wallet extends TrackerReact(PureComponent) {
     _handleChange(value, event) {
         let change = {};
         if (event.target.id == 'ozcAmount') {
-            value = new BigNumber(value);
+            value = new BigNumber(value.toString());
             change.ozcAmountReceived = value.minus(value.times(this.txFee)).round(5, 1).toNumber();
             value = value.toNumber();
         }
         if (event.target.id == 'ozcAmountReceived') {
-            value = new BigNumber(value);
+            value = new BigNumber(value.toString());
             change.ozcAmount = value.dividedBy(1 - this.txFee.toNumber()).round(5, 1).toNumber();
             value = value.toNumber();
         }
@@ -352,8 +352,8 @@ export default class Wallet extends TrackerReact(PureComponent) {
             ozc: Globals.findOne({name: "ozcPrice"}) || {ETH: 0, USD: 0, BTC: 0},
         };
 
-        profile.ozcBalanceUSD = new BigNumber(profile.ozcBalance).times(prices.ozc.USD).round(2).toFormat(2);
-        profile.ethBalanceUSD = new BigNumber(profile.balance).times(prices.eth.USD).round(2).toFormat(2);
+        profile.ozcBalanceUSD = new BigNumber(profile.ozcBalance.toString()).times(prices.ozc.USD).round(2).toFormat(2);
+        profile.ethBalanceUSD = new BigNumber(profile.balance.toString()).times(prices.eth.USD).round(2).toFormat(2);
         let dialogTitle;
         if (this.state.getPasswordVisible)
             dialogTitle = "Enter our password to validate the transaction";
@@ -385,7 +385,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             <MediaOverlay>
                                 <CardTitle
                                     title={profile.formattedOzcBalance + " OzGLD = " + profile.ozcBalanceUSD + " USD"}
-                                    subtitle={"price for OzGLD in USD " + (new BigNumber(prices.ozc.USD).toFormat(2))}>
+                                    subtitle={"price for OzGLD in USD " + (new BigNumber(prices.ozc.USD.toString()).toFormat(2))}>
                                     <Button className="md-cell--right" icon onClick={this._toggleMode}>
                                         {this.modeButton}
                                     </Button>
@@ -400,7 +400,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             <MediaOverlay>
                                 <CardTitle
                                     title={profile.formattedEthBalance + " ETH = " + profile.ethBalanceUSD + " USD"}
-                                    subtitle={"price for ETH in USD " + (new BigNumber(prices.eth.USD).toFormat(2))}>
+                                    subtitle={"price for ETH in USD " + (new BigNumber(prices.eth.USD.toString()).toFormat(2))}>
                                     <Button className="md-cell--right"
                                             style={profile.affiliateBalance ? {color: "#8BC34A"} : {}}
                                             disabled={!profile.affiliateBalance}

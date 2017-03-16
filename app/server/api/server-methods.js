@@ -20,7 +20,7 @@ Meteor.methods({
         if (userProfile) {
             profile = Profiles.findOne({address: userProfile.affiliateCompany}, {fields: {alias: 1, price: 1}});
             if (profile && profile.prices && profile.price.sell) {
-                profile.price.sell = new BigNumber(profile.price.sell).dividedBy(ether).times(ozcoin).toNumber();
+                profile.price.sell = new BigNumber(profile.price.sell.toString()).dividedBy(ether).times(ozcoin).toNumber();
             }
         }
         return profile;

@@ -229,7 +229,7 @@ const getEthereumPrice = function () {
                 .then((ozcPrices) => {
                     Globals.upsert({name: 'ozcoin-account'}, {$set: {address: ozcAddress}});
                     setOzcPrices(ozcAddress, ozcPrices[0].toNumber(), ozcPrices[1].toNumber());
-                    prices.ETH = new BigNumber(ozcPrices[0]).dividedBy(ether).times(ozcoin).toNumber();
+                    prices.ETH = new BigNumber(ozcPrices[0].toString()).dividedBy(ether).times(ozcoin).toNumber();
 
                     /**converting OzGLD to ETH and adapting the price*/
                     prices.USD = prices.USD * prices.ETH;

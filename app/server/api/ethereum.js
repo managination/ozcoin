@@ -45,7 +45,7 @@ export const createRawValueTx = function (userId, recipient, value) {
 
         resolve({
             rawTx: rawTxString,
-            transactionCost: new BigNumber(gasEstimate * gasPrice).dividedBy(ether).toNumber(),
+            transactionCost: new BigNumber(gasEstimate.toString()).times(gasPrice).dividedBy(ether).toNumber(),
             accountBalance: web3.eth.getBalance(profile.address).dividedBy(ether).toNumber(),
         });
     })
@@ -82,7 +82,7 @@ export const createRawTx = function (userId, contractName, funcName, value) {
 
         return {
             rawTx: rawTxString,
-            transactionCost: new BigNumber(gasEstimate * gasPrice).dividedBy(ether).toNumber(),
+            transactionCost: new BigNumber(gasEstimate.toString()).times(gasPrice).dividedBy(ether).toNumber(),
             accountBalance: web3.eth.getBalance(profile.address).dividedBy(ether).toNumber(),
         };
     }).catch((err) => {

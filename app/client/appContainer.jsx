@@ -38,7 +38,8 @@ export default class AppContainer extends TrackerReact(PureComponent) {
         console.log("componentWillMount app.jsx");
         const user = Meteor.user();
         if (user) {
-            if (this.props.location.pathname.indexOf('register') >= 0) {
+            let profile = currentProfile();
+            if (this.props.location.pathname.indexOf('register') >= 0 && profile && profile.address) {
                 browserHistory.push('/edit-user/' + profile.address);
             } else if (this.props.location.pathname == '/') {
                 browserHistory.push('/wallet');

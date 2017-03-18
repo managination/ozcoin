@@ -285,7 +285,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
             else
                 purchaseCardText.push(<p key="purchaseCardText4">For the {profile.formattedEthBalance} ETH in your
                     account you can
-                    purchase {maxOzc.round(2).toFormat(2)} OzGLD</p>);
+                    purchase {maxOzc.round(2, 1).toFormat(2)} OzGLD</p>);
 
             return [
                 <form key="transferForm" onSubmit={(e) => e.preventDefault()} className="md-grid">
@@ -352,8 +352,8 @@ export default class Wallet extends TrackerReact(PureComponent) {
             ozc: Globals.findOne({name: "ozcPrice"}) || {ETH: 0, USD: 0, BTC: 0},
         };
 
-        profile.ozcBalanceUSD = new BigNumber(profile.ozcBalance.toString()).times(prices.ozc.USD).round(2).toFormat(2);
-        profile.ethBalanceUSD = new BigNumber(profile.balance.toString()).times(prices.eth.USD).round(2).toFormat(2);
+        profile.ozcBalanceUSD = new BigNumber(profile.ozcBalance.toString()).round(2, 1).times(prices.ozc.USD).toFormat(2);
+        profile.ethBalanceUSD = new BigNumber(profile.balance.toString()).round(2, 1).times(prices.eth.USD).toFormat(2);
         let dialogTitle;
         if (this.state.getPasswordVisible)
             dialogTitle = "Enter our password to validate the transaction";

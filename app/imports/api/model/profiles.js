@@ -15,8 +15,8 @@ export const Profiles = new Mongo.Collection('profiles',
             else
                 profile.ozcBalance = new BigNumber(0);
 
-            profile.formattedEthBalance = profile.balance.toFormat(2);
-            profile.formattedOzcBalance = profile.ozcBalance.toFormat(2);
+            profile.formattedEthBalance = profile.balance.round(2, 1).toFormat(2);
+            profile.formattedOzcBalance = profile.ozcBalance.round(2, 1).toFormat(2);
             return profile;
         }
     });

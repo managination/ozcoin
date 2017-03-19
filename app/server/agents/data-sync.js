@@ -266,7 +266,7 @@ const updateProfileAffiliateBalane = function (profile) {
     if (!profile || !profile.address || !isValidAddress(profile.address)) return;
 
     callContractMethod('StandardToken', 'getAffiliateBalance', profile.address).then((balance) => {
-        if (!profile.affiliateBalance || balance.comparedTo(profile.affiliateBalance) != 0) {
+        if (!profile.affiliateBalance || balance.comparedTo(profile.affiliateBalance.toString()) != 0) {
             Profiles.update({_id: profile._id}, {$set: {affiliateBalance: balance.toNumber()}});
         }
     })

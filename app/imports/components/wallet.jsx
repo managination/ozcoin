@@ -318,7 +318,7 @@ export default class Wallet extends TrackerReact(PureComponent) {
                             onClick={this._buyOzc}
                             disabled={!profile.balance.toNumber() || !profile.isRegistered
                             || this.state.ozcPurchase < 0.01
-                            || maxOzc.comparedTo(this.state.ozcPurchase) == -1}>
+                            || maxOzc.comparedTo(this.state.ozcPurchase.toString()) == -1}>
                         check
                     </Button>
                     <Button secondary

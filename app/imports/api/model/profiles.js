@@ -1,6 +1,6 @@
 import {Mongo} from "meteor/mongo";
 import BigNumber from "bignumber.js";
-import {ozcoin, ether} from "../ethereum-services";
+import {ozcoin, ether} from "../../../../../LuckyDAO/app/imports/ethereum/ethereum-services";
 
 export const Profiles = new Mongo.Collection('profiles',
     {

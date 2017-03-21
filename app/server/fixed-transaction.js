@@ -1,6 +1,6 @@
-import Tx from 'ethereumjs-tx';
-import {getWeb3} from '../imports/api/ethereum-services';
-import {add0x} from '../imports/api/ethereum-services';
+import Tx from "ethereumjs-tx";
+import {getWeb3, add0x} from "../../../LuckyDAO/app/imports/ethereum/ethereum-services";
+import {signing, keystore, txutils} from "eth-lightwallet";
 
 export const executeTx = (web3) => {
     let privateKey = "fff7b3e0508db1b9059c7542e6287c5ff8013413dd9ced1ca50dc86916c0f353";
@@ -29,10 +29,6 @@ export const executeTx = (web3) => {
         }
     });
 };
-
-import {signing} from 'eth-lightwallet';
-import {keystore} from 'eth-lightwallet';
-import {txutils} from 'eth-lightwallet';
 
 export const executeTxLW = () => {
     console.log("creating transaction");

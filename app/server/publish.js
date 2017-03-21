@@ -1,7 +1,7 @@
 import {Profiles, Roles} from "../imports/api/model/profiles";
 import {Documents} from "../imports/api/model/documents";
 import {Globals} from "../imports/api/model/globals";
-import {add0x} from "../imports/api/ethereum-services";
+import {add0x} from "../../../LuckyDAO/app/imports/ethereum/ethereum-services";
 
 Meteor.startup (() => {
 });

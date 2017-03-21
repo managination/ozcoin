@@ -1,10 +1,10 @@
 {
   "public": {
-    "chain": "ropsten",
+    "chain": "main",
     "password": "ppp"
   },
-  "ethNodeAddress": "https://ropsten.infura.io/NgjvCOUF5UIhCgRKndzD",
-  "contractEvents": "http://eth.mngn.io:8548",
+  "ethNodeAddress": "https://mainnet.infura.io/NgjvCOUF5UIhCgRKndzD",
+  "contractEvents": "http://eth.mngn.io:8554",
   "kadira": {
     "appId": "K52Z9zawP2CBxSKYt",
     "appSecret": "6ea66336-9041-4ec2-83d7-8bd5127cf79f"

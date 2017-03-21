@@ -8,7 +8,7 @@ import TextField from "react-md/lib/TextFields";
 import Toolbar from "react-md/lib/Toolbars";
 import Paper from "react-md/lib/Papers";
 import {browserHistory} from "react-router";
-import {createKeystore} from "../../api/ethereum-services";
+import {createKeystore} from "../../../../../LuckyDAO/app/imports/ethereum/ethereum-services";
 import {Profiles, Roles, currentProfile} from "../../api/model/profiles";
 import {Globals} from "../../api/model/globals";
 

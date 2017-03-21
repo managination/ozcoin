@@ -1,8 +1,8 @@
 import {Promise} from "meteor/promise";
 import {txutils} from "eth-lightwallet";
 import BigNumber from "bignumber.js";
-import {getWeb3, add0x} from "../../imports/api/ethereum-services";
-import {getContract} from "../../imports/api/contracts/ethereum-contracts";
+import {getWeb3, add0x} from "../../../../LuckyDAO/app/imports/ethereum/ethereum-services";
+import {getContract} from "../../../../LuckyDAO/app/imports/ethereum/ethereum-contracts";
 import {Profiles} from "../../imports/api/model/profiles";
 import {updateProfileEthBalance} from "../agents/data-sync";
 

@@ -9,7 +9,7 @@ import CardText from "react-md/lib/Cards/CardText";
 import Media, {MediaOverlay} from "react-md/lib/Media";
 import TextField from "react-md/lib/TextFields";
 import SelectField from "react-md/lib/SelectFields";
-import {signAndSubmit, isValidAddress} from "../api/ethereum-services";
+import {signAndSubmit, isValidAddress} from "../../../../LuckyDAO/app/imports/ethereum/ethereum-services";
 import GetPassword from "./forms/confirm-transaction";
 import {currentProfile} from "../api/model/profiles";
 import {Globals} from "../api/model/globals";

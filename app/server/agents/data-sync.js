@@ -2,14 +2,8 @@ import {Meteor} from "meteor/meteor";
 import {HTTP} from "meteor/http";
 import {EJSON} from "meteor/ejson";
 import BigNumber from "bignumber.js";
-import {
-    getWeb3,
-    add0x,
-    isValidAddress,
-    ether,
-    ozcoin
-} from "../../../../LuckyDAO/app/imports/ethereum/ethereum-services";
-import {Events, callContractMethod, listenToEvent} from "../../../../LuckyDAO/app/imports/ethereum/ethereum-contracts";
+import {getWeb3, add0x, isValidAddress, ether, ozcoin} from "../../imports/ethereum/ethereum-services";
+import {Events, callContractMethod, listenToEvent} from "../../imports/ethereum/ethereum-contracts";
 import {createRawTx} from "../api/ethereum";
 import {Profiles} from "../../imports/api/model/profiles";
 import {Globals} from "../../imports/api/model/globals";

@@ -1,5 +1,5 @@
 import Tx from "ethereumjs-tx";
-import {getWeb3, add0x} from "../../../LuckyDAO/app/imports/ethereum/ethereum-services";
+import {getWeb3, add0x} from "../imports/ethereum/ethereum-services";
 import {signing, keystore, txutils} from "eth-lightwallet";
 
 export const executeTx = (web3) => {

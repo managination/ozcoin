@@ -8,7 +8,7 @@ import * as LocalStorage from "meteor/simply:reactive-local-storage";
 import Wait from "../imports/components/wait";
 import DelayNotification from "../imports/components/delayNotification";
 import GetPassword from "../imports/components/forms/confirm-transaction";
-import {initializeKeystore} from "../../../LuckyDAO/app/imports/ethereum/ethereum-services";
+import {initializeKeystore} from "../imports/ethereum/ethereum-services";
 import {Globals} from "../imports/api/model/globals";
 import {currentProfile} from "../imports/api/model/profiles";
 

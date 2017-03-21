@@ -1,5 +1,5 @@
 import {chai} from "meteor/practicalmeteor:chai";
-import {callContractMethod} from "../../../../../LuckyDAO/app/imports/ethereum/ethereum-contracts";
+import {callContractMethod} from "../../../imports/ethereum/ethereum-contracts";
 
 describe('execute web3js calls', function () {
     it('gets details of registered users', function () {

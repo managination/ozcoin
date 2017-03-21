@@ -8,7 +8,7 @@ import ListItem from "react-md/lib/Lists/ListItem";
 import Avatar from "react-md/lib/Avatars";
 import FontIcon from "react-md/lib/FontIcons";
 import Subheader from "react-md/lib/Subheaders";
-import {signAndSubmit} from "../../../../../LuckyDAO/app/imports/ethereum/ethereum-services";
+import {signAndSubmit} from "../../../imports/ethereum/ethereum-services";
 import GetPassword from "./confirm-transaction";
 import {Documents} from "../../api/model/documents";
 import {Roles, currentProfile} from "../../api/model/profiles";

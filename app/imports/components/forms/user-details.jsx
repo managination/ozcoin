@@ -2,7 +2,7 @@ import React, {PureComponent} from "react";
 import {EJSON} from "meteor/ejson";
 import {Promise} from "meteor/promise";
 import {Roles, Profiles, currentProfile} from "../../api/model/profiles";
-import {signAndSubmit} from "../../../../../LuckyDAO/app/imports/ethereum/ethereum-services";
+import {signAndSubmit} from "../../../imports/ethereum/ethereum-services";
 import FocusContainer from "react-md/lib/Helpers/FocusContainer";
 import SelectField from "react-md/lib/SelectFields";
 import Button from "react-md/lib/Buttons";

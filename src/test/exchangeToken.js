@@ -2,7 +2,6 @@ var TokenData = artifacts.require("./TokenData.sol");
 var StandardToken = artifacts.require("./StandardToken.sol");
 var ExchangeToken = artifacts.require("./ExchangeToken.sol");
 var User = artifacts.require("./User.sol");
-var NameRegistry = artifacts.require("./NameRegistry.sol");
 
 
 contract('ExchangeToken', function(accounts) {

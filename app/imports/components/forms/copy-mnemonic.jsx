@@ -1,6 +1,6 @@
 import CryptoJS from "crypto-js";
 import * as LocalStorage from "meteor/simply:reactive-local-storage";
-import React, {PureComponent, PropTypes} from "react";
+import React, {PropTypes, PureComponent} from "react";
 import {createContainer} from "meteor/react-meteor-data";
 import Dialog from "react-md/lib/Dialogs";
 import Toolbar from "react-md/lib/Toolbars";
@@ -39,6 +39,7 @@ export default class CopyMnemonicOverlay extends PureComponent {
 
     _hideOverlay() {
         Session.set("showCopyMnemonic", false);
+        this.setState({ksPassword: "", mnemonic: ""});
         this._showToast("mnemonic copied");
     }
 

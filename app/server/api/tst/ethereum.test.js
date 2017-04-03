@@ -1,5 +1,5 @@
 import {chai} from "meteor/practicalmeteor:chai";
-import {callContractMethod} from "../../../imports/ethereum/ethereum-contracts";
+import {callContractMethod} from "../../../imports/api/contracts/ethereum-contracts";
 
 describe('execute web3js calls', function () {
     it('gets details of registered users', function () {

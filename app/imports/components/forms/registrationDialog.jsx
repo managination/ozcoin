@@ -4,12 +4,13 @@ import TrackerReact from "meteor/ultimatejs:tracker-react";
 import React, {PureComponent} from "react";
 import Dialog from "react-md/lib/Dialogs";
 import Button from "react-md/lib/Buttons/Button";
+import Switch from "react-md/lib/SelectionControls/Switch";
 import TextField from "react-md/lib/TextFields";
 import Toolbar from "react-md/lib/Toolbars";
 import Paper from "react-md/lib/Papers";
 import {browserHistory} from "react-router";
 import {createKeystore} from "../../../imports/ethereum/ethereum-services";
-import {Profiles, Roles, currentProfile} from "../../api/model/profiles";
+import {currentProfile, Profiles, Roles} from "../../api/model/profiles";
 import {Globals} from "../../api/model/globals";
 
 export default class RegistrationDialog extends TrackerReact(PureComponent) {
@@ -17,6 +18,7 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
         super(props);
 
         this.state = {visible: true, noAffiliate: true, affiliate: ''};
+        this._toggleMnemonic = this._toggleMnemonic.bind(this);
         this._openDialog = this._openDialog.bind(this);
         this._closeDialog = this._closeDialog.bind(this);
         this._createKeystore = this._createKeystore.bind(this);
@@ -51,6 +53,10 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
         }
 
         this.setState({visible: true, pageX, pageY});
+    }
+
+    _toggleMnemonic() {
+        this.setState({restoreMnemonic: !this.state.restoreMnemonic});
     }
 
     _closeDialog() {
@@ -177,27 +183,32 @@ export default class RegistrationDialog extends TrackerReact(PureComponent) {
                     className="md-cell md-cell--12"
                     required
                 />
+                <Button primary raised label="Create keystore" onClick={this._createKeystore}/>
                 <Paper
                     key={1}
                     zDepth={1}
                     raiseOnHover={true}
                     className="md-cell md-cell--12"
                 >
-                    <TextField
-                        autoComplete="off"
-                        id="mnemonic"
-                        ref="mnemonic"
-                        label="mnemonic"
-                        placeholder="if you know your mnemonic paste it here"
-                        customSize="title"
-                        className="md-cell md-cell--12"
-                        helpText="if you do not provide a mnemonic a random one will be created for you"
-                    />
-                    <h1 style={{"textAlign": "center"}}>
-                        If you have lost your password or cannot access your wallet, re-enter your existing information
-                        in the relevant fields and enter your existing wallet's mnemonic here to regenerate your
-                        original OzGLD wallet.
-                    </h1>
+                    <Switch id="switch3" name="controlledSwitch" label="Restore Wallet"
+                            checked={this.state.restoreMnemonic} onChange={this._toggleMnemonic}/>
+                    <div className={this.state.restoreMnemonic ? "" : "hidden"}>
+                        <TextField
+                            autoComplete="off"
+                            id="mnemonic"
+                            ref="mnemonic"
+                            label="mnemonic"
+                            placeholder="paste your saved mnemonic here"
+                            customSize="title"
+                            className="md-cell md-cell--12"
+                        />
+                        <h1 style={{"textAlign": "center"}}>
+                            If you have lost your password or cannot access your wallet, re-enter your existing
+                            information
+                            in the relevant fields and enter your existing wallet's mnemonic here to regenerate your
+                            original OzGLD wallet.
+                        </h1>
+                    </div>
                 </Paper>
             </form>
 

@@ -1,7 +1,7 @@
 import React, {PureComponent} from "react";
 import {EJSON} from "meteor/ejson";
 import {Promise} from "meteor/promise";
-import {Roles, Profiles, currentProfile} from "../../api/model/profiles";
+import {currentProfile, Profiles, Roles} from "../../api/model/profiles";
 import {signAndSubmit} from "../../../imports/ethereum/ethereum-services";
 import FocusContainer from "react-md/lib/Helpers/FocusContainer";
 import SelectField from "react-md/lib/SelectFields";
@@ -27,6 +27,13 @@ export default class UserDetails extends PureComponent {
             zip: '',
             state: '',
             country: '',
+            bank: '',
+            accountType: '',
+            bsb: '',
+            accountNumber: '',
+            accountTitle: '',
+            swift: '',
+            paypal: '',
         };
         this.user = {};
         this.userDetailsForms = [
@@ -80,6 +87,7 @@ export default class UserDetails extends PureComponent {
 
     _handleRoleChange = (value, index, event) => {
         this.roleChanged = true;
+        this.becameAffiliateCompany = this.user.role != Roles.affiliatecompany && value == Roles.affiliatecompany;
         this.user.role = value;
         this.setState({role: value});
     };
@@ -162,6 +170,14 @@ export default class UserDetails extends PureComponent {
                 throw new Meteor.Error("nothing to do");
             })
             .then((result) => signAndSubmit(password, result.rawTx, true))
+            .then(() => {
+                /**if the user just became an affiliate company, then tell the contract*/
+                if (self.becameAffiliateCompany) {
+                    return Meteor.callPromise('make-affiliate-company', self.user);
+                }
+                throw new Meteor.Error("nothing to do");
+            })
+            .then((result) => signAndSubmit(password, result.rawTx, true))
             .then(() => Session.set("showWait", false))
             .catch(() => Session.set("showWait", false));
     };
@@ -174,6 +190,7 @@ export default class UserDetails extends PureComponent {
     render() {
         const profile = currentProfile();
 
+        let bankDetails = [];
         return (
             <div>
                 <GetPassword visible={this.state.getPasswordVisible}
@@ -314,6 +331,64 @@ export default class UserDetails extends PureComponent {
                             className="md-cell md-cell--4"
                             disabled={!this.state._id}
                             value={this.state.country}
+                            onChange={this._handleChange}
+                        />
+                    </form>
+                    <form id="user-details" className="md-grid" onSubmit={(e) => e.preventDefault()}>
+                        <TextField
+                            id="bank"
+                            key="bank"
+                            label="Bank"
+                            value={this.state.bank}
+                            className="md-cell md-cell--4"
+                            onChange={this._handleChange}
+                        />
+                        <TextField
+                            id="accountType"
+                            key="accountType"
+                            label="Account Type"
+                            value={this.state.accountType}
+                            className="md-cell md-cell--4"
+                            onChange={this._handleChange}
+                        />
+                        <TextField
+                            id="bsb"
+                            key="bsb"
+                            label="BSB"
+                            value={this.state.bsb}
+                            className="md-cell md-cell--4"
+                            onChange={this._handleChange}
+                        />
+                        <TextField
+                            id="accountNumber"
+                            key="accountNumber"
+                            label="Account Number"
+                            value={this.state.accountNumber}
+                            className="md-cell md-cell--4"
+                            onChange={this._handleChange}
+                        />
+                        <TextField
+                            id="accountTitle"
+                            key="accountTitle"
+                            label="Account Title"
+                            value={this.state.accountTitle}
+                            className="md-cell md-cell--4"
+                            onChange={this._handleChange}
+                        />
+                        <TextField
+                            id="swift"
+                            key="swift"
+                            label="SWIFT / BIC"
+                            value={this.state.swift}
+                            className="md-cell md-cell--4"
+                            onChange={this._handleChange}
+                        />
+                        <TextField
+                            id="paypal"
+                            key="paypal"
+                            label="PayPal Emai"
+                            value={this.state.paypal}
+                            className="md-cell md-cell--4"
                             onChange={this._handleChange}
                         />
                     </form>

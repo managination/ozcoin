@@ -1,7 +1,7 @@
 import ipfsAPI from "ipfs-api";
 import {EJSON} from "meteor/ejson";
 import {Documents} from "../../imports/api/model/documents";
-import {ozcoin, ether, createRawTx} from "./ethereum";
+import {createRawTx, ether, ozcoin} from "./ethereum";
 import {Profiles} from "../../imports/api/model/profiles";
 
 const fs = require('fs');
@@ -39,6 +39,17 @@ Meteor.methods({
         } else {
             return {zeroBalance: true};
         }
+    },
+
+    'make-affiliate-company': function (userDetails) {
+        let account = userDetails.address;
+        let name = userDetails.alias;
+        let details = EJSON.stringify({email: userDetails.email, alias: userDetails.alias});
+        let affiliateAccount = userDetails.address;
+        let affiliateCompany = userDetails.address;
+
+        return createRawTx(this.userId, "User", "updateUserDetails", 0,
+            account, name, details, affiliateAccount, affiliateCompany);
     },
 
     'register-user': function () {

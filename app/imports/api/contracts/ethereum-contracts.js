@@ -1,18 +1,24 @@
 import {Meteor} from "meteor/meteor";
 import {Promise} from "meteor/promise";
-import {getWeb3} from "./ethereum-services";
+import {getWeb3} from "../../ethereum/ethereum-services";
 import {Mongo} from "meteor/mongo";
-import {Globals} from "../model/globals";
-
+import {EJSON} from "meteor/ejson";
 /**
  * get the contract interface JSON from the project Assets (the private folder)
  * the JSON is pushed to the Globals collection to make it accessible by the client
  *
  * @returns {Promise that resolves with a JSON}
  */
-export const contractDefs = function () {
-    let contractDefs = Globals.findOne({name: "contractInterfaces"});
-    return contractDefs ? contractDefs.contracts : {};
+export const getContractDefs = function () {
+    return new Promise(function (resolve, reject) {
+        Assets.getText(Meteor.settings.public.chain + ".json", function (err, json) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(EJSON.parse(json));
+            }
+        });
+    })
 };
 
 /**the events are used to record all the contract events that happen.
@@ -27,16 +33,15 @@ if (Meteor.isServer) {
 }
 
 let contracts = {};
-export const getContract = (name) => {
-    return new Promise((resolve, reject) => {
+export const getContract = (name, event) => {
+    return getContractDefs().then(function (contractDefs) {
         if (!contracts[name]) try {
             contracts[name] = getWeb3(event).eth.contract(contractDefs[name].abi).at(contractDefs[name].address);
         } catch (err) {
-            reject(err);
-            return;
+            throw err;
         }
-        resolve(contracts[name]);
-    });
+        return contracts[name];
+    })
 };
 
 export const callContractMethod = function (contract, funcName) {

@@ -12,7 +12,7 @@ Meteor.publish("current-profile", function () {
 
 Meteor.publish("user-profile", function (address) {
     let profile = Profiles.findOne({owner: this.userId});
-    if (profile.role == Roles.administrator)
+    if (profile && profile.role == Roles.administrator)
         return Profiles.find({address: add0x(address)});
     return Profiles.find({address: "unauthorized"});
 });

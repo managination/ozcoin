@@ -21,6 +21,7 @@ if (!window.console) {
 }
 
 Meteor.startup(() => {
+    localStorage.removeItem("pk"); //was introduced for testing but must not be present
     let mnemonic = LocalStorage.getItem('encrypted-mnemonic');
     BigNumber.config({ERRORS: false});
     const waitMessage = function () {

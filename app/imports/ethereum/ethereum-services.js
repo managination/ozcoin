@@ -120,7 +120,6 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
             LocalStorage.setItem('salt', ks.salt);
             LocalStorage.setItem('alias', alias);
             LocalStorage.setItem('email', email);
-            LocalStorage.setItem('pk', ks.exportPrivateKey(ks.getAddresses()[0], pwDerivedKey));
 
             LocalStorage.setItem('username', ks.getAddresses()[0]);
 

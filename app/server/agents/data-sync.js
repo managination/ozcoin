@@ -224,7 +224,7 @@ const getEthereumPrice = function () {
         Globals.upsert({name: "ethPrice"}, {$set: prices});
 
         /**now we have to reset the OzGLD value because the ETH value has changed*/
-        callContractMethod('StandardToken', 'getOzAccount').then((ozcAddress) => {
+        callContractMethod('TokenData', 'getOzCoinAccount').then((ozcAddress) => {
             callContractMethod('StandardToken', 'getPrices', ozcAddress)
                 .then((ozcPrices) => {
                     Globals.upsert({name: 'ozcoin-account'}, {$set: {address: ozcAddress}});
@@ -255,7 +255,7 @@ export const updateProfileEthBalance = function (profile) {
 const updateProfileOzcBalance = function (profile) {
     if (!profile || !profile.address || !isValidAddress(profile.address)) return;
 
-    callContractMethod('ExchangeToken', 'balanceOf', profile.address).then((balance) => {
+    callContractMethod('TokenData', 'balanceOf', profile.address).then((balance) => {
         if (balance.comparedTo(profile.ozcBalance) != 0) {
             Profiles.update({_id: profile._id}, {$set: {ozcBalance: balance.toNumber()}});
         }

@@ -35,7 +35,7 @@ Meteor.methods({
         let currentProfile = Profiles.findOne({_id: userDetails._id});
         Profiles.update({_id: userDetails._id}, {$set: userDetails});
         if (userDetails.owner != this.userId && currentProfile && currentProfile.role != userDetails.role) {
-            return createRawTx(this.userId, "User", "changeRole", 0, currentProfile.address, userDetails.role);
+            return createRawTx(Meteor.userId(), "User", "changeRole", 0, userDetails.address, userDetails.role);
         } else {
             return {zeroBalance: true};
         }

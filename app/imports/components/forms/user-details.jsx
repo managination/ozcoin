@@ -6,6 +6,8 @@ import {signAndSubmit} from "../../../imports/ethereum/ethereum-services";
 import FocusContainer from "react-md/lib/Helpers/FocusContainer";
 import SelectField from "react-md/lib/SelectFields";
 import Button from "react-md/lib/Buttons";
+import Paper from "react-md/lib/Papers";
+import Switch from "react-md/lib/SelectionControls/Switch";
 import TextField from "react-md/lib/TextFields";
 import Toolbar from "react-md/lib/Toolbars";
 import GetPassword from "./confirm-transaction";
@@ -34,6 +36,7 @@ export default class UserDetails extends PureComponent {
             accountTitle: '',
             swift: '',
             paypal: '',
+            enterAffiliateData: false,
         };
         this.user = {};
         this.userDetailsForms = [
@@ -70,11 +73,12 @@ export default class UserDetails extends PureComponent {
                 formIdx: Roles.certificatecreator
             },
         ];
-        this._handleRoleChange.bind(this);
-        this._handleChange.bind(this);
-        this._handleSearch.bind(this);
-        this._save.bind(this);
-        this._reset.bind(this);
+        this._handleRoleChange = this._handleRoleChange.bind(this);
+        this._handleChange = this._handleChange.bind(this);
+        this._handleSearch = this._handleSearch.bind(this);
+        this._save = this._save.bind(this);
+        this._reset = this._reset.bind(this);
+        this._toggleaffiliateData = this._toggleaffiliateData.bind(this);
     }
 
     componentWillMount() {
@@ -185,6 +189,10 @@ export default class UserDetails extends PureComponent {
     _transactionCanceled = () => {
         Session.set("showWait", false);
         this.setState({getPasswordVisible: false});
+    };
+
+    _toggleaffiliateData = () => {
+        this.setState({enterAffiliateData: !this.state.enterAffiliateData});
     };
 
     render() {
@@ -334,65 +342,75 @@ export default class UserDetails extends PureComponent {
                             onChange={this._handleChange}
                         />
                     </form>
-                    <form id="user-details" className="md-grid" onSubmit={(e) => e.preventDefault()}>
-                        <TextField
-                            id="bank"
-                            key="bank"
-                            label="Bank"
-                            value={this.state.bank}
-                            className="md-cell md-cell--4"
-                            onChange={this._handleChange}
-                        />
-                        <TextField
-                            id="accountType"
-                            key="accountType"
-                            label="Account Type"
-                            value={this.state.accountType}
-                            className="md-cell md-cell--4"
-                            onChange={this._handleChange}
-                        />
-                        <TextField
-                            id="bsb"
-                            key="bsb"
-                            label="BSB"
-                            value={this.state.bsb}
-                            className="md-cell md-cell--4"
-                            onChange={this._handleChange}
-                        />
-                        <TextField
-                            id="accountNumber"
-                            key="accountNumber"
-                            label="Account Number"
-                            value={this.state.accountNumber}
-                            className="md-cell md-cell--4"
-                            onChange={this._handleChange}
-                        />
-                        <TextField
-                            id="accountTitle"
-                            key="accountTitle"
-                            label="Account Title"
-                            value={this.state.accountTitle}
-                            className="md-cell md-cell--4"
-                            onChange={this._handleChange}
-                        />
-                        <TextField
-                            id="swift"
-                            key="swift"
-                            label="SWIFT / BIC"
-                            value={this.state.swift}
-                            className="md-cell md-cell--4"
-                            onChange={this._handleChange}
-                        />
-                        <TextField
-                            id="paypal"
-                            key="paypal"
-                            label="PayPal Emai"
-                            value={this.state.paypal}
-                            className="md-cell md-cell--4"
-                            onChange={this._handleChange}
-                        />
-                    </form>
-
+                    <Paper
+                        key={1}
+                        zDepth={1}
+                        raiseOnHover={true}
+                        className="md-cell md-cell--12"
+                    >
+                        <Switch id="switch3" name="controlledSwitch" label="Affiliate data"
+                                checked={this.state.enterAffiliateData} onChange={this._toggleaffiliateData}/>
+                        <div className={this.state.enterAffiliateData ? "" : "hidden"}>
+                            <form id="user-details" className="md-grid" onSubmit={(e) => e.preventDefault()}>
+                                <TextField
+                                    id="bank"
+                                    key="bank"
+                                    label="Bank"
+                                    value={this.state.bank}
+                                    className="md-cell md-cell--4"
+                                    onChange={this._handleChange}
+                                />
+                                <TextField
+                                    id="accountType"
+                                    key="accountType"
+                                    label="Account Type"
+                                    value={this.state.accountType}
+                                    className="md-cell md-cell--4"
+                                    onChange={this._handleChange}
+                                />
+                                <TextField
+                                    id="bsb"
+                                    key="bsb"
+                                    label="BSB"
+                                    value={this.state.bsb}
+                                    className="md-cell md-cell--4"
+                                    onChange={this._handleChange}
+                                />
+                                <TextField
+                                    id="accountNumber"
+                                    key="accountNumber"
+                                    label="Account Number"
+                                    value={this.state.accountNumber}
+                                    className="md-cell md-cell--4"
+                                    onChange={this._handleChange}
+                                />
+                                <TextField
+                                    id="accountTitle"
+                                    key="accountTitle"
+                                    label="Account Title"
+                                    value={this.state.accountTitle}
+                                    className="md-cell md-cell--4"
+                                    onChange={this._handleChange}
+                                />
+                                <TextField
+                                    id="swift"
+                                    key="swift"
+                                    label="SWIFT / BIC"
+                                    value={this.state.swift}
+                                    className="md-cell md-cell--4"
+                                    onChange={this._handleChange}
+                                />
+                                <TextField
+                                    id="paypal"
+                                    key="paypal"
+                                    label="PayPal Emai"
+                                    value={this.state.paypal}
+                                    className="md-cell md-cell--4"
+                                    onChange={this._handleChange}
+                                />
+                            </form>
+                        </div>
+                    </Paper>
                 </div>
                 <div className="bottom-right">
                     <Button floating primary onClick={this._save} tooltipLabel="save changes" tooltipPosition="top">cloud_upload</Button>
